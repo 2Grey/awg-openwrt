@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "architecture": "riscv64_generic",
+  "packages": {
+    "amneziawg-tools": "3.0.20260805-r1",
+    "kmod-amneziawg": "6.12.94.3.0.20260731-r1",
+    "luci-i18n-amneziawg-ru": "0.260807.69963",
+    "luci-proto-amneziawg": "3.0.0-r1"
+  }
+}
