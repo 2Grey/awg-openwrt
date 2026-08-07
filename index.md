@@ -1,0 +1,13 @@
+---
+layout: default
+title: AmneziaWG OpenWrt Feed
+---
+
+# AmneziaWG OpenWrt Feed
+This GitHub Pages site publishes an APK package feed for OpenWrt 25.12.x and newer.
+
+OpenWrt 24.10.x and older are not supported by this feed. Use GitHub Releases artifacts for legacy `.ipk` packages.
+
+## Available OpenWrt versions
+
+- [25.12.4](https://2grey.github.io/awg-openwrt/25.12.4/)
