@@ -11,4 +11,5 @@ Choose a subtarget.
 
 ## Subtargets
 
+- [nand](https://2grey.github.io/awg-openwrt/25.12.1/apm821xx/nand/)
 - [sata](https://2grey.github.io/awg-openwrt/25.12.1/apm821xx/sata/)

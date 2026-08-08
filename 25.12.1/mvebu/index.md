@@ -11,5 +11,6 @@ Choose a subtarget.
 
 ## Subtargets
 
+- [cortexa53](https://2grey.github.io/awg-openwrt/25.12.1/mvebu/cortexa53/)
 - [cortexa72](https://2grey.github.io/awg-openwrt/25.12.1/mvebu/cortexa72/)
 - [cortexa9](https://2grey.github.io/awg-openwrt/25.12.1/mvebu/cortexa9/)
