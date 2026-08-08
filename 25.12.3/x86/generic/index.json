@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "architecture": "i386_pentium4",
+  "packages": {
+    "amneziawg-tools": "3.0.20260805-r1",
+    "kmod-amneziawg": "6.12.85.3.0.20260731-r1",
+    "luci-i18n-amneziawg-ru": "0.260808.24007",
+    "luci-proto-amneziawg": "3.0.0-r1"
+  }
+}
