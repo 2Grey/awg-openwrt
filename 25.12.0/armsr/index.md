@@ -12,3 +12,4 @@ Choose a subtarget.
 ## Subtargets
 
 - [armv7](https://2grey.github.io/awg-openwrt/25.12.0/armsr/armv7/)
+- [armv8](https://2grey.github.io/awg-openwrt/25.12.0/armsr/armv8/)

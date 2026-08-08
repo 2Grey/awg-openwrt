@@ -12,4 +12,5 @@ Choose a subtarget.
 ## Subtargets
 
 - [chromium](https://2grey.github.io/awg-openwrt/25.12.0/ipq40xx/chromium/)
+- [generic](https://2grey.github.io/awg-openwrt/25.12.0/ipq40xx/generic/)
 - [mikrotik](https://2grey.github.io/awg-openwrt/25.12.0/ipq40xx/mikrotik/)

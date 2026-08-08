@@ -13,4 +13,5 @@ Choose a subtarget.
 
 - [generic](https://2grey.github.io/awg-openwrt/25.12.0/ath79/generic/)
 - [mikrotik](https://2grey.github.io/awg-openwrt/25.12.0/ath79/mikrotik/)
+- [nand](https://2grey.github.io/awg-openwrt/25.12.0/ath79/nand/)
 - [tiny](https://2grey.github.io/awg-openwrt/25.12.0/ath79/tiny/)

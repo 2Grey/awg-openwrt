@@ -15,4 +15,5 @@ Choose a subtarget.
 - [rtl839x](https://2grey.github.io/awg-openwrt/25.12.0/realtek/rtl839x/)
 - [rtl930x](https://2grey.github.io/awg-openwrt/25.12.0/realtek/rtl930x/)
 - [rtl930x_nand](https://2grey.github.io/awg-openwrt/25.12.0/realtek/rtl930x_nand/)
+- [rtl931x](https://2grey.github.io/awg-openwrt/25.12.0/realtek/rtl931x/)
 - [rtl931x_nand](https://2grey.github.io/awg-openwrt/25.12.0/realtek/rtl931x_nand/)
