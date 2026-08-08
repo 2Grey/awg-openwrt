@@ -1,0 +1,18 @@
+---
+layout: default
+title: "OpenWrt 25.12.0 realtek"
+---
+
+# OpenWrt 25.12.0 / realtek
+
+Index of [(root)](https://2grey.github.io/awg-openwrt/) / [25.12.0](https://2grey.github.io/awg-openwrt/25.12.0/)
+
+Choose a subtarget.
+
+## Subtargets
+
+- [rtl838x](https://2grey.github.io/awg-openwrt/25.12.0/realtek/rtl838x/)
+- [rtl839x](https://2grey.github.io/awg-openwrt/25.12.0/realtek/rtl839x/)
+- [rtl930x](https://2grey.github.io/awg-openwrt/25.12.0/realtek/rtl930x/)
+- [rtl930x_nand](https://2grey.github.io/awg-openwrt/25.12.0/realtek/rtl930x_nand/)
+- [rtl931x_nand](https://2grey.github.io/awg-openwrt/25.12.0/realtek/rtl931x_nand/)
