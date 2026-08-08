@@ -16,3 +16,4 @@ Choose a subtarget.
 - [bcm6328](https://2grey.github.io/awg-openwrt/25.12.2/bmips/bcm6328/)
 - [bcm6358](https://2grey.github.io/awg-openwrt/25.12.2/bmips/bcm6358/)
 - [bcm6362](https://2grey.github.io/awg-openwrt/25.12.2/bmips/bcm6362/)
+- [bcm6368](https://2grey.github.io/awg-openwrt/25.12.2/bmips/bcm6368/)

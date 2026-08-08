@@ -37,6 +37,7 @@ Choose a target.
 - [mxs](https://2grey.github.io/awg-openwrt/25.12.2/mxs/)
 - [octeon](https://2grey.github.io/awg-openwrt/25.12.2/octeon/)
 - [omap](https://2grey.github.io/awg-openwrt/25.12.2/omap/)
+- [pistachio](https://2grey.github.io/awg-openwrt/25.12.2/pistachio/)
 - [qoriq](https://2grey.github.io/awg-openwrt/25.12.2/qoriq/)
 - [qualcommax](https://2grey.github.io/awg-openwrt/25.12.2/qualcommax/)
 - [ramips](https://2grey.github.io/awg-openwrt/25.12.2/ramips/)
