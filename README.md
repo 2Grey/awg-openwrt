@@ -22,7 +22,7 @@ The netifd and LuCI support `HeaderProtectionKey`, `ContentPaddingAddition`,
 Ranges are specified as `lower-upper` (for example, `20-30`) or as a single number.  
 When using `HeaderProtectionKey`, the `S1-S4` parameters must be at least 12.
 
-## Automatic configuration of AmneziaWG for OpenWRT version 23.05.0 and newer
+## Automatic configuration of AmneziaWG for OpenWRT version 24.10.4 ~ 25.12.5
 
 The `master` branch builds an aligned AWG 3.0 stack: `kmod-amneziawg`
 `v3.0.20260731`, `amneziawg-tools` `v3.0.20260805`, and an AWG 3.0-aware
