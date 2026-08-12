@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Slava-Shchipunov/awg-openwrt.git"
+    "url": "git+https://github.com/2Grey/awg-openwrt.git"
   },
   "author": "Slava Shchipunov",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Slava-Shchipunov/awg-openwrt/issues"
+    "url": "https://github.com/2Grey/awg-openwrt/issues"
   },
-  "homepage": "https://github.com/Slava-Shchipunov/awg-openwrt#readme",
+  "homepage": "https://github.com/2Grey/awg-openwrt#readme",
   "dependencies": {
     "@actions/core": "^1.10.1",
     "axios": "^1.3.1",
