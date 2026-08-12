@@ -274,6 +274,7 @@ install_awg_packages() {
     VERSION=$(ubus call system board | jsonfilter -e '@.release.version')
     [ -n "$TARGET" ] && [ -n "$SUBTARGET" ] && [ -n "$VERSION" ] ||
         die "Unable to detect OpenWrt release information."
+    print_info "Detected OpenWrt target: $TARGET, subtarget: $SUBTARGET"
 
     PKGPOSTFIX_BASE="_v${VERSION}_${PKGARCH}_${TARGET}_${SUBTARGET}"
     BASE_URL="https://github.com/2Grey/awg-openwrt/releases/download/"
@@ -300,7 +301,7 @@ install_awg_packages() {
 
     if [ "$AWG_VERSION" != "1.0" ] && [ "$ASK_FOR_TRANSLATION" -eq 1 ]; then
         if ask_yes_no \
-            "Устанавливаем пакет с русской локализацией? Install Russian language pack? (y/n) [n]:" \
+            "Устанавливаем пакет с русской локализацией? Install Russian language pack? (y/N):" \
             "n"; then
             install_translation_package
         else
@@ -531,7 +532,7 @@ main() {
         return
     fi
 
-    if ask_yes_no "Do you want to configure the amneziawg interface? (y/n):" "n"; then
+    if ask_yes_no "Do you want to configure the amneziawg interface? (y/N):" "n"; then
         configure_amneziawg_interface
     else
         print_info "Skipping amneziawg interface configuration."
