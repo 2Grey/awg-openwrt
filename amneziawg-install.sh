@@ -276,7 +276,7 @@ install_awg_packages() {
         die "Unable to detect OpenWrt release information."
 
     PKGPOSTFIX_BASE="_v${VERSION}_${PKGARCH}_${TARGET}_${SUBTARGET}"
-    BASE_URL="https://github.com/Slava-Shchipunov/awg-openwrt/releases/download/"
+    BASE_URL="https://github.com/2Grey/awg-openwrt/releases/download/"
 
     detect_base_awg_version
 
