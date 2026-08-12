@@ -44,13 +44,13 @@ The script will create an interface, configure firewall rules for it, and also *
 To run the script, connect to the router via SSH, enter the command and follow the instructions on the screen:
 
 ```sh
-sh <(wget -O - https://raw.githubusercontent.com/Slava-Shchipunov/awg-openwrt/refs/heads/master/amneziawg-install.sh)
+sh <(wget -O - https://raw.githubusercontent.com/2Grey/awg-openwrt/refs/heads/master/amneziawg-install.sh)
 ```
 
 3. There is also a non-interactive mode for simple package installation (without questions about configuring an interface with the AmneziaWG protocol and installing the `luci-i18n-amneziawg-ru` package):
 
 ```sh
-sh <(wget -O - https://raw.githubusercontent.com/Slava-Shchipunov/awg-openwrt/refs/heads/master/amneziawg-install.sh) -en
+sh <(wget -O - https://raw.githubusercontent.com/2Grey/awg-openwrt/refs/heads/master/amneziawg-install.sh) -en
 ```
 
 4. In addition, for automatic configuration you can also use the [script](https://github.com/itdoginfo/domain-routing-openwrt) from user [@itdoginfo](https://github.com/itdoginfo).  
@@ -68,6 +68,11 @@ At the moment I have collected packages for all devices for OpenWRT versions:
 4. [25.12.2](https://github.com/2Grey/awg-openwrt/releases/tag/v25.12.2) – AWG-3.0
 5. [25.12.1](https://github.com/2Grey/awg-openwrt/releases/tag/v25.12.1) – AWG-3.0
 6. [25.12.0](https://github.com/2Grey/awg-openwrt/releases/tag/v25.12.0) – AWG-3.0
+7. [24.10.8](https://github.com/2Grey/awg-openwrt/releases/tag/v24.10.8) – AWG-3.0
+8. [24.10.7](https://github.com/2Grey/awg-openwrt/releases/tag/v24.10.7) – AWG-3.0
+9. [24.10.6](https://github.com/2Grey/awg-openwrt/releases/tag/v24.10.6) – AWG-3.0
+10. [24.10.5](https://github.com/2Grey/awg-openwrt/releases/tag/v24.10.5) – AWG-3.0
+11. [24.10.4](https://github.com/2Grey/awg-openwrt/releases/tag/v24.10.4) – AWG-3.0
 
 For builds for older versions of OpenWRT, see the [Slava-Shchipunov](https://github.com/Slava-Shchipunov/awg-openwrt) repository.
 
