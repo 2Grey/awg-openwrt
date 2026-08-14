@@ -1,3 +1,5 @@
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/2grey/awg-openwrt/total?style=for-the-badge)
+
 # AmneziAWG packages for routers running OpenWRT
 
 ## Custom package feed (GitHub Pages)
