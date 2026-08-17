@@ -36,7 +36,9 @@ function handleInterfaceDetails(iface) {
 			_('Name'), iface.name,
 			_('Public Key'), E('code', [ iface.public_key ]),
 			_('Listen Port'), iface.listen_port,
-			_('Firewall Mark'), iface.fwmark != 'off' ? iface.fwmark : E('em', _('none'))
+			_('Firewall Mark'), iface.fwmark != 'off' ? iface.fwmark : E('em', _('none')),
+			_('Random Trailers'), iface.random_trailers == 'on' ? _('enabled') : _('disabled'),
+			_('Cookie Replies'), iface.disable_cookies == 'on' ? _('disabled') : _('enabled')
 		]),
 		E('div', { 'class': 'right' }, [
 			E('button', {

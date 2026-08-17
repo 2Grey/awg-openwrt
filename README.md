@@ -7,30 +7,36 @@ for APKs on OpenWrt 25.x and later.
 
 [Detailed documentation](docs/custom-feed.md)
 
-## AWG 3.0 Support
+## AWG 3.1 Support
 
-The `master` branch contains the agreed-upon set of AWG 3.0 components:
+The `master` branch contains the agreed-upon set of AWG 3.1 components:
 
-- `kmod-amneziawg` — `v3.0.20260731`;
-- `amneziawg-tools` — `v3.0.20260805`;
-- `luci-proto-amneziawg` — Web interface and import/export of AWG 3.0 configurations.
+- `kmod-amneziawg` — `v3.1.20260812`;
+- `amneziawg-tools` — `v3.1.20260812`;
+- `luci-proto-amneziawg` — Web interface and import/export of AWG 3.1 configurations.
 
 The netifd and LuCI support `HeaderProtectionKey`, `ContentPaddingAddition`,
 `RekeyAfterTime`, `RekeyTimeout`, `RejectAfterTime`, `KeepaliveTimeout`,
-`MaxHandshakeAttempts`, the `H1-H4` ranges, and the `PersistentKeepalive` range.
+`MaxHandshakeAttempts`, `RandomTrailers`, `DisableCookies`, the `H1-H4`
+ranges, and the `PersistentKeepalive` range.
+
+`RandomTrailers` and `DisableCookies` accept `on` or `off`. `RandomTrailers`
+must have the same value on both sides. A 3.1 implementation remains compatible
+with existing AWG 3.0 configurations when both new settings are absent or off.
 
 Ranges are specified as `lower-upper` (for example, `20-30`) or as a single number.  
 When using `HeaderProtectionKey`, the `S1-S4` parameters must be at least 12.
 
 ## Automatic configuration of AmneziaWG for OpenWRT version 24.10.4 ~ 25.12.5
 
-The `master` branch builds an aligned AWG 3.0 stack: `kmod-amneziawg`
-`v3.0.20260731`, `amneziawg-tools` `v3.0.20260805`, and an AWG 3.0-aware
+The `master` branch builds an aligned AWG 3.1 stack: `kmod-amneziawg`
+`v3.1.20260812`, `amneziawg-tools` `v3.1.20260812`, and an AWG 3.1-aware
 LuCI/netifd integration.
 
 The UI and configuration import/export support
 `HeaderProtectionKey`, `ContentPaddingAddition`, customizable timing ranges,
-`H1-H4` ranges, and `PersistentKeepalive` ranges.
+`RandomTrailers`, `DisableCookies`, `H1-H4` ranges, and
+`PersistentKeepalive` ranges.
 
 A range is written as
 `lower-upper` (for example, `20-30`). When header protection is enabled, each
@@ -80,7 +86,7 @@ For builds for older versions of OpenWRT, see the [Slava-Shchipunov](https://git
 
 In accordance with the paragraph [Specify variables for builds](https://github.com/itdoginfo/domain-routing-openwrt/wiki/Amnezia-WG-Build#%D1%83%D0%BA%D0%B0%D0%B7%D1%8B%D0%B2%D0%B0%D0%B5%D0%BC%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5-%D0%B4%D0%BB%D1%8F-%D1%81%D0%B1%D0%BE%D1%80%D0%BA%D0%B8) (instructions in Russian) determine `target` and `subtarget` of your device.  
 Then go to the release page corresponding to your OpenWRT version, then search the page (Ctrl+F) to find 3 packages whose names end in `target_subtarget.ipk` corresponding to your device.  
-For AWG 2.0 and 3.0, the Russian localization package luci-i18n-amneziawg-ru is also available
+For AWG 2.0, 3.0, and 3.1, the Russian localization package luci-i18n-amneziawg-ru is also available
 
 ## How to run a build for all supported devices
 
@@ -98,7 +104,7 @@ For public repositories, Github provides unlimited use of runners, I had up to 2
 
 You can see how to start building AWG 1.0 packages for a specific platform in the [wiki instructions](https://github.com/itdoginfo/domain-routing-openwrt/wiki/Amnezia-WG-Build) (instructions in Russian). Building for one device will take about 2 hours.
 
-AWG 2.0 and 3.0 can be built for a specific platform as follows:
+AWG 2.0, 3.0, and 3.1 can be built for a specific platform as follows:
 
 1. Create a fork of this repository
 2. Switch to the Actions tab and enable Github actions (they are disabled for forks by default)

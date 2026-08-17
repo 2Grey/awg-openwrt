@@ -74,11 +74,14 @@ const methods = {
 
 					if (last_device != record[0]) {
 						last_device = record[0];
+						const has_awg31_fields = length(record) >= 30;
 						data[last_device] = {
 							name: last_device,
 							public_key: record[2],
 							listen_port: record[3],
-							fwmark: record[4],
+							fwmark: record[length(record) - 1],
+							random_trailers: has_awg31_fields ? record[27] : 'off',
+							disable_cookies: has_awg31_fields ? record[28] : 'off',
 							peers: []
 						};
 

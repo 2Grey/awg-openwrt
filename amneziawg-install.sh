@@ -200,8 +200,7 @@ install_release_package() {
     INSTALL_PACKAGE_NAME=$1
 
     if is_pkg_installed "$INSTALL_PACKAGE_NAME"; then
-        printf '%s already installed\n' "$INSTALL_PACKAGE_NAME"
-        return
+        printf '%s already installed; updating from the selected release\n' "$INSTALL_PACKAGE_NAME"
     fi
 
     if ! INSTALL_PACKAGE_FILE=$(
@@ -264,6 +263,13 @@ ask_yes_no() {
     esac
 }
 
+is_awg3() {
+    case "$AWG_VERSION" in
+        3.*) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
 install_awg_packages() {
     PKGARCH=$(get_pkgarch)
     [ -n "$PKGARCH" ] || die "Unable to detect the package architecture."
@@ -287,14 +293,19 @@ install_awg_packages() {
     install_release_package "kmod-amneziawg"
     install_release_package "amneziawg-tools"
 
-    if awg --version 2>/dev/null | grep -q 'amneziawg-tools v3\.'; then
-        AWG_VERSION="3.0"
-    fi
+    AWG_TOOLS_VERSION=$(awg --version 2>/dev/null || true)
+    case "$AWG_TOOLS_VERSION" in
+        *'amneziawg-tools v3.1.'*) AWG_VERSION="3.1" ;;
+        *'amneziawg-tools v3.0.'*) AWG_VERSION="3.0" ;;
+    esac
     print_info "Detected AWG version: $AWG_VERSION"
 
-    # Either LuCI package provides the interface; do not install both variants.
-    if is_pkg_installed "luci-proto-amneziawg" || is_pkg_installed "luci-app-amneziawg"; then
-        printf '%s already installed\n' "$LUCI_PACKAGE_NAME"
+    # Either LuCI package provides the interface; update the selected variant,
+    # but do not install it alongside the legacy alternative.
+    if is_pkg_installed "$LUCI_PACKAGE_NAME"; then
+        install_release_package "$LUCI_PACKAGE_NAME"
+    elif is_pkg_installed "luci-proto-amneziawg" || is_pkg_installed "luci-app-amneziawg"; then
+        printf 'A different AmneziaWG LuCI package is already installed; leaving it unchanged\n'
     else
         install_release_package "$LUCI_PACKAGE_NAME"
     fi
@@ -321,6 +332,19 @@ read_prompt() {
         die "Input aborted."
     fi
     [ -n "$READ_VALUE" ] || READ_VALUE=$PROMPT_DEFAULT
+}
+
+read_on_off_prompt() {
+    ON_OFF_PROMPT=$1
+    ON_OFF_DEFAULT=$2
+
+    while :; do
+        read_prompt "$ON_OFF_PROMPT" "$ON_OFF_DEFAULT"
+        case "$READ_VALUE" in
+            on | off) return ;;
+            *) printf 'Expected "on" or "off". Please repeat\n' ;;
+        esac
+    done
 }
 
 collect_interface_settings() {
@@ -382,7 +406,7 @@ collect_interface_settings() {
     fi
 
     AWG_PERSISTENT_KEEPALIVE="25"
-    if [ "$AWG_VERSION" = "3.0" ]; then
+    if is_awg3; then
         read_prompt "Enter HeaderProtectionKey (from [Interface]) [optional, leave blank to skip]:"
         AWG_HEADER_PROTECTION_KEY=$READ_VALUE
         read_prompt "Enter ContentPaddingAddition (number or range) [optional, leave blank to skip]:"
@@ -399,6 +423,13 @@ collect_interface_settings() {
         AWG_MAX_HANDSHAKE_ATTEMPTS=$READ_VALUE
         read_prompt "Enter PersistentKeepalive (number or range) [25]:" "25"
         AWG_PERSISTENT_KEEPALIVE=$READ_VALUE
+    fi
+
+    if [ "$AWG_VERSION" = "3.1" ]; then
+        read_on_off_prompt "Enter RandomTrailers (on/off) [on]:" "on"
+        AWG_RANDOM_TRAILERS=$READ_VALUE
+        read_on_off_prompt "Enter DisableCookies (on/off) [on]:" "on"
+        AWG_DISABLE_COOKIES=$READ_VALUE
     fi
 }
 
@@ -439,7 +470,7 @@ write_network_config() {
         uci_set_if_present "network.${INTERFACE_NAME}.awg_i5" "$AWG_I5"
     fi
 
-    if [ "$AWG_VERSION" = "3.0" ]; then
+    if is_awg3; then
         uci_set_if_present "network.${INTERFACE_NAME}.awg_header_protection_key" "$AWG_HEADER_PROTECTION_KEY"
         uci_set_if_present "network.${INTERFACE_NAME}.awg_content_padding_addition" "$AWG_CONTENT_PADDING_ADDITION"
         uci_set_if_present "network.${INTERFACE_NAME}.awg_rekey_after_time" "$AWG_REKEY_AFTER_TIME"
@@ -447,6 +478,11 @@ write_network_config() {
         uci_set_if_present "network.${INTERFACE_NAME}.awg_reject_after_time" "$AWG_REJECT_AFTER_TIME"
         uci_set_if_present "network.${INTERFACE_NAME}.awg_keepalive_timeout" "$AWG_KEEPALIVE_TIMEOUT"
         uci_set_if_present "network.${INTERFACE_NAME}.awg_max_handshake_attempts" "$AWG_MAX_HANDSHAKE_ATTEMPTS"
+    fi
+
+    if [ "$AWG_VERSION" = "3.1" ]; then
+        uci_set_if_present "network.${INTERFACE_NAME}.awg_random_trailers" "$AWG_RANDOM_TRAILERS"
+        uci_set_if_present "network.${INTERFACE_NAME}.awg_disable_cookies" "$AWG_DISABLE_COOKIES"
     fi
 
     if ! uci -q get "network.@${CONFIG_NAME}[0]" >/dev/null 2>&1; then
