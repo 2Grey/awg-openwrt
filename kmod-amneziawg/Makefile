@@ -38,7 +38,7 @@ define Build/Compile
 		$(KERNEL_MAKE_FLAGS) \
 		M="$(PKG_BUILD_DIR)/$(MAKE_PATH)" \
 		EXTRA_CFLAGS="$(BUILDFLAGS)" \
-		WIREGUARD_VERSION="$(WIREGUARD_VERSION)" \
+		WIREGUARD_VERSION="$(PKG_VERSION)" \
 		modules
 endef
 
