@@ -59,7 +59,7 @@ function handlePeerDetails(peer) {
 			_('Received Data'), '%1024mB'.format(peer.transfer_rx),
 			_('Transmitted Data'), '%1024mB'.format(peer.transfer_tx),
 			_('Latest Handshake'), timestampToStr(+peer.latest_handshake),
-			_('Keep-Alive'), (peer.persistent_keepalive != 'off') ? _('every %ds', 'AmneziaWG keep alive interval').format(+peer.persistent_keepalive) : E('em', _('none')),
+			_('Keep-Alive'), (peer.persistent_keepalive != 'off') ? _('every %s', 'AmneziaWG keep alive interval').format(peer.persistent_keepalive) : E('em', _('none')),
 		]),
 		E('div', { 'class': 'right' }, [
 			E('button', {

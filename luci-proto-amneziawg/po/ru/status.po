@@ -21,8 +21,8 @@ msgid "Never"
 msgstr "Никогда"
 
 msgctxt "AmneziaWG keep alive interval"
-msgid "every %ds"
-msgstr "каждые %dс"
+msgid "every %s"
+msgstr "каждые %s с"
 
 msgctxt "Tooltip displaying full AmneziaWG peer public key"
 msgid "Public key: %h"
