@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: luci-proto-amneziawg\n"
-"PO-Revision-Date: 2026-08-06 00:00+0400\n"
+"PO-Revision-Date: 2026-08-17 00:00+0400\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -114,8 +114,8 @@ msgstr "Значения диапазона должны находиться м
 msgid "Header Protection Key"
 msgstr "Ключ защиты заголовка"
 
-msgid "AWG 3.0. Base64 key used to protect packet headers. The same key is required on both sides; S1-S4 must each be at least 12."
-msgstr "AWG 3.0. Ключ Base64 для защиты заголовков пакетов. На обеих сторонах требуется одинаковый ключ; каждый из параметров S1-S4 должен быть не меньше 12."
+msgid "AWG 3.x. Base64 key used to protect packet headers. The same key is required on both sides; S1-S4 must each be at least 12."
+msgstr "AWG 3.x. Ключ Base64 для защиты заголовков пакетов. На обеих сторонах требуется одинаковый ключ; каждый из параметров S1-S4 должен быть не меньше 12."
 
 msgid "Header protection requires S1, S2, S3 and S4 to be at least 12"
 msgstr "Для защиты заголовка параметры S1, S2, S3 и S4 должны быть не меньше 12"
@@ -129,38 +129,38 @@ msgstr "Сгенерировать ключ"
 msgid "Content Padding Addition"
 msgstr "Дополнительное заполнение данных"
 
-msgid "AWG 3.0. Optional random byte padding range added to transport packets."
-msgstr "AWG 3.0. Необязательный диапазон случайного заполнения в байтах, добавляемого к транспортным пакетам."
+msgid "AWG 3.x. Optional random byte padding range added to transport packets."
+msgstr "AWG 3.x. Необязательный диапазон случайного заполнения в байтах, добавляемого к транспортным пакетам."
 
 msgid "Rekey After Time"
 msgstr "Время до обновления ключа"
 
-msgid "AWG 3.0. Seconds before initiating a new handshake; accepts a number or range."
-msgstr "AWG 3.0. Число секунд до начала нового рукопожатия; принимается число или диапазон."
+msgid "AWG 3.x. Seconds before initiating a new handshake; accepts a number or range."
+msgstr "AWG 3.x. Число секунд до начала нового рукопожатия; принимается число или диапазон."
 
 msgid "Rekey Timeout"
 msgstr "Тайм-аут обновления ключа"
 
-msgid "AWG 3.0. Seconds before retrying a handshake; accepts a number or range."
-msgstr "AWG 3.0. Число секунд до повторного рукопожатия; принимается число или диапазон."
+msgid "AWG 3.x. Seconds before retrying a handshake; accepts a number or range."
+msgstr "AWG 3.x. Число секунд до повторного рукопожатия; принимается число или диапазон."
 
 msgid "Reject After Time"
 msgstr "Время до отклонения трафика"
 
-msgid "AWG 3.0. Seconds before expiring keys and rejecting traffic; accepts a number or range."
-msgstr "AWG 3.0. Число секунд до истечения ключей и отклонения трафика; принимается число или диапазон."
+msgid "AWG 3.x. Seconds before expiring keys and rejecting traffic; accepts a number or range."
+msgstr "AWG 3.x. Число секунд до истечения ключей и отклонения трафика; принимается число или диапазон."
 
 msgid "Keepalive Timeout"
 msgstr "Тайм-аут Keepalive"
 
-msgid "AWG 3.0. Idle seconds before sending a keepalive; accepts a number or range."
-msgstr "AWG 3.0. Число секунд простоя до отправки keepalive; принимается число или диапазон."
+msgid "AWG 3.x. Idle seconds before sending a keepalive; accepts a number or range."
+msgstr "AWG 3.x. Число секунд простоя до отправки keepalive; принимается число или диапазон."
 
 msgid "Maximum Handshake Attempts"
 msgstr "Максимум попыток рукопожатия"
 
-msgid "AWG 3.0. Maximum handshake retries; accepts a number or range."
-msgstr "AWG 3.0. Максимальное число повторов рукопожатия; принимается число или диапазон."
+msgid "AWG 3.x. Maximum handshake retries; accepts a number or range."
+msgstr "AWG 3.x. Максимальное число повторов рукопожатия; принимается число или диапазон."
 
 msgid "HeaderProtectionKey setting is invalid"
 msgstr "Параметр HeaderProtectionKey недействителен"
@@ -168,11 +168,29 @@ msgstr "Параметр HeaderProtectionKey недействителен"
 msgid "H1-H4 settings must be valid 32-bit numbers or ranges"
 msgstr "Параметры H1-H4 должны быть допустимыми 32-битными числами или диапазонами"
 
-msgid "AWG 3.0 timing and padding settings must be valid 16-bit numbers or ranges"
-msgstr "Параметры таймеров и заполнения AWG 3.0 должны быть допустимыми 16-битными числами или диапазонами"
+msgid "AWG 3.x timing and padding settings must be valid 16-bit numbers or ranges"
+msgstr "Параметры таймеров и заполнения AWG 3.x должны быть допустимыми 16-битными числами или диапазонами"
 
-msgid "Optional. Seconds between keep alive messages. AWG 3.0 accepts a range such as 20-30. Default is 0 (disabled)."
-msgstr "Необязательно. Интервал между keepalive-сообщениями в секундах. AWG 3.0 принимает диапазон, например 20-30. Значение по умолчанию — 0 (отключено)."
+msgid "Optional. Seconds between keep alive messages. AWG 3.x accepts a range such as 20-30. Default is 0 (disabled)."
+msgstr "Необязательно. Интервал между keepalive-сообщениями в секундах. AWG 3.x принимает диапазон, например 20-30. Значение по умолчанию — 0 (отключено)."
+
+msgid "Expected \"on\", \"off\", or a non-negative integer"
+msgstr "Ожидается \"on\", \"off\" или неотрицательное целое число"
+
+msgid "Random Trailers"
+msgstr "Случайные хвосты пакетов"
+
+msgid "AWG 3.1. Append a random trailer to packets to vary their sizes. This setting must be identical on both sides."
+msgstr "AWG 3.1. Добавляет к пакетам случайный хвост, чтобы изменять их размер. Значение должно совпадать на обеих сторонах."
+
+msgid "Disable Cookies"
+msgstr "Отключить Cookie Reply"
+
+msgid "AWG 3.1. Disable WireGuard cookie replies. This reduces an active-probing fingerprint but may prevent new handshakes while the interface is under load."
+msgstr "AWG 3.1. Отключает ответы WireGuard Cookie Reply. Это уменьшает сигнатуру при активном зондировании, но может помешать новым рукопожатиям при высокой нагрузке на интерфейс."
+
+msgid "AWG 3.1 boolean settings must be \"on\", \"off\", or non-negative integers"
+msgstr "Логические параметры AWG 3.1 должны быть \"on\", \"off\" или неотрицательными целыми числами"
 
 msgid "Enable / Disable peer. Restart amneziawg interface to apply changes."
 msgstr ""

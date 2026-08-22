@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/kernel.mk
 
 PKG_NAME:=kmod-amneziawg
-PKG_VERSION:=3.0.20260731
+PKG_VERSION:=3.1.20260812
 PKG_RELEASE:=1
 
 PKG_SOURCE_PROTO:=git
@@ -38,7 +38,7 @@ define Build/Compile
 		$(KERNEL_MAKE_FLAGS) \
 		M="$(PKG_BUILD_DIR)/$(MAKE_PATH)" \
 		EXTRA_CFLAGS="$(BUILDFLAGS)" \
-		WIREGUARD_VERSION="$(WIREGUARD_VERSION)" \
+		WIREGUARD_VERSION="$(PKG_VERSION)" \
 		modules
 endef
 

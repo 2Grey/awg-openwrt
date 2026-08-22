@@ -69,6 +69,26 @@ function validateUint32Range(section_id, value) {
 	return validateUnsignedIntegerRange(section_id, value, 4294967295);
 }
 
+function validateAwgBoolean(section_id, value) {
+	if (value == null || value.length == 0)
+		return true;
+
+	if (!value.match(/^(?:on|off|\d+)$/i))
+		return _('Expected "on", "off", or a non-negative integer');
+
+	return true;
+}
+
+function awgBooleanToFlag(value) {
+	var normalized = String(value == null ? '' : value).toLowerCase();
+
+	return (normalized == 'on' || normalized.match(/^\d*[1-9]\d*$/)) ? '1' : '0';
+}
+
+function awgBooleanToConfig(value) {
+	return awgBooleanToFlag(value) == '1' ? 'on' : 'off';
+}
+
 var stubValidator = {
 	factory: validation,
 	apply: function(type, value, args) {
@@ -317,7 +337,7 @@ return network.registerProtocol('amneziawg', {
         o.datatype = 'string';
         o.optional = true;
 
-		o = s.taboption('amneziawg', form.Value, 'awg_header_protection_key', _('Header Protection Key'), _('AWG 3.0. Base64 key used to protect packet headers. The same key is required on both sides; S1-S4 must each be at least 12.'));
+		o = s.taboption('amneziawg', form.Value, 'awg_header_protection_key', _('Header Protection Key'), _('AWG 3.x. Base64 key used to protect packet headers. The same key is required on both sides; S1-S4 must each be at least 12.'));
 		o.password = true;
 		o.optional = true;
 		o.validate = function(section_id, value) {
@@ -347,34 +367,42 @@ return network.registerProtocol('amneziawg', {
 			});
 		};
 
-		o = s.taboption('amneziawg', form.Value, 'awg_content_padding_addition', _('Content Padding Addition'), _('AWG 3.0. Optional random byte padding range added to transport packets.'));
+		o = s.taboption('amneziawg', form.Value, 'awg_content_padding_addition', _('Content Padding Addition'), _('AWG 3.x. Optional random byte padding range added to transport packets.'));
 		o.validate = validateUint16Range;
 		o.placeholder = _('disabled');
 		o.optional = true;
 
-		o = s.taboption('amneziawg', form.Value, 'awg_rekey_after_time', _('Rekey After Time'), _('AWG 3.0. Seconds before initiating a new handshake; accepts a number or range.'));
+		o = s.taboption('amneziawg', form.Value, 'awg_rekey_after_time', _('Rekey After Time'), _('AWG 3.x. Seconds before initiating a new handshake; accepts a number or range.'));
 		o.validate = validateUint16Range;
 		o.placeholder = _('default');
 		o.optional = true;
 
-		o = s.taboption('amneziawg', form.Value, 'awg_rekey_timeout', _('Rekey Timeout'), _('AWG 3.0. Seconds before retrying a handshake; accepts a number or range.'));
+		o = s.taboption('amneziawg', form.Value, 'awg_rekey_timeout', _('Rekey Timeout'), _('AWG 3.x. Seconds before retrying a handshake; accepts a number or range.'));
 		o.validate = validateUint16Range;
 		o.placeholder = _('default');
 		o.optional = true;
 
-		o = s.taboption('amneziawg', form.Value, 'awg_reject_after_time', _('Reject After Time'), _('AWG 3.0. Seconds before expiring keys and rejecting traffic; accepts a number or range.'));
+		o = s.taboption('amneziawg', form.Value, 'awg_reject_after_time', _('Reject After Time'), _('AWG 3.x. Seconds before expiring keys and rejecting traffic; accepts a number or range.'));
 		o.validate = validateUint16Range;
 		o.placeholder = _('default');
 		o.optional = true;
 
-		o = s.taboption('amneziawg', form.Value, 'awg_keepalive_timeout', _('Keepalive Timeout'), _('AWG 3.0. Idle seconds before sending a keepalive; accepts a number or range.'));
+		o = s.taboption('amneziawg', form.Value, 'awg_keepalive_timeout', _('Keepalive Timeout'), _('AWG 3.x. Idle seconds before sending a keepalive; accepts a number or range.'));
 		o.validate = validateUint16Range;
 		o.placeholder = _('default');
 		o.optional = true;
 
-		o = s.taboption('amneziawg', form.Value, 'awg_max_handshake_attempts', _('Maximum Handshake Attempts'), _('AWG 3.0. Maximum handshake retries; accepts a number or range.'));
+		o = s.taboption('amneziawg', form.Value, 'awg_max_handshake_attempts', _('Maximum Handshake Attempts'), _('AWG 3.x. Maximum handshake retries; accepts a number or range.'));
 		o.validate = validateUint16Range;
 		o.placeholder = _('default');
+		o.optional = true;
+
+		o = s.taboption('amneziawg', form.Flag, 'awg_random_trailers', _('Random Trailers'), _('AWG 3.1. Append a random trailer to packets to vary their sizes. This setting must be identical on both sides.'));
+		o.default = o.disabled;
+		o.optional = true;
+
+		o = s.taboption('amneziawg', form.Flag, 'awg_disable_cookies', _('Disable Cookies'), _('AWG 3.1. Disable WireGuard cookie replies. This reduces an active-probing fingerprint but may prevent new handshakes while the interface is under load.'));
+		o.default = o.disabled;
 		o.optional = true;
 
 		// -- peers -----------------------------------------------------------------------
@@ -497,7 +525,13 @@ return network.registerProtocol('amneziawg', {
 			for (var i = 0; i < uint16RangeSettings.length; i++)
 				if (config[uint16RangeSettings[i]] != null &&
 				    validateUint16Range(null, config[uint16RangeSettings[i]]) !== true)
-					return _('AWG 3.0 timing and padding settings must be valid 16-bit numbers or ranges');
+					return _('AWG 3.x timing and padding settings must be valid 16-bit numbers or ranges');
+
+			var booleanSettings = [ 'interface_randomtrailers', 'interface_disablecookies' ];
+			for (var i = 0; i < booleanSettings.length; i++)
+				if (config[booleanSettings[i]] != null &&
+				    validateAwgBoolean(null, config[booleanSettings[i]]) !== true)
+					return _('AWG 3.1 boolean settings must be "on", "off", or non-negative integers');
 
 			for (var i = 0; i < config.peers.length; i++) {
 				var pconf = config.peers[i];
@@ -584,6 +618,8 @@ return network.registerProtocol('amneziawg', {
 					s.getOption('awg_reject_after_time').getUIElement(s.section).setValue(config.interface_rejectaftertime || '');
 					s.getOption('awg_keepalive_timeout').getUIElement(s.section).setValue(config.interface_keepalivetimeout || '');
 					s.getOption('awg_max_handshake_attempts').getUIElement(s.section).setValue(config.interface_maxhandshakeattempts || '');
+					s.getOption('awg_random_trailers').getUIElement(s.section).setValue(awgBooleanToFlag(config.interface_randomtrailers));
+					s.getOption('awg_disable_cookies').getUIElement(s.section).setValue(awgBooleanToFlag(config.interface_disablecookies));
 
 					if (config.interface_dns)
 						s.getOption('dns').getUIElement(s.section).setValue(config.interface_dns);
@@ -902,7 +938,7 @@ return network.registerProtocol('amneziawg', {
 		o.placeholder = '51820';
 		o.datatype = 'port';
 
-		o = ss.option(form.Value, 'persistent_keepalive', _('Persistent Keep Alive'), _('Optional. Seconds between keep alive messages. AWG 3.0 accepts a range such as 20-30. Default is 0 (disabled).'));
+		o = ss.option(form.Value, 'persistent_keepalive', _('Persistent Keep Alive'), _('Optional. Seconds between keep alive messages. AWG 3.x accepts a range such as 20-30. Default is 0 (disabled).'));
 		o.modalonly = true;
 		o.validate = validateUint16Range;
 		o.placeholder = '0';
@@ -940,6 +976,8 @@ return network.registerProtocol('amneziawg', {
 				rejectAfterTime = s.formvalue(s.section, 'awg_reject_after_time'),
 				keepaliveTimeout = s.formvalue(s.section, 'awg_keepalive_timeout'),
 				maxHandshakeAttempts = s.formvalue(s.section, 'awg_max_handshake_attempts'),
+				randomTrailers = s.formvalue(s.section, 'awg_random_trailers'),
+				disableCookies = s.formvalue(s.section, 'awg_disable_cookies'),
 			    prv = this.section.formvalue(section_id, 'private_key'),
 			    psk = this.section.formvalue(section_id, 'preshared_key'),
 			    eport = this.section.formvalue(section_id, 'endpoint_port'),
@@ -979,6 +1017,8 @@ return network.registerProtocol('amneziawg', {
 				rejectAfterTime ? 'RejectAfterTime = ' + rejectAfterTime : '# RejectAfterTime not defined',
 				keepaliveTimeout ? 'KeepaliveTimeout = ' + keepaliveTimeout : '# KeepaliveTimeout not defined',
 				maxHandshakeAttempts ? 'MaxHandshakeAttempts = ' + maxHandshakeAttempts : '# MaxHandshakeAttempts not defined',
+				randomTrailers != null ? 'RandomTrailers = ' + awgBooleanToConfig(randomTrailers) : '# RandomTrailers not defined',
+				disableCookies != null ? 'DisableCookies = ' + awgBooleanToConfig(disableCookies) : '# DisableCookies not defined',
 				'',
 				'[Peer]',
 				'PublicKey = ' + pub,

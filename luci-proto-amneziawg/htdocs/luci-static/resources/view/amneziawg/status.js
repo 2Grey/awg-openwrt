@@ -36,7 +36,9 @@ function handleInterfaceDetails(iface) {
 			_('Name'), iface.name,
 			_('Public Key'), E('code', [ iface.public_key ]),
 			_('Listen Port'), iface.listen_port,
-			_('Firewall Mark'), iface.fwmark != 'off' ? iface.fwmark : E('em', _('none'))
+			_('Firewall Mark'), iface.fwmark != 'off' ? iface.fwmark : E('em', _('none')),
+			_('Random Trailers'), iface.random_trailers == 'on' ? _('enabled') : _('disabled'),
+			_('Cookie Replies'), iface.disable_cookies == 'on' ? _('disabled') : _('enabled')
 		]),
 		E('div', { 'class': 'right' }, [
 			E('button', {
@@ -57,7 +59,7 @@ function handlePeerDetails(peer) {
 			_('Received Data'), '%1024mB'.format(peer.transfer_rx),
 			_('Transmitted Data'), '%1024mB'.format(peer.transfer_tx),
 			_('Latest Handshake'), timestampToStr(+peer.latest_handshake),
-			_('Keep-Alive'), (peer.persistent_keepalive != 'off') ? _('every %ds', 'AmneziaWG keep alive interval').format(+peer.persistent_keepalive) : E('em', _('none')),
+			_('Keep-Alive'), (peer.persistent_keepalive != 'off') ? _('every %s', 'AmneziaWG keep alive interval').format(peer.persistent_keepalive) : E('em', _('none')),
 		]),
 		E('div', { 'class': 'right' }, [
 			E('button', {

@@ -7,6 +7,9 @@ PKG_MANAGER=""
 PKG_EXT=""
 AWG_DIR=""
 AWG_VERSION="1.0"
+AWG_PROFILE="auto"
+CONFIG_FILE=""
+INTERFACE_NAME="awg1"
 
 ASK_FOR_TRANSLATION=1
 ASK_FOR_INTERFACE_CONFIG=1
@@ -26,15 +29,22 @@ die() {
 
 usage() {
     cat <<EOF
-Usage: ${0##*/} [-h] [-e] [-n]
+Usage: ${0##*/} [-h] [-e] [-n] [-a 2.0|3.0|3.1|auto] [-c FILE] [-i NAME]
     -h    show this help
     -e    do not install 'luci-i18n-amneziawg-ru' package
     -n    do not configure the amneziawg interface
+    -a    connection profile: 2.0, 3.0, 3.1, or auto (default: auto)
+    -c    import connection settings from an AmneziaWG .conf file
+    -i    OpenWrt interface name (default: awg1)
+
+An installed AWG 3.1 stack is backwards-compatible with 2.0 and 3.0
+connection profiles. In auto mode, FILE is inspected for version-specific
+settings; without FILE, the script asks which profile to configure.
 EOF
 }
 
 parse_options() {
-    while getopts ":ehn" OPT; do
+    while getopts ":a:c:ehi:n" OPT; do
         case "$OPT" in
             h)
                 usage
@@ -42,6 +52,14 @@ parse_options() {
                 ;;
             e) ASK_FOR_TRANSLATION=0 ;;
             n) ASK_FOR_INTERFACE_CONFIG=0 ;;
+            a) AWG_PROFILE=$OPTARG ;;
+            c) CONFIG_FILE=$OPTARG ;;
+            i) INTERFACE_NAME=$OPTARG ;;
+            :)
+                printf 'Option -%s requires an argument\n' "$OPTARG" >&2
+                usage >&2
+                exit 1
+                ;;
             \?)
                 printf 'Unknown option -%s\n' "$OPTARG" >&2
                 usage >&2
@@ -50,6 +68,22 @@ parse_options() {
         esac
     done
     shift "$((OPTIND - 1))"
+
+    [ "$#" -eq 0 ] || die "Unexpected positional arguments."
+
+    case "$AWG_PROFILE" in
+        auto | 2.0 | 3.0 | 3.1) ;;
+        *) die "Unsupported AWG profile: $AWG_PROFILE (expected 2.0, 3.0, 3.1, or auto)." ;;
+    esac
+
+    case "$INTERFACE_NAME" in
+        '' | *[!A-Za-z0-9_]*) die "Invalid interface name: $INTERFACE_NAME" ;;
+    esac
+
+    if [ -n "$CONFIG_FILE" ]; then
+        [ "$ASK_FOR_INTERFACE_CONFIG" -eq 1 ] || die "Options -c and -n cannot be used together."
+        [ -r "$CONFIG_FILE" ] || die "Configuration file is not readable: $CONFIG_FILE"
+    fi
 }
 
 cleanup_downloads() {
@@ -200,8 +234,7 @@ install_release_package() {
     INSTALL_PACKAGE_NAME=$1
 
     if is_pkg_installed "$INSTALL_PACKAGE_NAME"; then
-        printf '%s already installed\n' "$INSTALL_PACKAGE_NAME"
-        return
+        printf '%s already installed; updating from the selected release\n' "$INSTALL_PACKAGE_NAME"
     fi
 
     if ! INSTALL_PACKAGE_FILE=$(
@@ -264,6 +297,166 @@ ask_yes_no() {
     esac
 }
 
+is_awg3() {
+    case "$AWG_PROFILE" in
+        3.*) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+awg_version_rank() {
+    case "$1" in
+        3.1) printf '31\n' ;;
+        3.0) printf '30\n' ;;
+        2.0) printf '20\n' ;;
+        *) printf '0\n' ;;
+    esac
+}
+
+detect_installed_awg_version() {
+    AWG_TOOLS_VERSION=$(awg --version 2>/dev/null || true)
+    case "$AWG_TOOLS_VERSION" in
+        *'amneziawg-tools v3.1.'*) AWG_VERSION="3.1" ;;
+        *'amneziawg-tools v3.0.'*) AWG_VERSION="3.0" ;;
+    esac
+}
+
+detect_running_awg_version() {
+    RUNNING_AWG_VERSION=""
+    RUNNING_AWG_IMPLEMENTATION=""
+
+    if [ ! -e /sys/module/amneziawg ]; then
+        modprobe amneziawg >/dev/null 2>&1 || true
+    fi
+
+    if [ ! -e /sys/module/amneziawg ]; then
+        if command -v amneziawg-go >/dev/null 2>&1; then
+            RUNNING_AWG_IMPLEMENTATION="amneziawg-go"
+        fi
+        return 0
+    fi
+
+    RUNNING_AWG_IMPLEMENTATION="kernel module"
+    RUNNING_AWG_RELEASE=$(cat /sys/module/amneziawg/version 2>/dev/null || true)
+    case "$RUNNING_AWG_RELEASE" in
+        3.1.*) RUNNING_AWG_VERSION="3.1" ;;
+        3.0.*) RUNNING_AWG_VERSION="3.0" ;;
+        *) RUNNING_AWG_VERSION="2.0" ;;
+    esac
+}
+
+config_get_value() {
+    CONFIG_SECTION=$1
+    CONFIG_KEY=$2
+
+    awk -v wanted_section="$CONFIG_SECTION" -v wanted_key="$CONFIG_KEY" '
+        function trim(value) {
+            sub(/^[[:space:]]+/, "", value)
+            sub(/[[:space:]]+$/, "", value)
+            return value
+        }
+        {
+            sub(/\r$/, "")
+        }
+        /^[[:space:]]*[#;]/ { next }
+        /^[[:space:]]*\[/ {
+            line = $0
+            sub(/^[[:space:]]*\[/, "", line)
+            sub(/\][[:space:]]*$/, "", line)
+            section = tolower(trim(line))
+            if (section == "peer")
+                peer_count++
+            next
+        }
+        {
+            equals = index($0, "=")
+            if (!equals)
+                next
+            key = tolower(trim(substr($0, 1, equals - 1)))
+            value = trim(substr($0, equals + 1))
+            if (section == tolower(wanted_section) &&
+                key == tolower(wanted_key) &&
+                (section != "peer" || peer_count == 1)) {
+                print value
+                exit
+            }
+        }
+    ' "$CONFIG_FILE"
+}
+
+config_has_any() {
+    CONFIG_HAS_SECTION=$1
+    shift
+
+    for CONFIG_HAS_KEY in "$@"; do
+        if [ -n "$(config_get_value "$CONFIG_HAS_SECTION" "$CONFIG_HAS_KEY")" ]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+config_has_range() {
+    CONFIG_RANGE_SECTION=$1
+    shift
+
+    for CONFIG_RANGE_KEY in "$@"; do
+        CONFIG_RANGE_VALUE=$(config_get_value "$CONFIG_RANGE_SECTION" "$CONFIG_RANGE_KEY")
+        case "$CONFIG_RANGE_VALUE" in
+            *-*) return 0 ;;
+        esac
+    done
+    return 1
+}
+
+detect_profile_from_config() {
+    if config_has_any Interface RandomTrailers DisableCookies; then
+        printf '3.1\n'
+    elif config_has_any Interface \
+        HeaderProtectionKey ContentPaddingAddition RekeyAfterTime RekeyTimeout \
+        RejectAfterTime KeepaliveTimeout MaxHandshakeAttempts ||
+        config_has_range Interface H1 H2 H3 H4 ||
+        config_has_range Peer PersistentKeepalive; then
+        printf '3.0\n'
+    else
+        printf '2.0\n'
+    fi
+}
+
+select_awg_profile() {
+    if [ "$AWG_PROFILE" = "auto" ]; then
+        if [ -n "$CONFIG_FILE" ]; then
+            AWG_PROFILE=$(detect_profile_from_config)
+            print_info "Detected connection profile from config: AWG $AWG_PROFILE"
+        else
+            while :; do
+                read_prompt "Select connection profile (2.0, 3.0, or 3.1) [$AWG_VERSION]:" "$AWG_VERSION"
+                case "$READ_VALUE" in
+                    2.0 | 3.0 | 3.1)
+                        AWG_PROFILE=$READ_VALUE
+                        break
+                        ;;
+                    *) printf 'Expected 2.0, 3.0, or 3.1. Please repeat\n' ;;
+                esac
+            done
+        fi
+    fi
+
+    INSTALLED_RANK=$(awg_version_rank "$AWG_VERSION")
+    PROFILE_RANK=$(awg_version_rank "$AWG_PROFILE")
+    if [ "$INSTALLED_RANK" -lt "$PROFILE_RANK" ]; then
+        die "Installed packages provide AWG $AWG_VERSION, but the selected connection requires AWG $AWG_PROFILE. Publish/install matching AWG $AWG_PROFILE packages for this OpenWrt release first."
+    fi
+
+    detect_running_awg_version
+    if [ -n "$RUNNING_AWG_VERSION" ] &&
+        [ "$(awg_version_rank "$RUNNING_AWG_VERSION")" -lt "$PROFILE_RANK" ]; then
+        die "The active $RUNNING_AWG_IMPLEMENTATION is AWG $RUNNING_AWG_VERSION, but profile $AWG_PROFILE requires a newer implementation. If packages were just upgraded, reboot the router and run this script again."
+    fi
+
+    print_info "Using AWG $AWG_PROFILE connection profile on AWG $AWG_VERSION packages"
+}
+
 install_awg_packages() {
     PKGARCH=$(get_pkgarch)
     [ -n "$PKGARCH" ] || die "Unable to detect the package architecture."
@@ -287,14 +480,15 @@ install_awg_packages() {
     install_release_package "kmod-amneziawg"
     install_release_package "amneziawg-tools"
 
-    if awg --version 2>/dev/null | grep -q 'amneziawg-tools v3\.'; then
-        AWG_VERSION="3.0"
-    fi
-    print_info "Detected AWG version: $AWG_VERSION"
+    detect_installed_awg_version
+    print_info "Detected installed AWG stack: $AWG_VERSION"
 
-    # Either LuCI package provides the interface; do not install both variants.
-    if is_pkg_installed "luci-proto-amneziawg" || is_pkg_installed "luci-app-amneziawg"; then
-        printf '%s already installed\n' "$LUCI_PACKAGE_NAME"
+    # Either LuCI package provides the interface; update the selected variant,
+    # but do not install it alongside the legacy alternative.
+    if is_pkg_installed "$LUCI_PACKAGE_NAME"; then
+        install_release_package "$LUCI_PACKAGE_NAME"
+    elif is_pkg_installed "luci-proto-amneziawg" || is_pkg_installed "luci-app-amneziawg"; then
+        printf 'A different AmneziaWG LuCI package is already installed; leaving it unchanged\n'
     else
         install_release_package "$LUCI_PACKAGE_NAME"
     fi
@@ -323,7 +517,199 @@ read_prompt() {
     [ -n "$READ_VALUE" ] || READ_VALUE=$PROMPT_DEFAULT
 }
 
+read_on_off_prompt() {
+    ON_OFF_PROMPT=$1
+    ON_OFF_DEFAULT=$2
+
+    while :; do
+        read_prompt "$ON_OFF_PROMPT" "$ON_OFF_DEFAULT"
+        case "$READ_VALUE" in
+            on | off) return ;;
+            *) printf 'Expected "on" or "off". Please repeat\n' ;;
+        esac
+    done
+}
+
+normalize_on_off() {
+    case "$1" in
+        on | ON | On | 1) printf 'on\n' ;;
+        off | OFF | Off | 0 | '') printf 'off\n' ;;
+        *) return 1 ;;
+    esac
+}
+
+validate_range_setting() {
+    RANGE_NAME=$1
+    RANGE_VALUE=$2
+    RANGE_MAX=$3
+
+    [ -n "$RANGE_VALUE" ] || return 0
+    awk -v name="$RANGE_NAME" -v value="$RANGE_VALUE" -v max="$RANGE_MAX" '
+        BEGIN {
+            if (value !~ /^[0-9]+(-[0-9]+)?$/) {
+                printf "%s must be a number or ascending range: %s\n", name, value > "/dev/stderr"
+                exit 1
+            }
+            count = split(value, bounds, "-")
+            lower = bounds[1] + 0
+            upper = (count == 2 ? bounds[2] : bounds[1]) + 0
+            if (lower > upper || upper > max) {
+                printf "%s must be between 0 and %s: %s\n", name, max, value > "/dev/stderr"
+                exit 1
+            }
+        }
+    ' || die "Invalid $RANGE_NAME value."
+}
+
+validate_connection_settings() {
+    case "$AWG_ENDPOINT_PORT_INT" in
+        '' | *[!0-9]*) die "Endpoint port must be a number." ;;
+    esac
+    [ "$AWG_ENDPOINT_PORT_INT" -ge 1 ] && [ "$AWG_ENDPOINT_PORT_INT" -le 65535 ] ||
+        die "Endpoint port must be between 1 and 65535."
+
+    if [ "$AWG_PROFILE" = "2.0" ]; then
+        case "$AWG_H1 $AWG_H2 $AWG_H3 $AWG_H4 $AWG_PERSISTENT_KEEPALIVE" in
+            *-*) die "H1-H4 and PersistentKeepalive ranges require profile 3.0 or newer." ;;
+        esac
+    fi
+
+    validate_range_setting ContentPaddingAddition "$AWG_CONTENT_PADDING_ADDITION" 65535
+    validate_range_setting RekeyAfterTime "$AWG_REKEY_AFTER_TIME" 65535
+    validate_range_setting RekeyTimeout "$AWG_REKEY_TIMEOUT" 65535
+    validate_range_setting RejectAfterTime "$AWG_REJECT_AFTER_TIME" 65535
+    validate_range_setting KeepaliveTimeout "$AWG_KEEPALIVE_TIMEOUT" 65535
+    validate_range_setting MaxHandshakeAttempts "$AWG_MAX_HANDSHAKE_ATTEMPTS" 65535
+
+    case "$AWG_PERSISTENT_KEEPALIVE" in
+        off | '') ;;
+        *) validate_range_setting PersistentKeepalive "$AWG_PERSISTENT_KEEPALIVE" 65535 ;;
+    esac
+
+    validate_range_setting H1 "$AWG_H1" 4294967295
+    validate_range_setting H2 "$AWG_H2" 4294967295
+    validate_range_setting H3 "$AWG_H3" 4294967295
+    validate_range_setting H4 "$AWG_H4" 4294967295
+
+    if [ -n "$AWG_HEADER_PROTECTION_KEY" ]; then
+        for AWG_PADDING in "$AWG_S1" "$AWG_S2" "$AWG_S3" "$AWG_S4"; do
+            case "$AWG_PADDING" in
+                '' | *[!0-9]*) die "HeaderProtectionKey requires numeric S1-S4 values of at least 12." ;;
+            esac
+            [ "$AWG_PADDING" -ge 12 ] ||
+                die "HeaderProtectionKey requires S1-S4 values of at least 12."
+        done
+    fi
+}
+
+validate_config_profile() {
+    if [ "$AWG_PROFILE" = "2.0" ] && config_has_any Interface \
+        HeaderProtectionKey ContentPaddingAddition RekeyAfterTime RekeyTimeout \
+        RejectAfterTime KeepaliveTimeout MaxHandshakeAttempts RandomTrailers DisableCookies; then
+        die "The configuration contains AWG 3.x settings but profile 2.0 was selected."
+    fi
+
+    if [ "$AWG_PROFILE" = "2.0" ] && {
+        config_has_range Interface H1 H2 H3 H4 ||
+            config_has_range Peer PersistentKeepalive;
+    }; then
+        die "H1-H4 and PersistentKeepalive ranges require profile 3.0 or newer."
+    fi
+
+    if [ "$AWG_PROFILE" = "3.0" ] && config_has_any Interface RandomTrailers DisableCookies; then
+        die "The configuration contains AWG 3.1 settings but profile 3.0 was selected."
+    fi
+}
+
+load_config_settings() {
+    validate_config_profile
+
+    AWG_PEER_COUNT=$(awk '
+        /^[[:space:]]*\[[Pp][Ee][Ee][Rr]\][[:space:]]*$/ { count++ }
+        END { print count + 0 }
+    ' "$CONFIG_FILE")
+    [ "$AWG_PEER_COUNT" -eq 1 ] ||
+        die "The installer accepts exactly one [Peer] section; found $AWG_PEER_COUNT. Use LuCI for multi-peer configurations."
+
+    AWG_PRIVATE_KEY_INT=$(config_get_value Interface PrivateKey)
+    AWG_IP=$(config_get_value Interface Address)
+    AWG_LISTEN_PORT=$(config_get_value Interface ListenPort)
+    AWG_MTU=$(config_get_value Interface MTU)
+    AWG_DNS=$(config_get_value Interface DNS)
+
+    AWG_JC=$(config_get_value Interface Jc)
+    AWG_JMIN=$(config_get_value Interface Jmin)
+    AWG_JMAX=$(config_get_value Interface Jmax)
+    AWG_S1=$(config_get_value Interface S1)
+    AWG_S2=$(config_get_value Interface S2)
+    AWG_S3=$(config_get_value Interface S3)
+    AWG_S4=$(config_get_value Interface S4)
+    AWG_H1=$(config_get_value Interface H1)
+    AWG_H2=$(config_get_value Interface H2)
+    AWG_H3=$(config_get_value Interface H3)
+    AWG_H4=$(config_get_value Interface H4)
+    AWG_I1=$(config_get_value Interface I1)
+    AWG_I2=$(config_get_value Interface I2)
+    AWG_I3=$(config_get_value Interface I3)
+    AWG_I4=$(config_get_value Interface I4)
+    AWG_I5=$(config_get_value Interface I5)
+
+    AWG_HEADER_PROTECTION_KEY=$(config_get_value Interface HeaderProtectionKey)
+    AWG_CONTENT_PADDING_ADDITION=$(config_get_value Interface ContentPaddingAddition)
+    AWG_REKEY_AFTER_TIME=$(config_get_value Interface RekeyAfterTime)
+    AWG_REKEY_TIMEOUT=$(config_get_value Interface RekeyTimeout)
+    AWG_REJECT_AFTER_TIME=$(config_get_value Interface RejectAfterTime)
+    AWG_KEEPALIVE_TIMEOUT=$(config_get_value Interface KeepaliveTimeout)
+    AWG_MAX_HANDSHAKE_ATTEMPTS=$(config_get_value Interface MaxHandshakeAttempts)
+    AWG_RANDOM_TRAILERS=$(config_get_value Interface RandomTrailers)
+    AWG_DISABLE_COOKIES=$(config_get_value Interface DisableCookies)
+
+    AWG_PUBLIC_KEY_INT=$(config_get_value Peer PublicKey)
+    AWG_PRESHARED_KEY_INT=$(config_get_value Peer PresharedKey)
+    AWG_ALLOWED_IPS=$(config_get_value Peer AllowedIPs)
+    AWG_PERSISTENT_KEEPALIVE=$(config_get_value Peer PersistentKeepalive)
+    AWG_ENDPOINT=$(config_get_value Peer Endpoint)
+
+    [ -n "$AWG_PRIVATE_KEY_INT" ] || die "PrivateKey is missing in $CONFIG_FILE"
+    [ -n "$AWG_IP" ] || die "Address is missing in $CONFIG_FILE"
+    [ -n "$AWG_PUBLIC_KEY_INT" ] || die "Peer PublicKey is missing in $CONFIG_FILE"
+    [ -n "$AWG_ENDPOINT" ] || die "Peer Endpoint is missing in $CONFIG_FILE"
+
+    [ -n "$AWG_LISTEN_PORT" ] || AWG_LISTEN_PORT="51821"
+    [ -n "$AWG_ALLOWED_IPS" ] || AWG_ALLOWED_IPS="0.0.0.0/0, ::/0"
+    [ -n "$AWG_PERSISTENT_KEEPALIVE" ] || AWG_PERSISTENT_KEEPALIVE="25"
+
+    case "$AWG_ENDPOINT" in
+        \[*\]:*)
+            AWG_ENDPOINT_INT=${AWG_ENDPOINT#\[}
+            AWG_ENDPOINT_INT=${AWG_ENDPOINT_INT%%\]*}
+            AWG_ENDPOINT_PORT_INT=${AWG_ENDPOINT##*\]:}
+            ;;
+        *:*)
+            AWG_ENDPOINT_INT=${AWG_ENDPOINT%:*}
+            AWG_ENDPOINT_PORT_INT=${AWG_ENDPOINT##*:}
+            ;;
+        *) die "Endpoint must include a port: $AWG_ENDPOINT" ;;
+    esac
+
+    if [ -n "$AWG_RANDOM_TRAILERS" ]; then
+        AWG_RANDOM_TRAILERS=$(normalize_on_off "$AWG_RANDOM_TRAILERS") ||
+            die "RandomTrailers must be on/off or 0/1."
+    fi
+    if [ -n "$AWG_DISABLE_COOKIES" ]; then
+        AWG_DISABLE_COOKIES=$(normalize_on_off "$AWG_DISABLE_COOKIES") ||
+            die "DisableCookies must be on/off or 0/1."
+    fi
+
+    validate_connection_settings
+}
+
 collect_interface_settings() {
+    AWG_LISTEN_PORT="51821"
+    AWG_ALLOWED_IPS="0.0.0.0/0, ::/0"
+    AWG_MTU=""
+    AWG_DNS=""
+
     read_prompt "Enter the private key (from [Interface]):"
     AWG_PRIVATE_KEY_INT=$READ_VALUE
 
@@ -364,7 +750,7 @@ collect_interface_settings() {
     read_prompt "Enter H4 value (from [Interface]):"
     AWG_H4=$READ_VALUE
 
-    if [ "$AWG_VERSION" != "1.0" ]; then
+    if [ "$AWG_PROFILE" != "1.0" ]; then
         read_prompt "Enter S3 value (from [Interface]) [optional, leave blank to skip]:"
         AWG_S3=$READ_VALUE
         read_prompt "Enter S4 value (from [Interface]) [optional, leave blank to skip]:"
@@ -382,7 +768,7 @@ collect_interface_settings() {
     fi
 
     AWG_PERSISTENT_KEEPALIVE="25"
-    if [ "$AWG_VERSION" = "3.0" ]; then
+    if is_awg3; then
         read_prompt "Enter HeaderProtectionKey (from [Interface]) [optional, leave blank to skip]:"
         AWG_HEADER_PROTECTION_KEY=$READ_VALUE
         read_prompt "Enter ContentPaddingAddition (number or range) [optional, leave blank to skip]:"
@@ -400,6 +786,15 @@ collect_interface_settings() {
         read_prompt "Enter PersistentKeepalive (number or range) [25]:" "25"
         AWG_PERSISTENT_KEEPALIVE=$READ_VALUE
     fi
+
+    if [ "$AWG_PROFILE" = "3.1" ]; then
+        read_on_off_prompt "Enter RandomTrailers (on/off) [off]:" "off"
+        AWG_RANDOM_TRAILERS=$READ_VALUE
+        read_on_off_prompt "Enter DisableCookies (on/off) [off]:" "off"
+        AWG_DISABLE_COOKIES=$READ_VALUE
+    fi
+
+    validate_connection_settings
 }
 
 uci_set() {
@@ -412,12 +807,49 @@ uci_set_if_present() {
     fi
 }
 
+uci_delete() {
+    uci -q delete "$1" >/dev/null 2>&1 || true
+}
+
+uci_add_list_values() {
+    UCI_LIST_KEY=$1
+    UCI_LIST_VALUES=$2
+    UCI_LIST_OLD_IFS=$IFS
+    IFS=','
+    set -- $UCI_LIST_VALUES
+    IFS=$UCI_LIST_OLD_IFS
+
+    for UCI_LIST_VALUE in "$@"; do
+        UCI_LIST_VALUE=$(printf '%s\n' "$UCI_LIST_VALUE" |
+            sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+        [ -n "$UCI_LIST_VALUE" ] || continue
+        uci add_list "${UCI_LIST_KEY}=${UCI_LIST_VALUE}"
+    done
+}
+
 write_network_config() {
     uci_set "network.${INTERFACE_NAME}" "interface"
     uci_set "network.${INTERFACE_NAME}.proto" "$PROTO"
     uci_set "network.${INTERFACE_NAME}.private_key" "$AWG_PRIVATE_KEY_INT"
-    uci_set "network.${INTERFACE_NAME}.listen_port" "51821"
-    uci_set "network.${INTERFACE_NAME}.addresses" "$AWG_IP"
+    uci_set "network.${INTERFACE_NAME}.listen_port" "$AWG_LISTEN_PORT"
+    uci_delete "network.${INTERFACE_NAME}.addresses"
+    uci_add_list_values "network.${INTERFACE_NAME}.addresses" "$AWG_IP"
+    uci_delete "network.${INTERFACE_NAME}.dns"
+    uci_add_list_values "network.${INTERFACE_NAME}.dns" "$AWG_DNS"
+    if [ -n "$AWG_MTU" ]; then
+        uci_set "network.${INTERFACE_NAME}.mtu" "$AWG_MTU"
+    else
+        uci_delete "network.${INTERFACE_NAME}.mtu"
+    fi
+
+    for AWG_OPTION in \
+        awg_s3 awg_s4 awg_i1 awg_i2 awg_i3 awg_i4 awg_i5 \
+        awg_header_protection_key awg_content_padding_addition \
+        awg_rekey_after_time awg_rekey_timeout awg_reject_after_time \
+        awg_keepalive_timeout awg_max_handshake_attempts \
+        awg_random_trailers awg_disable_cookies; do
+        uci_delete "network.${INTERFACE_NAME}.${AWG_OPTION}"
+    done
 
     uci_set "network.${INTERFACE_NAME}.awg_jc" "$AWG_JC"
     uci_set "network.${INTERFACE_NAME}.awg_jmin" "$AWG_JMIN"
@@ -429,7 +861,7 @@ write_network_config() {
     uci_set "network.${INTERFACE_NAME}.awg_h3" "$AWG_H3"
     uci_set "network.${INTERFACE_NAME}.awg_h4" "$AWG_H4"
 
-    if [ "$AWG_VERSION" != "1.0" ]; then
+    if [ "$AWG_PROFILE" != "1.0" ]; then
         uci_set_if_present "network.${INTERFACE_NAME}.awg_s3" "$AWG_S3"
         uci_set_if_present "network.${INTERFACE_NAME}.awg_s4" "$AWG_S4"
         uci_set_if_present "network.${INTERFACE_NAME}.awg_i1" "$AWG_I1"
@@ -439,7 +871,7 @@ write_network_config() {
         uci_set_if_present "network.${INTERFACE_NAME}.awg_i5" "$AWG_I5"
     fi
 
-    if [ "$AWG_VERSION" = "3.0" ]; then
+    if is_awg3; then
         uci_set_if_present "network.${INTERFACE_NAME}.awg_header_protection_key" "$AWG_HEADER_PROTECTION_KEY"
         uci_set_if_present "network.${INTERFACE_NAME}.awg_content_padding_addition" "$AWG_CONTENT_PADDING_ADDITION"
         uci_set_if_present "network.${INTERFACE_NAME}.awg_rekey_after_time" "$AWG_REKEY_AFTER_TIME"
@@ -447,6 +879,11 @@ write_network_config() {
         uci_set_if_present "network.${INTERFACE_NAME}.awg_reject_after_time" "$AWG_REJECT_AFTER_TIME"
         uci_set_if_present "network.${INTERFACE_NAME}.awg_keepalive_timeout" "$AWG_KEEPALIVE_TIMEOUT"
         uci_set_if_present "network.${INTERFACE_NAME}.awg_max_handshake_attempts" "$AWG_MAX_HANDSHAKE_ATTEMPTS"
+    fi
+
+    if [ "$AWG_PROFILE" = "3.1" ]; then
+        uci_set_if_present "network.${INTERFACE_NAME}.awg_random_trailers" "$AWG_RANDOM_TRAILERS"
+        uci_set_if_present "network.${INTERFACE_NAME}.awg_disable_cookies" "$AWG_DISABLE_COOKIES"
     fi
 
     if ! uci -q get "network.@${CONFIG_NAME}[0]" >/dev/null 2>&1; then
@@ -457,63 +894,75 @@ write_network_config() {
     uci_set "$PEER_SECTION" "$CONFIG_NAME"
     uci_set "${PEER_SECTION}.name" "${INTERFACE_NAME}_client"
     uci_set "${PEER_SECTION}.public_key" "$AWG_PUBLIC_KEY_INT"
-    uci_set "${PEER_SECTION}.preshared_key" "$AWG_PRESHARED_KEY_INT"
+    if [ -n "$AWG_PRESHARED_KEY_INT" ]; then
+        uci_set "${PEER_SECTION}.preshared_key" "$AWG_PRESHARED_KEY_INT"
+    else
+        uci_delete "${PEER_SECTION}.preshared_key"
+    fi
     uci_set "${PEER_SECTION}.route_allowed_ips" "1"
     uci_set "${PEER_SECTION}.persistent_keepalive" "$AWG_PERSISTENT_KEEPALIVE"
     uci_set "${PEER_SECTION}.endpoint_host" "$AWG_ENDPOINT_INT"
-    uci_set "${PEER_SECTION}.allowed_ips" "0.0.0.0/0"
-    uci add_list "${PEER_SECTION}.allowed_ips=::/0"
+    uci_delete "${PEER_SECTION}.allowed_ips"
+    uci_add_list_values "${PEER_SECTION}.allowed_ips" "$AWG_ALLOWED_IPS"
     uci_set "${PEER_SECTION}.endpoint_port" "$AWG_ENDPOINT_PORT_INT"
     uci commit network
 }
 
-firewall_section_exists() {
+find_firewall_section() {
     FIREWALL_SECTION_TYPE=$1
     FIREWALL_SECTION_NAME=$2
 
     uci -q show firewall 2>/dev/null |
-        grep -q "^firewall\.@${FIREWALL_SECTION_TYPE}\[[0-9][0-9]*\]\.name='${FIREWALL_SECTION_NAME}'$"
+        sed -n "s/^\(firewall\.@${FIREWALL_SECTION_TYPE}\[[0-9][0-9]*\]\)\.name='${FIREWALL_SECTION_NAME}'$/\1/p" |
+        head -n 1
 }
 
 ensure_firewall_zone() {
-    if firewall_section_exists "zone" "$ZONE_NAME"; then
-        return
+    FIREWALL_ZONE_SECTION=$(find_firewall_section "zone" "$ZONE_NAME")
+    if [ -z "$FIREWALL_ZONE_SECTION" ]; then
+        print_info "Zone Create"
+        uci add firewall zone >/dev/null
+        FIREWALL_ZONE_SECTION="firewall.@zone[-1]"
     fi
 
-    print_info "Zone Create"
-    uci add firewall zone >/dev/null
-    uci_set "firewall.@zone[-1].name" "$ZONE_NAME"
-    uci_set "firewall.@zone[-1].network" "$INTERFACE_NAME"
-    uci_set "firewall.@zone[-1].forward" "REJECT"
-    uci_set "firewall.@zone[-1].output" "ACCEPT"
-    uci_set "firewall.@zone[-1].input" "REJECT"
-    uci_set "firewall.@zone[-1].masq" "1"
-    uci_set "firewall.@zone[-1].mtu_fix" "1"
-    uci_set "firewall.@zone[-1].family" "ipv4"
+    uci_set "${FIREWALL_ZONE_SECTION}.name" "$ZONE_NAME"
+    uci_set "${FIREWALL_ZONE_SECTION}.network" "$INTERFACE_NAME"
+    uci_set "${FIREWALL_ZONE_SECTION}.forward" "REJECT"
+    uci_set "${FIREWALL_ZONE_SECTION}.output" "ACCEPT"
+    uci_set "${FIREWALL_ZONE_SECTION}.input" "REJECT"
+    uci_set "${FIREWALL_ZONE_SECTION}.masq" "1"
+    uci_set "${FIREWALL_ZONE_SECTION}.masq6" "1"
+    uci_set "${FIREWALL_ZONE_SECTION}.mtu_fix" "1"
+    uci_delete "${FIREWALL_ZONE_SECTION}.family"
 }
 
 ensure_firewall_forwarding() {
     FORWARDING_NAME="${ZONE_NAME}-lan"
-    if firewall_section_exists "forwarding" "$FORWARDING_NAME"; then
-        return
+    FIREWALL_FORWARDING_SECTION=$(find_firewall_section "forwarding" "$FORWARDING_NAME")
+    if [ -z "$FIREWALL_FORWARDING_SECTION" ]; then
+        print_info "Configured forwarding"
+        uci add firewall forwarding >/dev/null
+        FIREWALL_FORWARDING_SECTION="firewall.@forwarding[-1]"
     fi
 
-    print_info "Configured forwarding"
-    uci add firewall forwarding >/dev/null
-    uci_set "firewall.@forwarding[-1]" "forwarding"
-    uci_set "firewall.@forwarding[-1].name" "$FORWARDING_NAME"
-    uci_set "firewall.@forwarding[-1].dest" "$ZONE_NAME"
-    uci_set "firewall.@forwarding[-1].src" "lan"
-    uci_set "firewall.@forwarding[-1].family" "ipv4"
+    uci_set "$FIREWALL_FORWARDING_SECTION" "forwarding"
+    uci_set "${FIREWALL_FORWARDING_SECTION}.name" "$FORWARDING_NAME"
+    uci_set "${FIREWALL_FORWARDING_SECTION}.dest" "$ZONE_NAME"
+    uci_set "${FIREWALL_FORWARDING_SECTION}.src" "lan"
+    uci_delete "${FIREWALL_FORWARDING_SECTION}.family"
 }
 
 configure_amneziawg_interface() {
-    INTERFACE_NAME="awg1"
-    CONFIG_NAME="amneziawg_awg1"
+    CONFIG_NAME="amneziawg_${INTERFACE_NAME}"
     PROTO="amneziawg"
-    ZONE_NAME="awg1"
+    ZONE_NAME="$INTERFACE_NAME"
 
-    collect_interface_settings
+    select_awg_profile
+    if [ -n "$CONFIG_FILE" ]; then
+        load_config_settings
+    else
+        collect_interface_settings
+    fi
     write_network_config
     ensure_firewall_zone
     ensure_firewall_forwarding
@@ -532,6 +981,11 @@ main() {
         return
     fi
 
+    if [ -n "$CONFIG_FILE" ]; then
+        configure_amneziawg_interface
+        return
+    fi
+
     if ask_yes_no "Do you want to configure the amneziawg interface? (y/N):" "n"; then
         configure_amneziawg_interface
     else
@@ -542,4 +996,6 @@ main() {
 trap cleanup_downloads 0
 trap 'exit 1' HUP INT TERM
 
-main "$@"
+if [ "${AMNEZIAWG_INSTALL_SOURCE_ONLY:-0}" != "1" ]; then
+    main "$@"
+fi
