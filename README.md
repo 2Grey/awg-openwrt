@@ -9,7 +9,7 @@ for APKs on OpenWrt 25.x and later.
 
 ## AWG 3.1 Support
 
-The `master` branch contains the agreed-upon set of AWG 3.1 components:
+The `master` branch contains an aligned set of AWG 3.1 components:
 
 - `kmod-amneziawg` — `v3.1.20260812`;
 - `amneziawg-tools` — `v3.1.20260812`;
@@ -59,6 +59,26 @@ sh <(wget -O - https://raw.githubusercontent.com/2Grey/awg-openwrt/refs/heads/ma
 sh <(wget -O - https://raw.githubusercontent.com/2Grey/awg-openwrt/refs/heads/master/amneziawg-install.sh) -en
 ```
 
+The installer can configure AWG 2.0, 3.0, and 3.1 connection profiles. A ready
+AmneziaWG configuration with one `[Peer]` section can be imported directly;
+`auto` detects the minimum required profile:
+
+```sh
+sh amneziawg-install.sh -e -a auto -c /root/client.conf
+```
+
+To enter settings interactively and force a particular compatibility profile:
+
+```sh
+sh amneziawg-install.sh -a 2.0
+sh amneziawg-install.sh -a 3.0
+sh amneziawg-install.sh -a 3.1
+```
+
+The script verifies the version reported by the installed `amneziawg-tools`
+and refuses to configure a newer profile on older release assets. If an older
+kernel module is still loaded after an upgrade, reboot the router and run the
+script again.
 4. In addition, for automatic configuration you can also use the [script](https://github.com/itdoginfo/domain-routing-openwrt) from user [@itdoginfo](https://github.com/itdoginfo).  
 This script allows you to automatically download the necessary packages from those collected here and configure [point-by-point bypass of blocking by domains](https://habr.com/ru/articles/767464/) (instructions in Russian).  
 Suitable if you have a weak router with insufficient ROM to install podkop and its dependencies
