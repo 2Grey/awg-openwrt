@@ -96,11 +96,11 @@ At the moment I have collected packages for all devices for OpenWRT versions:
 4. [25.12.2](https://github.com/2Grey/awg-openwrt/releases/tag/v25.12.2) – AWG-3.0
 5. [25.12.1](https://github.com/2Grey/awg-openwrt/releases/tag/v25.12.1) – AWG-3.0
 6. [25.12.0](https://github.com/2Grey/awg-openwrt/releases/tag/v25.12.0) – AWG-3.0
-7. [24.10.8](https://github.com/2Grey/awg-openwrt/releases/tag/v24.10.8) – AWG-3.0
-8. [24.10.7](https://github.com/2Grey/awg-openwrt/releases/tag/v24.10.7) – AWG-3.0
-9. [24.10.6](https://github.com/2Grey/awg-openwrt/releases/tag/v24.10.6) – AWG-3.0
-10. [24.10.5](https://github.com/2Grey/awg-openwrt/releases/tag/v24.10.5) – AWG-3.0
-11. [24.10.4](https://github.com/2Grey/awg-openwrt/releases/tag/v24.10.4) – AWG-3.0
+7. [24.10.8](https://github.com/2Grey/awg-openwrt/releases/tag/v24.10.8) – AWG-3.1
+8. [24.10.7](https://github.com/2Grey/awg-openwrt/releases/tag/v24.10.7) – AWG-3.1
+9. [24.10.6](https://github.com/2Grey/awg-openwrt/releases/tag/v24.10.6) – AWG-3.1
+10. [24.10.5](https://github.com/2Grey/awg-openwrt/releases/tag/v24.10.5) – AWG-3.1
+11. [24.10.4](https://github.com/2Grey/awg-openwrt/releases/tag/v24.10.4) – AWG-3.1
 
 For builds for older versions of OpenWRT, see the [Slava-Shchipunov](https://github.com/Slava-Shchipunov/awg-openwrt) repository.
 
