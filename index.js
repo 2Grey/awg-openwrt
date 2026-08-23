@@ -12,6 +12,7 @@ const filterSubtargets = filterSubtargetsStr ? filterSubtargetsStr.split(',').ma
 
 const excludedBuilds = [
   {
+    versionPrefix: '25.12.',
     target: 'microchipsw',
     subtarget: 'lan969x',
     reason: 'OpenWrt 25.12.x SDK fails while packaging kmod-crypto-xxhash: xxhash.ko is built into the kernel for this specialized target',
@@ -117,7 +118,8 @@ async function main() {
         }
 
         const excludedBuild = excludedBuilds.find(
-          item => item.target === target && item.subtarget === subtarget
+          item => (!item.versionPrefix || version.startsWith(item.versionPrefix)) &&
+                  item.target === target && item.subtarget === subtarget
         );
         if (excludedBuild) {
           core.warning(`Skipping ${target}/${subtarget}: ${excludedBuild.reason}`);

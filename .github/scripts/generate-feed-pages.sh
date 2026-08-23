@@ -9,20 +9,27 @@ REPO_ROOT=$(cd "$SCRIPT_DIR/../.." && pwd)
 mkdir -p "$SITE_DIR"
 rm -f "$SITE_DIR/.nojekyll"
 find "$SITE_DIR" -name "index.md" -delete
-rm -f "$SITE_DIR/keys/awg-openwrt-feed.pub"
 
 # Retain the public layout /<version>/<target>/<subtarget>/ even when an SDK
 # creates the intermediate package-architecture directory.
 while IFS= read -r -d '' dir; do
-  [ -s "$dir/packages.adb" ] || continue
+  if [ ! -s "$dir/packages.adb" ] && [ ! -s "$dir/Packages.gz" ]; then
+    continue
+  fi
   parent=$(dirname "$dir")
-  if [ ! -s "$parent/packages.adb" ]; then
+  if [ ! -s "$parent/packages.adb" ] && [ ! -s "$parent/Packages.gz" ]; then
     cp -a "$dir"/. "$parent"/
     if [ ! -s "$parent/feed.json" ]; then
       pkgarch=$(basename "$dir")
+      if [ -s "$dir/packages.adb" ]; then
+        feed_format="apk"
+      else
+        feed_format="ipk"
+      fi
       cat > "$parent/feed.json" <<EOF
 {
   "pkgarch": "$pkgarch",
+  "format": "$feed_format",
   "feed": "awg"
 }
 EOF
@@ -33,7 +40,7 @@ done < <(find "$SITE_DIR" -mindepth 4 -maxdepth 4 -type d -print0)
 
 cat > "$SITE_DIR/_config.yml" <<'EOF'
 title: AmneziaWG OpenWrt Feed
-description: APK package feed for AmneziaWG on OpenWrt 25.12.x and newer
+description: Signed package feeds for AmneziaWG on OpenWrt 24.10.x and newer
 theme: jekyll-theme-midnight
 EOF
 
@@ -47,9 +54,10 @@ title: AmneziaWG OpenWrt Feed
 ---
 
 # AmneziaWG OpenWrt Feed
-This GitHub Pages site publishes an APK package feed for OpenWrt 25.12.x and newer.
+This GitHub Pages site publishes signed AmneziaWG package feeds for OpenWrt 24.10.x and newer.
 
-OpenWrt 24.10.x and older are not supported by this feed. Use GitHub Releases artifacts for legacy \`.ipk\` packages.
+- OpenWrt 24.x uses \`opkg\`, \`.ipk\` packages, and a \`Packages.gz\` index.
+- OpenWrt 25.x and newer use \`apk\`, \`.apk\` packages, and a \`packages.adb\` index.
 
 ## Available OpenWrt versions
 
@@ -57,7 +65,7 @@ EOF
 
 mapfile -t FEED_DIRS < <(find "$SITE_DIR" -mindepth 3 -maxdepth 3 -type d | sort)
 for feed_dir in "${FEED_DIRS[@]}"; do
-  if [ ! -s "$feed_dir/packages.adb" ]; then
+  if [ ! -s "$feed_dir/packages.adb" ] && [ ! -s "$feed_dir/Packages.gz" ]; then
     continue
   fi
 
@@ -66,11 +74,19 @@ for feed_dir in "${FEED_DIRS[@]}"; do
 $rel_path
 EOF
   pkgarch="unknown"
+  feed_format=""
   if [ -s "$feed_dir/feed.json" ]; then
     pkgarch=$(sed -n 's/.*"pkgarch": "\([^"]*\)".*/\1/p' "$feed_dir/feed.json" | head -n1)
+    feed_format=$(sed -n 's/.*"format": "\([^"]*\)".*/\1/p' "$feed_dir/feed.json" | head -n1)
+  fi
+  if [ -z "$feed_format" ]; then
+    if [ -s "$feed_dir/packages.adb" ]; then
+      feed_format="apk"
+    else
+      feed_format="ipk"
+    fi
   fi
   feed_url="$BASE_URL/$rel_path"
-  adb_url="$feed_url/packages.adb"
   version_dir="$SITE_DIR/$version"
   target_dir="$version_dir/$target"
   subtarget_dir="$target_dir/$subtarget"
@@ -139,17 +155,23 @@ Index of [(root)]($BASE_URL/) / [$version]($version_url/) / [$target]($target_ur
 - Target: \`$target\`
 - Subtarget: \`$subtarget\`
 - Package architecture: \`$pkgarch\`
+- Package format: \`$feed_format\`
 
 ## Upstream OpenWrt target
 
 [$openwrt_target_url]($openwrt_target_url)
+
+EOF
+
+  if [ "$feed_format" = "apk" ]; then
+    cat >> "$subtarget_dir/index.md" <<EOF
 
 ## Configure Feed
 
 \`\`\`sh
 mkdir -p /etc/apk/keys
 wget -O /etc/apk/keys/awg-openwrt-feed.pem "$BASE_URL/keys/awg-openwrt-feed.pem"
-echo "$adb_url" >> /etc/apk/repositories.d/customfeeds.list
+echo "$feed_url/packages.adb" >> /etc/apk/repositories.d/customfeeds.list
 \`\`\`
 
 ## Install Packages
@@ -158,6 +180,31 @@ echo "$adb_url" >> /etc/apk/repositories.d/customfeeds.list
 apk update
 apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 \`\`\`
+
+EOF
+  else
+    cat >> "$subtarget_dir/index.md" <<EOF
+
+## Configure Feed
+
+\`\`\`sh
+wget -O /tmp/awg-openwrt-feed.pub "$BASE_URL/keys/awg-openwrt-feed.pub"
+opkg-key add /tmp/awg-openwrt-feed.pub
+rm -f /tmp/awg-openwrt-feed.pub
+echo "src/gz awg $feed_url" >> /etc/opkg/customfeeds.conf
+\`\`\`
+
+## Install Packages
+
+\`\`\`sh
+opkg update
+opkg install amneziawg-tools kmod-amneziawg luci-proto-amneziawg
+\`\`\`
+
+EOF
+  fi
+
+  cat >> "$subtarget_dir/index.md" <<EOF
 
 <script src="$BASE_URL/assets/copy-code.js?v=2"></script>
 

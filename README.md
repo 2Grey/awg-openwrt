@@ -5,7 +5,8 @@
 ## Custom package feed (GitHub Pages)
 
 The repository also publishes a full-featured [OpenWRT package feed](https://2grey.github.io/awg-openwrt/)
-for APKs on OpenWrt 25.x and later.
+with signed IPK repositories for OpenWrt 24.x and signed APK repositories for
+OpenWrt 25.x and later.
 
 [Detailed documentation](docs/custom-feed.md)
 

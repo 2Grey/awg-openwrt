@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "OpenWRT version with apk support (25.x or newer, e.g., 25.12.3)"
+        description: "OpenWrt version with a matching v* GitHub Release (24.x ipk, 25.x+ apk)"
         required: true
         type: string
       targets:
@@ -24,6 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       job-config: ${{ steps.generate-config.outputs.job-config }}
+      package-format: ${{ steps.prepare-inputs.outputs.package-format }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -34,6 +35,7 @@ jobs:
           node-version: "20.16.0"
 
       - name: Prepare build inputs
+        id: prepare-inputs
         run: |
           set -euo pipefail
           VERSION="${{ inputs.version }}"
@@ -42,10 +44,15 @@ jobs:
             echo "Invalid OpenWrt version: $VERSION"
             exit 1
           fi
-          if [ "$MAJOR_VERSION" -lt 25 ]; then
-            echo "GitHub Pages package feed is supported only for OpenWrt 25.x or newer (apk/packages.adb)."
-            echo "Use GitHub Releases artifacts for OpenWrt $VERSION."
+          if [ "$MAJOR_VERSION" -lt 24 ]; then
+            echo "GitHub Pages package feed is supported for OpenWrt 24.x or newer."
             exit 1
+          fi
+
+          if [ "$MAJOR_VERSION" -eq 24 ]; then
+            echo "package-format=ipk" >> "$GITHUB_OUTPUT"
+          else
+            echo "package-format=apk" >> "$GITHUB_OUTPUT"
           fi
 
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
@@ -67,25 +74,153 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  build-feed:
-    name: "v${{ matrix.build_env.tag }} - ${{ matrix.build_env.pkgarch }} :: feed"
+  download-release-packages:
+    name: Download packages from release
     runs-on: ubuntu-latest
     needs: generate-config
+    steps:
+      - name: Download matching release assets
+        id: download
+        uses: actions/github-script@v7
+        env:
+          BUILD_CONFIGS: ${{ needs.generate-config.outputs.job-config }}
+          PACKAGE_FORMAT: ${{ needs.generate-config.outputs.package-format }}
+          OPENWRT_VERSION: ${{ inputs.version }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const crypto = require('crypto');
+            const fs = require('fs');
+            const path = require('path');
+
+            const configs = JSON.parse(process.env.BUILD_CONFIGS);
+            const extension = process.env.PACKAGE_FORMAT;
+            const version = process.env.OPENWRT_VERSION;
+            const tag = `v${version}`;
+            const packageNames = [
+              'amneziawg-tools',
+              'kmod-amneziawg',
+              'luci-proto-amneziawg',
+              'luci-i18n-amneziawg-ru',
+            ];
+
+            const { data: release } = await github.rest.repos.getReleaseByTag({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag,
+            });
+            const assets = await github.paginate(github.rest.repos.listReleaseAssets, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: release.id,
+              per_page: 100,
+            });
+            const assetsByName = new Map(assets.map(asset => [asset.name, asset]));
+            const publishRoot = path.join(process.env.GITHUB_WORKSPACE, 'release-packages');
+            const preparedFeeds = [];
+
+            for (const config of configs) {
+              const suffix = `v${config.tag}_${config.pkgarch}_${config.target}_${config.subtarget}.${extension}`;
+              const expectedNames = packageNames.map(name => `${name}_${suffix}`);
+              const missingNames = expectedNames.filter(name => !assetsByName.has(name));
+
+              if (missingNames.length > 0) {
+                core.warning(
+                  `Skipping ${config.target}/${config.subtarget}: missing release assets: ${missingNames.join(', ')}`
+                );
+                continue;
+              }
+
+              const feedDir = path.join(publishRoot, config.tag, config.target, config.subtarget);
+              fs.mkdirSync(feedDir, { recursive: true });
+              preparedFeeds.push({ config, feedDir, expectedNames });
+            }
+
+            const downloadQueue = preparedFeeds.flatMap(({ feedDir, expectedNames }) =>
+              expectedNames.map(assetName => ({
+                asset: assetsByName.get(assetName),
+                assetName,
+                feedDir,
+              }))
+            );
+            let nextDownload = 0;
+
+            async function downloadWorker() {
+              while (nextDownload < downloadQueue.length) {
+                const queueIndex = nextDownload++;
+                const { asset, assetName, feedDir } = downloadQueue[queueIndex];
+                const response = await github.request(
+                  'GET /repos/{owner}/{repo}/releases/assets/{asset_id}',
+                  {
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    asset_id: asset.id,
+                    headers: { accept: 'application/octet-stream' },
+                  }
+                );
+                const contents = Buffer.from(response.data);
+
+                if (asset.digest && asset.digest.startsWith('sha256:')) {
+                  const actualDigest = `sha256:${crypto.createHash('sha256').update(contents).digest('hex')}`;
+                  if (actualDigest !== asset.digest) {
+                    throw new Error(`Digest mismatch for ${assetName}`);
+                  }
+                }
+
+                fs.writeFileSync(path.join(feedDir, assetName), contents);
+                core.info(`Downloaded ${assetName}`);
+              }
+            }
+
+            const workerCount = Math.min(8, downloadQueue.length);
+            await Promise.all(Array.from({ length: workerCount }, () => downloadWorker()));
+
+            for (const { config, feedDir } of preparedFeeds) {
+              fs.writeFileSync(
+                path.join(feedDir, 'feed.json'),
+                `${JSON.stringify({
+                  version: config.tag,
+                  target: config.target,
+                  subtarget: config.subtarget,
+                  pkgarch: config.pkgarch,
+                  format: extension,
+                  feed: 'awg',
+                }, null, 2)}\n`
+              );
+            }
+
+            const feedCount = preparedFeeds.length;
+            if (feedCount === 0) {
+              throw new Error(`Release ${tag} has no complete ${extension.toUpperCase()} package sets for the selected targets`);
+            }
+            core.notice(`Prepared ${feedCount} feed directories from release ${tag}`);
+
+      - name: Upload release packages artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-packages-${{ inputs.version }}
+          path: release-packages/
+          if-no-files-found: error
+
+  build-feed:
+    name: "v${{ inputs.version }} :: APK feed index"
+    runs-on: ubuntu-latest
+    needs: [generate-config, download-release-packages]
+    if: ${{ needs.generate-config.outputs.package-format == 'apk' }}
     defaults:
       run:
         shell: bash
     container:
-      image: ghcr.io/openwrt/sdk:${{ matrix.build_env.target }}-${{ matrix.build_env.subtarget }}-${{ matrix.build_env.tag }}
+      image: ghcr.io/openwrt/sdk:x86-64-${{ inputs.version }}
       options: --user root
-    strategy:
-      matrix:
-        build_env: ${{ fromJson(needs.generate-config.outputs.job-config) }}
-      fail-fast: false
     steps:
-      - name: Checkout AWG source code
-        uses: actions/checkout@v4
+      - name: Download release packages artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: release-packages-${{ inputs.version }}
+          path: feed-publish
 
-      - name: Setup SDK and feeds
+      - name: Generate signed APK feed indexes
         env:
           AWG_FEED_APK_PRIVATE_KEY: ${{ secrets.AWG_FEED_APK_PRIVATE_KEY }}
           AWG_FEED_APK_PUBLIC_KEY: ${{ secrets.AWG_FEED_APK_PUBLIC_KEY }}
@@ -97,183 +232,252 @@ jobs:
             exit 1
           fi
           SDK_DIR=$(cd "$SDK_DIR" && pwd)
-          WORKSPACE_DIR=$(pwd)
           cd "$SDK_DIR"
-
           if [ ! -d scripts ]; then
             ./setup.sh
           fi
 
-          if [ -z "${AWG_FEED_APK_PRIVATE_KEY:-}" ] || [ -z "${AWG_FEED_APK_PUBLIC_KEY:-}" ]; then
-            echo "Missing AWG_FEED_APK_PRIVATE_KEY and/or AWG_FEED_APK_PUBLIC_KEY repository secrets."
-            echo "Generate them with:"
-            echo "openssl ecparam -name prime256v1 -genkey -noout -out awg-openwrt-feed.pem"
-            echo "openssl ec -in awg-openwrt-feed.pem -pubout > awg-openwrt-feed.pub.pem"
-            exit 1
-          fi
-          printf '%s\n' "$AWG_FEED_APK_PRIVATE_KEY" > private-key.pem
-          printf '%s\n' "$AWG_FEED_APK_PUBLIC_KEY" > public-key.pem
-          chmod 600 private-key.pem
-          test -s private-key.pem
-          test -s public-key.pem
-          grep -q "BEGIN .*PRIVATE KEY" private-key.pem
-          grep -q "BEGIN PUBLIC KEY" public-key.pem
-
-          AWG_FEED_DIR="$WORKSPACE_DIR/.tmp-awg-feed"
-          rm -rf "$AWG_FEED_DIR"
-          mkdir -p "$AWG_FEED_DIR"
-          cp -a "$WORKSPACE_DIR/kmod-amneziawg" "$AWG_FEED_DIR/"
-          cp -a "$WORKSPACE_DIR/amneziawg-tools" "$AWG_FEED_DIR/"
-          cp -a "$WORKSPACE_DIR/luci-proto-amneziawg" "$AWG_FEED_DIR/"
-          if [ ! -f feeds.conf.default ]; then
-            echo "feeds.conf.default is missing"
-            exit 1
-          fi
-          cp feeds.conf.default feeds.conf
-          echo "src-link awg $AWG_FEED_DIR" >> feeds.conf
-
-          ./scripts/feeds update base
-          ./scripts/feeds update luci
-          ./scripts/feeds update awg
-          ./scripts/feeds install -p awg kmod-amneziawg
-          ./scripts/feeds install -p awg amneziawg-tools
-          ./scripts/feeds install -p awg luci-proto-amneziawg
-
-          echo "CONFIG_PACKAGE_kmod-amneziawg=m" > .config
-          echo "CONFIG_PACKAGE_amneziawg-tools=y" >> .config
-          echo "CONFIG_PACKAGE_luci-proto-amneziawg=y" >> .config
-          echo "CONFIG_PACKAGE_luci-i18n-amneziawg-ru=y" >> .config
-          echo "CONFIG_SIGNED_PACKAGES=y" >> .config
-
-          make defconfig
-
-      - name: Build AmneziaWG packages
-        run: |
-          set -euo pipefail
-          SDK_DIR="${OPENWRT_SDK_DIR:-/builder}"
-          if [ ! -d "$SDK_DIR" ]; then
-            echo "OpenWrt SDK directory not found: $SDK_DIR"
-            exit 1
-          fi
-          SDK_DIR=$(cd "$SDK_DIR" && pwd)
-          cd "$SDK_DIR"
-          CANONICAL_AWG_FEED_DIR="$SDK_DIR/bin/packages/${{ matrix.build_env.pkgarch }}/awg"
-          mkdir -p "$CANONICAL_AWG_FEED_DIR"
-
-          make V=s PACKAGE_DIR="$CANONICAL_AWG_FEED_DIR" \
-            package/feeds/awg/luci-proto-amneziawg/compile
-
-          find "$CANONICAL_AWG_FEED_DIR" -maxdepth 1 -type f -name "*.apk" \
-            ! -name "amneziawg-tools*.apk" \
-            ! -name "kmod-amneziawg*.apk" \
-            ! -name "luci-proto-amneziawg*.apk" \
-            ! -name "luci-i18n-amneziawg-ru*.apk" \
-            -delete
-
-          echo "AWG feed package files:"
-          find "$CANONICAL_AWG_FEED_DIR" -maxdepth 1 -type f -name "*.apk" -printf "%f\n" | sort
-
-          ls "$CANONICAL_AWG_FEED_DIR"/amneziawg-tools*.apk >/dev/null
-          ls "$CANONICAL_AWG_FEED_DIR"/kmod-amneziawg*.apk >/dev/null
-          ls "$CANONICAL_AWG_FEED_DIR"/luci-proto-amneziawg*.apk >/dev/null
-          ls "$CANONICAL_AWG_FEED_DIR"/luci-i18n-amneziawg-ru*.apk >/dev/null
-
-          UNEXPECTED_PACKAGES=$(find "$CANONICAL_AWG_FEED_DIR" -maxdepth 1 -type f -name "*.apk" \
-            ! -name "amneziawg-tools*.apk" \
-            ! -name "kmod-amneziawg*.apk" \
-            ! -name "luci-proto-amneziawg*.apk" \
-            ! -name "luci-i18n-amneziawg-ru*.apk" \
-            -printf "%f\n")
-          if [ -n "$UNEXPECTED_PACKAGES" ]; then
-            echo "Unexpected package files in AWG feed:"
-            echo "$UNEXPECTED_PACKAGES"
-            exit 1
-          fi
-
-          make package/index V=s PACKAGE_DIR="$CANONICAL_AWG_FEED_DIR"
-
-          echo "AWG feed metadata:"
-          find "$CANONICAL_AWG_FEED_DIR" -maxdepth 1 -type f -printf "%f\n" | sort
-          echo "CANONICAL_AWG_FEED_DIR=$CANONICAL_AWG_FEED_DIR" >> "$GITHUB_ENV"
-          test -s "$CANONICAL_AWG_FEED_DIR/packages.adb"
-
-      - name: Prepare feed publish directory
-        run: |
-          set -euo pipefail
-          SDK_DIR="${OPENWRT_SDK_DIR:-/builder}"
-          if [ ! -d "$SDK_DIR" ]; then
-            echo "OpenWrt SDK directory not found: $SDK_DIR"
-            exit 1
-          fi
-          SDK_DIR=$(cd "$SDK_DIR" && pwd)
-          VERSION="${{ matrix.build_env.tag }}"
-          TARGET="${{ matrix.build_env.target }}"
-          SUBTARGET="${{ matrix.build_env.subtarget }}"
-          PKGARCH="${{ matrix.build_env.pkgarch }}"
-          FEED_DIR="$GITHUB_WORKSPACE/feed-publish/$VERSION/$TARGET/$SUBTARGET"
-          CANONICAL_AWG_FEED_DIR="${CANONICAL_AWG_FEED_DIR:?canonical feed is not resolved}"
-
-          mkdir -p "$FEED_DIR"
-          cp -a "$CANONICAL_AWG_FEED_DIR"/. "$FEED_DIR"/
-          cat > "$FEED_DIR/feed.json" <<EOF
-          {
-            "version": "$VERSION",
-            "target": "$TARGET",
-            "subtarget": "$SUBTARGET",
-            "pkgarch": "$PKGARCH",
-            "feed": "awg"
-          }
-          EOF
-
-          mkdir -p "$GITHUB_WORKSPACE/feed-publish/keys"
-          cp -a "$SDK_DIR/public-key.pem" "$GITHUB_WORKSPACE/feed-publish/keys/awg-openwrt-feed.pem"
-          test -s "$GITHUB_WORKSPACE/feed-publish/keys/awg-openwrt-feed.pem"
-
-      - name: Feed smoke tests
-        run: |
-          set -euo pipefail
-          SDK_DIR="${OPENWRT_SDK_DIR:-/builder}"
-          if [ ! -d "$SDK_DIR" ]; then
-            echo "OpenWrt SDK directory not found: $SDK_DIR"
-            exit 1
-          fi
-          SDK_DIR=$(cd "$SDK_DIR" && pwd)
-          FEED_DIR="$GITHUB_WORKSPACE/feed-publish/${{ matrix.build_env.tag }}/${{ matrix.build_env.target }}/${{ matrix.build_env.subtarget }}"
-
-          test -d "$FEED_DIR"
-          test -s "$GITHUB_WORKSPACE/feed-publish/keys/awg-openwrt-feed.pem"
-          ls "$FEED_DIR"/amneziawg-tools*.apk >/dev/null
-          ls "$FEED_DIR"/kmod-amneziawg*.apk >/dev/null
-          ls "$FEED_DIR"/luci-proto-amneziawg*.apk >/dev/null
-          ls "$FEED_DIR"/luci-i18n-amneziawg-ru*.apk >/dev/null
-
-          test -s "$FEED_DIR/packages.adb"
           APK_BIN="$SDK_DIR/staging_dir/host/bin/apk"
+          INDEX_JSON_SCRIPT="$SDK_DIR/scripts/make-index-json.py"
           if [ ! -x "$APK_BIN" ]; then
             echo "OpenWrt host apk tool not found: $APK_BIN"
             exit 1
           fi
-          ADB_DUMP_FILE="$RUNNER_TEMP/packages.adb.dump"
-          "$APK_BIN" adbdump "$FEED_DIR/packages.adb" > "$ADB_DUMP_FILE"
-          grep -q "amneziawg-tools" "$ADB_DUMP_FILE"
-          grep -q "kmod-amneziawg" "$ADB_DUMP_FILE"
-          grep -q "luci-proto-amneziawg" "$ADB_DUMP_FILE"
-          grep -q "luci-i18n-amneziawg-ru" "$ADB_DUMP_FILE"
-          ! grep -q "busybox" "$ADB_DUMP_FILE"
-          ! grep -q "\blibc\b" "$ADB_DUMP_FILE"
-          ! grep -q "\bubus\b" "$ADB_DUMP_FILE"
+          if [ ! -x "$INDEX_JSON_SCRIPT" ]; then
+            echo "OpenWrt index JSON script not found: $INDEX_JSON_SCRIPT"
+            exit 1
+          fi
+          if [ -z "${AWG_FEED_APK_PRIVATE_KEY:-}" ] || [ -z "${AWG_FEED_APK_PUBLIC_KEY:-}" ]; then
+            echo "Missing AWG_FEED_APK_PRIVATE_KEY and/or AWG_FEED_APK_PUBLIC_KEY repository secrets."
+            exit 1
+          fi
 
-      - name: Upload feed artifact
+          printf '%s\n' "$AWG_FEED_APK_PRIVATE_KEY" > private-key.pem
+          printf '%s\n' "$AWG_FEED_APK_PUBLIC_KEY" > public-key.pem
+          chmod 600 private-key.pem
+          grep -q "BEGIN .*PRIVATE KEY" private-key.pem
+          grep -q "BEGIN PUBLIC KEY" public-key.pem
+
+          while IFS= read -r -d '' metadata_file; do
+            feed_dir=$(dirname "$metadata_file")
+            pkgarch=$(sed -n 's/.*"pkgarch": "\([^"]*\)".*/\1/p' "$metadata_file" | head -n1)
+            mapfile -d '' packages < <(find "$feed_dir" -maxdepth 1 -type f -name '*.apk' -print0)
+            if [ "${#packages[@]}" -ne 4 ]; then
+              echo "Expected exactly 4 APK release assets in $feed_dir, found ${#packages[@]}"
+              exit 1
+            fi
+
+            (
+              cd "$feed_dir"
+              "$APK_BIN" mkndx \
+                --root "$SDK_DIR" \
+                --keys-dir "$SDK_DIR" \
+                --allow-untrusted \
+                --sign "$SDK_DIR/private-key.pem" \
+                --output packages.adb \
+                ./*.apk
+              "$APK_BIN" adbdump --format json packages.adb | \
+                "$INDEX_JSON_SCRIPT" -f apk -a "$pkgarch" - > index.json
+            )
+          done < <(find "$GITHUB_WORKSPACE/feed-publish" -mindepth 4 -maxdepth 4 -name feed.json -type f -print0)
+
+          mkdir -p "$GITHUB_WORKSPACE/feed-publish/keys"
+          cp -a public-key.pem "$GITHUB_WORKSPACE/feed-publish/keys/awg-openwrt-feed.pem"
+
+      - name: APK feed smoke tests
+        run: |
+          set -euo pipefail
+          SDK_DIR="${OPENWRT_SDK_DIR:-/builder}"
+          SDK_DIR=$(cd "$SDK_DIR" && pwd)
+          APK_BIN="$SDK_DIR/staging_dir/host/bin/apk"
+          test -s "$GITHUB_WORKSPACE/feed-publish/keys/awg-openwrt-feed.pem"
+
+          feed_count=0
+          while IFS= read -r -d '' feed_dir; do
+            feed_count=$((feed_count + 1))
+            ls "$feed_dir"/amneziawg-tools*.apk >/dev/null
+            ls "$feed_dir"/kmod-amneziawg*.apk >/dev/null
+            ls "$feed_dir"/luci-proto-amneziawg*.apk >/dev/null
+            ls "$feed_dir"/luci-i18n-amneziawg-ru*.apk >/dev/null
+            test -s "$feed_dir/packages.adb"
+            test -s "$feed_dir/index.json"
+
+            adb_dump="$RUNNER_TEMP/packages-$feed_count.adb.dump"
+            "$APK_BIN" adbdump "$feed_dir/packages.adb" > "$adb_dump"
+            grep -q "amneziawg-tools" "$adb_dump"
+            grep -q "kmod-amneziawg" "$adb_dump"
+            grep -q "luci-proto-amneziawg" "$adb_dump"
+            grep -q "luci-i18n-amneziawg-ru" "$adb_dump"
+            ! grep -q "busybox" "$adb_dump"
+            ! grep -q "\blibc\b" "$adb_dump"
+            ! grep -q "\bubus\b" "$adb_dump"
+          done < <(find "$GITHUB_WORKSPACE/feed-publish" -mindepth 3 -maxdepth 3 -type d -print0)
+          test "$feed_count" -gt 0
+
+      - name: Upload APK feed artifact
         uses: actions/upload-artifact@v4
         with:
-          name: feed-${{ matrix.build_env.tag }}-${{ matrix.build_env.target }}-${{ matrix.build_env.subtarget }}-${{ matrix.build_env.pkgarch }}
+          name: feed-apk-${{ inputs.version }}
+          path: feed-publish/
+          if-no-files-found: error
+
+  build-feed-ipk:
+    name: "v${{ inputs.version }} :: IPK feed index"
+    runs-on: ubuntu-latest
+    needs: [generate-config, download-release-packages]
+    if: ${{ needs.generate-config.outputs.package-format == 'ipk' }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Download release packages artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: release-packages-${{ inputs.version }}
+          path: feed-publish
+
+      - name: Cache OpenWrt IPK index tools
+        id: cache-sdk
+        uses: actions/cache@v4
+        with:
+          path: openwrt-sdk-*/
+          key: ${{ runner.os }}-openwrt-${{ inputs.version }}-x86-64-ipk-index-tools
+
+      - name: Install SDK archive prerequisite
+        if: steps.cache-sdk.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y zstd
+
+      - name: Download one OpenWrt SDK for IPK index tools
+        if: steps.cache-sdk.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          VERSION="${{ inputs.version }}"
+          SDK_INDEX_URL="https://downloads.openwrt.org/releases/$VERSION/targets/x86/64/"
+          SDK_FILE=$(curl -fsSL "$SDK_INDEX_URL" | \
+            grep -Eo "openwrt-sdk-${VERSION}-x86-64_gcc-[^\"]+_musl[^\"]*\\.Linux-x86_64\\.tar\\.(xz|zst)" | \
+            head -n1 || true)
+
+          if [ -z "$SDK_FILE" ]; then
+            echo "OpenWrt x86/64 SDK not found at $SDK_INDEX_URL"
+            exit 1
+          fi
+          curl -fL --retry 3 -o "$SDK_FILE" "$SDK_INDEX_URL$SDK_FILE"
+          case "$SDK_FILE" in
+            *.tar.zst) tar -I zstd -xf "$SDK_FILE" ;;
+            *.tar.xz) tar -xf "$SDK_FILE" ;;
+            *) echo "Unsupported SDK archive: $SDK_FILE"; exit 1 ;;
+          esac
+
+      - name: Resolve OpenWrt IPK index tools
+        run: |
+          set -euo pipefail
+          SDK_DIR=$(find "$GITHUB_WORKSPACE" -maxdepth 1 -name 'openwrt-sdk-*' -type d -print -quit)
+          if [ -z "$SDK_DIR" ]; then
+            echo "Extracted OpenWrt SDK directory was not found."
+            exit 1
+          fi
+          SDK_DIR=$(cd "$SDK_DIR" && pwd)
+          test -x "$SDK_DIR/staging_dir/host/bin/mkhash"
+          test -x "$SDK_DIR/staging_dir/host/bin/usign"
+          test -x "$SDK_DIR/scripts/ipkg-make-index.sh"
+          test -x "$SDK_DIR/scripts/make-index-json.py"
+          echo "SDK_DIR=$SDK_DIR" >> "$GITHUB_ENV"
+
+      - name: Generate signed IPK feed indexes
+        env:
+          AWG_FEED_USIGN_PRIVATE_KEY: ${{ secrets.AWG_FEED_USIGN_PRIVATE_KEY }}
+          AWG_FEED_USIGN_PUBLIC_KEY: ${{ secrets.AWG_FEED_USIGN_PUBLIC_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "${AWG_FEED_USIGN_PRIVATE_KEY:-}" ] || [ -z "${AWG_FEED_USIGN_PUBLIC_KEY:-}" ]; then
+            echo "Missing AWG_FEED_USIGN_PRIVATE_KEY and/or AWG_FEED_USIGN_PUBLIC_KEY repository secrets."
+            exit 1
+          fi
+
+          PRIVATE_KEY="$RUNNER_TEMP/awg-openwrt-feed.sec"
+          PUBLIC_KEY="$RUNNER_TEMP/awg-openwrt-feed.pub"
+          printf '%s\n' "$AWG_FEED_USIGN_PRIVATE_KEY" > "$PRIVATE_KEY"
+          printf '%s\n' "$AWG_FEED_USIGN_PUBLIC_KEY" > "$PUBLIC_KEY"
+          chmod 600 "$PRIVATE_KEY"
+
+          USIGN_BIN="$SDK_DIR/staging_dir/host/bin/usign"
+          MKHASH_BIN="$SDK_DIR/staging_dir/host/bin/mkhash"
+          IPKG_INDEX_SCRIPT="$SDK_DIR/scripts/ipkg-make-index.sh"
+          INDEX_JSON_SCRIPT="$SDK_DIR/scripts/make-index-json.py"
+          "$USIGN_BIN" -F -p "$PUBLIC_KEY"
+
+          while IFS= read -r -d '' metadata_file; do
+            feed_dir=$(dirname "$metadata_file")
+            pkgarch=$(sed -n 's/.*"pkgarch": "\([^"]*\)".*/\1/p' "$metadata_file" | head -n1)
+            mapfile -d '' packages < <(find "$feed_dir" -maxdepth 1 -type f -name '*.ipk' -print0)
+            if [ "${#packages[@]}" -ne 4 ]; then
+              echo "Expected exactly 4 IPK release assets in $feed_dir, found ${#packages[@]}"
+              exit 1
+            fi
+
+            (
+              cd "$feed_dir"
+              MKHASH="$MKHASH_BIN" "$IPKG_INDEX_SCRIPT" . > Packages.manifest
+              grep -vE '^(Maintainer|LicenseFiles|Source|SourceName|Require|SourceDateEpoch)' \
+                Packages.manifest > Packages
+              case "$(((64 + $(stat -L -c%s Packages)) % 128))" in
+                110|111) printf '\n\n' >> Packages ;;
+              esac
+              "$INDEX_JSON_SCRIPT" -f opkg -a "$pkgarch" Packages > index.json
+              gzip -9nc Packages > Packages.gz
+              "$USIGN_BIN" -S -m Packages -s "$PRIVATE_KEY"
+            )
+          done < <(find "$GITHUB_WORKSPACE/feed-publish" -mindepth 4 -maxdepth 4 -name feed.json -type f -print0)
+
+          mkdir -p "$GITHUB_WORKSPACE/feed-publish/keys"
+          cp -a "$PUBLIC_KEY" "$GITHUB_WORKSPACE/feed-publish/keys/awg-openwrt-feed.pub"
+
+      - name: IPK feed smoke tests
+        run: |
+          set -euo pipefail
+          USIGN_BIN="$SDK_DIR/staging_dir/host/bin/usign"
+          PUBLIC_KEY="$GITHUB_WORKSPACE/feed-publish/keys/awg-openwrt-feed.pub"
+          test -s "$PUBLIC_KEY"
+
+          feed_count=0
+          while IFS= read -r -d '' feed_dir; do
+            feed_count=$((feed_count + 1))
+            ls "$feed_dir"/amneziawg-tools*.ipk >/dev/null
+            ls "$feed_dir"/kmod-amneziawg*.ipk >/dev/null
+            ls "$feed_dir"/luci-proto-amneziawg*.ipk >/dev/null
+            ls "$feed_dir"/luci-i18n-amneziawg-ru*.ipk >/dev/null
+            test -s "$feed_dir/Packages"
+            test -s "$feed_dir/Packages.manifest"
+            test -s "$feed_dir/Packages.gz"
+            test -s "$feed_dir/Packages.sig"
+            test -s "$feed_dir/index.json"
+            gzip -dc "$feed_dir/Packages.gz" | cmp - "$feed_dir/Packages"
+            "$USIGN_BIN" -V -p "$PUBLIC_KEY" \
+              -m "$feed_dir/Packages" -x "$feed_dir/Packages.sig"
+            grep -q '^Package: amneziawg-tools$' "$feed_dir/Packages"
+            grep -q '^Package: kmod-amneziawg$' "$feed_dir/Packages"
+            grep -q '^Package: luci-proto-amneziawg$' "$feed_dir/Packages"
+            grep -q '^Package: luci-i18n-amneziawg-ru$' "$feed_dir/Packages"
+            ! grep -q '^Package: busybox$' "$feed_dir/Packages"
+            ! grep -q '^Package: libc$' "$feed_dir/Packages"
+            ! grep -q '^Package: ubus$' "$feed_dir/Packages"
+          done < <(find "$GITHUB_WORKSPACE/feed-publish" -mindepth 3 -maxdepth 3 -type d -print0)
+          test "$feed_count" -gt 0
+
+      - name: Upload IPK feed artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: feed-ipk-${{ inputs.version }}
           path: feed-publish/
           if-no-files-found: error
 
   deploy:
     name: Deploy feed to gh-pages
     runs-on: ubuntu-latest
-    needs: build-feed
+    needs: [build-feed, build-feed-ipk]
     if: ${{ always() }}
     steps:
       - name: Checkout repository
@@ -299,7 +503,7 @@ jobs:
       - name: Check publishable feed content
         run: |
           set -euo pipefail
-          if [ -z "$(find gh-pages-content -name packages.adb -type f -print -quit)" ]; then
+          if [ -z "$(find gh-pages-content -type f \( -name packages.adb -o -name Packages.gz \) -print -quit)" ]; then
             echo "No successful feed artifacts and no existing gh-pages feed content found."
             exit 1
           fi
