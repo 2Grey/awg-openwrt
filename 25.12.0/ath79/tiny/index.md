@@ -11,10 +11,12 @@ Index of [(root)](https://2grey.github.io/awg-openwrt/) / [25.12.0](https://2gre
 - Target: `ath79`
 - Subtarget: `tiny`
 - Package architecture: `mips_24kc`
+- Package format: `apk`
 
 ## Upstream OpenWrt target
 
 [https://downloads.openwrt.org/releases/25.12.0/targets/ath79/tiny/](https://downloads.openwrt.org/releases/25.12.0/targets/ath79/tiny/)
+
 
 ## Configure Feed
 
@@ -30,6 +32,7 @@ echo "https://2grey.github.io/awg-openwrt/25.12.0/ath79/tiny/packages.adb" >> /e
 apk update
 apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 ```
+
 
 <script src="https://2grey.github.io/awg-openwrt/assets/copy-code.js?v=2"></script>
 

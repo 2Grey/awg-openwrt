@@ -11,10 +11,12 @@ Index of [(root)](https://2grey.github.io/awg-openwrt/) / [25.12.2](https://2gre
 - Target: `mediatek`
 - Subtarget: `mt7622`
 - Package architecture: `aarch64_cortex-a53`
+- Package format: `apk`
 
 ## Upstream OpenWrt target
 
 [https://downloads.openwrt.org/releases/25.12.2/targets/mediatek/mt7622/](https://downloads.openwrt.org/releases/25.12.2/targets/mediatek/mt7622/)
+
 
 ## Configure Feed
 
@@ -30,6 +32,7 @@ echo "https://2grey.github.io/awg-openwrt/25.12.2/mediatek/mt7622/packages.adb" 
 apk update
 apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 ```
+
 
 <script src="https://2grey.github.io/awg-openwrt/assets/copy-code.js?v=2"></script>
 

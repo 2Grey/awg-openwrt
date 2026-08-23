@@ -11,10 +11,12 @@ Index of [(root)](https://2grey.github.io/awg-openwrt/) / [25.12.4](https://2gre
 - Target: `qualcommax`
 - Subtarget: `ipq60xx`
 - Package architecture: `aarch64_cortex-a53`
+- Package format: `apk`
 
 ## Upstream OpenWrt target
 
 [https://downloads.openwrt.org/releases/25.12.4/targets/qualcommax/ipq60xx/](https://downloads.openwrt.org/releases/25.12.4/targets/qualcommax/ipq60xx/)
+
 
 ## Configure Feed
 
@@ -31,14 +33,19 @@ apk update
 apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 ```
 
+
 <script src="https://2grey.github.io/awg-openwrt/assets/copy-code.js?v=2"></script>
 
 ## Feed files
 
 - [amneziawg-tools-3.0.20260805-r1.apk](https://2grey.github.io/awg-openwrt/25.12.4/qualcommax/ipq60xx/amneziawg-tools-3.0.20260805-r1.apk)
+- [amneziawg-tools_v25.12.4_aarch64_cortex-a53_qualcommax_ipq60xx.apk](https://2grey.github.io/awg-openwrt/25.12.4/qualcommax/ipq60xx/amneziawg-tools_v25.12.4_aarch64_cortex-a53_qualcommax_ipq60xx.apk)
 - [feed.json](https://2grey.github.io/awg-openwrt/25.12.4/qualcommax/ipq60xx/feed.json)
 - [index.json](https://2grey.github.io/awg-openwrt/25.12.4/qualcommax/ipq60xx/index.json)
 - [kmod-amneziawg-6.12.87.3.0.20260731-r1.apk](https://2grey.github.io/awg-openwrt/25.12.4/qualcommax/ipq60xx/kmod-amneziawg-6.12.87.3.0.20260731-r1.apk)
+- [kmod-amneziawg_v25.12.4_aarch64_cortex-a53_qualcommax_ipq60xx.apk](https://2grey.github.io/awg-openwrt/25.12.4/qualcommax/ipq60xx/kmod-amneziawg_v25.12.4_aarch64_cortex-a53_qualcommax_ipq60xx.apk)
 - [luci-i18n-amneziawg-ru-0.260807.39549.apk](https://2grey.github.io/awg-openwrt/25.12.4/qualcommax/ipq60xx/luci-i18n-amneziawg-ru-0.260807.39549.apk)
+- [luci-i18n-amneziawg-ru_v25.12.4_aarch64_cortex-a53_qualcommax_ipq60xx.apk](https://2grey.github.io/awg-openwrt/25.12.4/qualcommax/ipq60xx/luci-i18n-amneziawg-ru_v25.12.4_aarch64_cortex-a53_qualcommax_ipq60xx.apk)
 - [luci-proto-amneziawg-3.0.0-r1.apk](https://2grey.github.io/awg-openwrt/25.12.4/qualcommax/ipq60xx/luci-proto-amneziawg-3.0.0-r1.apk)
+- [luci-proto-amneziawg_v25.12.4_aarch64_cortex-a53_qualcommax_ipq60xx.apk](https://2grey.github.io/awg-openwrt/25.12.4/qualcommax/ipq60xx/luci-proto-amneziawg_v25.12.4_aarch64_cortex-a53_qualcommax_ipq60xx.apk)
 - [packages.adb](https://2grey.github.io/awg-openwrt/25.12.4/qualcommax/ipq60xx/packages.adb)

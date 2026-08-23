@@ -11,10 +11,12 @@ Index of [(root)](https://2grey.github.io/awg-openwrt/) / [25.12.2](https://2gre
 - Target: `malta`
 - Subtarget: `be`
 - Package architecture: `mips_24kc`
+- Package format: `apk`
 
 ## Upstream OpenWrt target
 
 [https://downloads.openwrt.org/releases/25.12.2/targets/malta/be/](https://downloads.openwrt.org/releases/25.12.2/targets/malta/be/)
+
 
 ## Configure Feed
 
@@ -30,6 +32,7 @@ echo "https://2grey.github.io/awg-openwrt/25.12.2/malta/be/packages.adb" >> /etc
 apk update
 apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 ```
+
 
 <script src="https://2grey.github.io/awg-openwrt/assets/copy-code.js?v=2"></script>
 

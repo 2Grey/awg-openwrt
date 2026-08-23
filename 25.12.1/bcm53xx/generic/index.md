@@ -11,10 +11,12 @@ Index of [(root)](https://2grey.github.io/awg-openwrt/) / [25.12.1](https://2gre
 - Target: `bcm53xx`
 - Subtarget: `generic`
 - Package architecture: `arm_cortex-a9`
+- Package format: `apk`
 
 ## Upstream OpenWrt target
 
 [https://downloads.openwrt.org/releases/25.12.1/targets/bcm53xx/generic/](https://downloads.openwrt.org/releases/25.12.1/targets/bcm53xx/generic/)
+
 
 ## Configure Feed
 
@@ -30,6 +32,7 @@ echo "https://2grey.github.io/awg-openwrt/25.12.1/bcm53xx/generic/packages.adb" 
 apk update
 apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 ```
+
 
 <script src="https://2grey.github.io/awg-openwrt/assets/copy-code.js?v=2"></script>
 

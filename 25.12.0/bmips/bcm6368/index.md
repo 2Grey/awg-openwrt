@@ -11,10 +11,12 @@ Index of [(root)](https://2grey.github.io/awg-openwrt/) / [25.12.0](https://2gre
 - Target: `bmips`
 - Subtarget: `bcm6368`
 - Package architecture: `mips_mips32`
+- Package format: `apk`
 
 ## Upstream OpenWrt target
 
 [https://downloads.openwrt.org/releases/25.12.0/targets/bmips/bcm6368/](https://downloads.openwrt.org/releases/25.12.0/targets/bmips/bcm6368/)
+
 
 ## Configure Feed
 
@@ -30,6 +32,7 @@ echo "https://2grey.github.io/awg-openwrt/25.12.0/bmips/bcm6368/packages.adb" >>
 apk update
 apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 ```
+
 
 <script src="https://2grey.github.io/awg-openwrt/assets/copy-code.js?v=2"></script>
 

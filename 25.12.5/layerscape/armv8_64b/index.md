@@ -11,10 +11,12 @@ Index of [(root)](https://2grey.github.io/awg-openwrt/) / [25.12.5](https://2gre
 - Target: `layerscape`
 - Subtarget: `armv8_64b`
 - Package architecture: `aarch64_generic`
+- Package format: `apk`
 
 ## Upstream OpenWrt target
 
 [https://downloads.openwrt.org/releases/25.12.5/targets/layerscape/armv8_64b/](https://downloads.openwrt.org/releases/25.12.5/targets/layerscape/armv8_64b/)
+
 
 ## Configure Feed
 
@@ -30,6 +32,7 @@ echo "https://2grey.github.io/awg-openwrt/25.12.5/layerscape/armv8_64b/packages.
 apk update
 apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 ```
+
 
 <script src="https://2grey.github.io/awg-openwrt/assets/copy-code.js?v=2"></script>
 

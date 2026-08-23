@@ -11,10 +11,12 @@ Index of [(root)](https://2grey.github.io/awg-openwrt/) / [25.12.4](https://2gre
 - Target: `gemini`
 - Subtarget: `generic`
 - Package architecture: `arm_fa526`
+- Package format: `apk`
 
 ## Upstream OpenWrt target
 
 [https://downloads.openwrt.org/releases/25.12.4/targets/gemini/generic/](https://downloads.openwrt.org/releases/25.12.4/targets/gemini/generic/)
+
 
 ## Configure Feed
 
@@ -31,14 +33,19 @@ apk update
 apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 ```
 
+
 <script src="https://2grey.github.io/awg-openwrt/assets/copy-code.js?v=2"></script>
 
 ## Feed files
 
 - [amneziawg-tools-3.0.20260805-r1.apk](https://2grey.github.io/awg-openwrt/25.12.4/gemini/generic/amneziawg-tools-3.0.20260805-r1.apk)
+- [amneziawg-tools_v25.12.4_arm_fa526_gemini_generic.apk](https://2grey.github.io/awg-openwrt/25.12.4/gemini/generic/amneziawg-tools_v25.12.4_arm_fa526_gemini_generic.apk)
 - [feed.json](https://2grey.github.io/awg-openwrt/25.12.4/gemini/generic/feed.json)
 - [index.json](https://2grey.github.io/awg-openwrt/25.12.4/gemini/generic/index.json)
 - [kmod-amneziawg-6.12.87.3.0.20260731-r1.apk](https://2grey.github.io/awg-openwrt/25.12.4/gemini/generic/kmod-amneziawg-6.12.87.3.0.20260731-r1.apk)
+- [kmod-amneziawg_v25.12.4_arm_fa526_gemini_generic.apk](https://2grey.github.io/awg-openwrt/25.12.4/gemini/generic/kmod-amneziawg_v25.12.4_arm_fa526_gemini_generic.apk)
 - [luci-i18n-amneziawg-ru-0.260807.38384.apk](https://2grey.github.io/awg-openwrt/25.12.4/gemini/generic/luci-i18n-amneziawg-ru-0.260807.38384.apk)
+- [luci-i18n-amneziawg-ru_v25.12.4_arm_fa526_gemini_generic.apk](https://2grey.github.io/awg-openwrt/25.12.4/gemini/generic/luci-i18n-amneziawg-ru_v25.12.4_arm_fa526_gemini_generic.apk)
 - [luci-proto-amneziawg-3.0.0-r1.apk](https://2grey.github.io/awg-openwrt/25.12.4/gemini/generic/luci-proto-amneziawg-3.0.0-r1.apk)
+- [luci-proto-amneziawg_v25.12.4_arm_fa526_gemini_generic.apk](https://2grey.github.io/awg-openwrt/25.12.4/gemini/generic/luci-proto-amneziawg_v25.12.4_arm_fa526_gemini_generic.apk)
 - [packages.adb](https://2grey.github.io/awg-openwrt/25.12.4/gemini/generic/packages.adb)

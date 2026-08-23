@@ -11,10 +11,12 @@ Index of [(root)](https://2grey.github.io/awg-openwrt/) / [25.12.1](https://2gre
 - Target: `qoriq`
 - Subtarget: `generic`
 - Package architecture: `powerpc64_e5500`
+- Package format: `apk`
 
 ## Upstream OpenWrt target
 
 [https://downloads.openwrt.org/releases/25.12.1/targets/qoriq/generic/](https://downloads.openwrt.org/releases/25.12.1/targets/qoriq/generic/)
+
 
 ## Configure Feed
 
@@ -30,6 +32,7 @@ echo "https://2grey.github.io/awg-openwrt/25.12.1/qoriq/generic/packages.adb" >>
 apk update
 apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 ```
+
 
 <script src="https://2grey.github.io/awg-openwrt/assets/copy-code.js?v=2"></script>
 

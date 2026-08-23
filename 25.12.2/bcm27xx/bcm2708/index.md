@@ -11,10 +11,12 @@ Index of [(root)](https://2grey.github.io/awg-openwrt/) / [25.12.2](https://2gre
 - Target: `bcm27xx`
 - Subtarget: `bcm2708`
 - Package architecture: `arm_arm1176jzf-s_vfp`
+- Package format: `apk`
 
 ## Upstream OpenWrt target
 
 [https://downloads.openwrt.org/releases/25.12.2/targets/bcm27xx/bcm2708/](https://downloads.openwrt.org/releases/25.12.2/targets/bcm27xx/bcm2708/)
+
 
 ## Configure Feed
 
@@ -30,6 +32,7 @@ echo "https://2grey.github.io/awg-openwrt/25.12.2/bcm27xx/bcm2708/packages.adb" 
 apk update
 apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 ```
+
 
 <script src="https://2grey.github.io/awg-openwrt/assets/copy-code.js?v=2"></script>
 

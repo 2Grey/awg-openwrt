@@ -11,10 +11,12 @@ Index of [(root)](https://2grey.github.io/awg-openwrt/) / [25.12.1](https://2gre
 - Target: `ipq40xx`
 - Subtarget: `mikrotik`
 - Package architecture: `arm_cortex-a7_neon-vfpv4`
+- Package format: `apk`
 
 ## Upstream OpenWrt target
 
 [https://downloads.openwrt.org/releases/25.12.1/targets/ipq40xx/mikrotik/](https://downloads.openwrt.org/releases/25.12.1/targets/ipq40xx/mikrotik/)
+
 
 ## Configure Feed
 
@@ -30,6 +32,7 @@ echo "https://2grey.github.io/awg-openwrt/25.12.1/ipq40xx/mikrotik/packages.adb"
 apk update
 apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 ```
+
 
 <script src="https://2grey.github.io/awg-openwrt/assets/copy-code.js?v=2"></script>
 

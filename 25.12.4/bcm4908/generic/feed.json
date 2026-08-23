@@ -3,5 +3,6 @@
   "target": "bcm4908",
   "subtarget": "generic",
   "pkgarch": "aarch64_cortex-a53",
+  "format": "apk",
   "feed": "awg"
 }

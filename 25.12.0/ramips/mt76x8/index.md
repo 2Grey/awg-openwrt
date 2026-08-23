@@ -11,10 +11,12 @@ Index of [(root)](https://2grey.github.io/awg-openwrt/) / [25.12.0](https://2gre
 - Target: `ramips`
 - Subtarget: `mt76x8`
 - Package architecture: `mipsel_24kc`
+- Package format: `apk`
 
 ## Upstream OpenWrt target
 
 [https://downloads.openwrt.org/releases/25.12.0/targets/ramips/mt76x8/](https://downloads.openwrt.org/releases/25.12.0/targets/ramips/mt76x8/)
+
 
 ## Configure Feed
 
@@ -30,6 +32,7 @@ echo "https://2grey.github.io/awg-openwrt/25.12.0/ramips/mt76x8/packages.adb" >>
 apk update
 apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 ```
+
 
 <script src="https://2grey.github.io/awg-openwrt/assets/copy-code.js?v=2"></script>
 

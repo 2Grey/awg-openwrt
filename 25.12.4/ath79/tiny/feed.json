@@ -3,5 +3,6 @@
   "target": "ath79",
   "subtarget": "tiny",
   "pkgarch": "mips_24kc",
+  "format": "apk",
   "feed": "awg"
 }

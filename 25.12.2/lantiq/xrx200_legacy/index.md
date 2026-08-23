@@ -11,10 +11,12 @@ Index of [(root)](https://2grey.github.io/awg-openwrt/) / [25.12.2](https://2gre
 - Target: `lantiq`
 - Subtarget: `xrx200_legacy`
 - Package architecture: `mips_24kc`
+- Package format: `apk`
 
 ## Upstream OpenWrt target
 
 [https://downloads.openwrt.org/releases/25.12.2/targets/lantiq/xrx200_legacy/](https://downloads.openwrt.org/releases/25.12.2/targets/lantiq/xrx200_legacy/)
+
 
 ## Configure Feed
 
@@ -30,6 +32,7 @@ echo "https://2grey.github.io/awg-openwrt/25.12.2/lantiq/xrx200_legacy/packages.
 apk update
 apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 ```
+
 
 <script src="https://2grey.github.io/awg-openwrt/assets/copy-code.js?v=2"></script>
 

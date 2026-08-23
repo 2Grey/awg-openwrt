@@ -11,10 +11,12 @@ Index of [(root)](https://2grey.github.io/awg-openwrt/) / [25.12.3](https://2gre
 - Target: `mpc85xx`
 - Subtarget: `p2020`
 - Package architecture: `powerpc_8548`
+- Package format: `apk`
 
 ## Upstream OpenWrt target
 
 [https://downloads.openwrt.org/releases/25.12.3/targets/mpc85xx/p2020/](https://downloads.openwrt.org/releases/25.12.3/targets/mpc85xx/p2020/)
+
 
 ## Configure Feed
 
@@ -30,6 +32,7 @@ echo "https://2grey.github.io/awg-openwrt/25.12.3/mpc85xx/p2020/packages.adb" >>
 apk update
 apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 ```
+
 
 <script src="https://2grey.github.io/awg-openwrt/assets/copy-code.js?v=2"></script>
 

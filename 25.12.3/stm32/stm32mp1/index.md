@@ -11,10 +11,12 @@ Index of [(root)](https://2grey.github.io/awg-openwrt/) / [25.12.3](https://2gre
 - Target: `stm32`
 - Subtarget: `stm32mp1`
 - Package architecture: `arm_cortex-a7_neon-vfpv4`
+- Package format: `apk`
 
 ## Upstream OpenWrt target
 
 [https://downloads.openwrt.org/releases/25.12.3/targets/stm32/stm32mp1/](https://downloads.openwrt.org/releases/25.12.3/targets/stm32/stm32mp1/)
+
 
 ## Configure Feed
 
@@ -30,6 +32,7 @@ echo "https://2grey.github.io/awg-openwrt/25.12.3/stm32/stm32mp1/packages.adb" >
 apk update
 apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 ```
+
 
 <script src="https://2grey.github.io/awg-openwrt/assets/copy-code.js?v=2"></script>
 

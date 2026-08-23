@@ -11,10 +11,12 @@ Index of [(root)](https://2grey.github.io/awg-openwrt/) / [25.12.5](https://2gre
 - Target: `ipq40xx`
 - Subtarget: `chromium`
 - Package architecture: `arm_cortex-a7_neon-vfpv4`
+- Package format: `apk`
 
 ## Upstream OpenWrt target
 
 [https://downloads.openwrt.org/releases/25.12.5/targets/ipq40xx/chromium/](https://downloads.openwrt.org/releases/25.12.5/targets/ipq40xx/chromium/)
+
 
 ## Configure Feed
 
@@ -30,6 +32,7 @@ echo "https://2grey.github.io/awg-openwrt/25.12.5/ipq40xx/chromium/packages.adb"
 apk update
 apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 ```
+
 
 <script src="https://2grey.github.io/awg-openwrt/assets/copy-code.js?v=2"></script>
 
