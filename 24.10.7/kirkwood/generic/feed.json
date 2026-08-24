@@ -1,0 +1,8 @@
+{
+  "version": "24.10.7",
+  "target": "kirkwood",
+  "subtarget": "generic",
+  "pkgarch": "arm_xscale",
+  "format": "ipk",
+  "feed": "awg"
+}

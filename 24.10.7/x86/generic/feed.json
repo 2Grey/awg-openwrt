@@ -1,0 +1,8 @@
+{
+  "version": "24.10.7",
+  "target": "x86",
+  "subtarget": "generic",
+  "pkgarch": "i386_pentium4",
+  "format": "ipk",
+  "feed": "awg"
+}

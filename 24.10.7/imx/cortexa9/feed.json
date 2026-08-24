@@ -1,0 +1,8 @@
+{
+  "version": "24.10.7",
+  "target": "imx",
+  "subtarget": "cortexa9",
+  "pkgarch": "arm_cortex-a9_neon",
+  "format": "ipk",
+  "feed": "awg"
+}

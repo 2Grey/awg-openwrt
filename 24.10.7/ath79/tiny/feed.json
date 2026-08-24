@@ -1,0 +1,8 @@
+{
+  "version": "24.10.7",
+  "target": "ath79",
+  "subtarget": "tiny",
+  "pkgarch": "mips_24kc",
+  "format": "ipk",
+  "feed": "awg"
+}

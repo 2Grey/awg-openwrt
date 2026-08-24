@@ -1,0 +1,8 @@
+{
+  "version": "24.10.7",
+  "target": "mpc85xx",
+  "subtarget": "p2020",
+  "pkgarch": "powerpc_8548",
+  "format": "ipk",
+  "feed": "awg"
+}

@@ -1,0 +1,8 @@
+{
+  "version": "24.10.7",
+  "target": "bcm27xx",
+  "subtarget": "bcm2708",
+  "pkgarch": "arm_arm1176jzf-s_vfp",
+  "format": "ipk",
+  "feed": "awg"
+}

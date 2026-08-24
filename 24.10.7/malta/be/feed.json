@@ -1,0 +1,8 @@
+{
+  "version": "24.10.7",
+  "target": "malta",
+  "subtarget": "be",
+  "pkgarch": "mips_24kc",
+  "format": "ipk",
+  "feed": "awg"
+}
