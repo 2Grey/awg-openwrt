@@ -3,5 +3,6 @@
   "target": "ramips",
   "subtarget": "mt7620",
   "pkgarch": "mipsel_24kc",
+  "format": "apk",
   "feed": "awg"
 }

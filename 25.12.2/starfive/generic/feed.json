@@ -3,5 +3,6 @@
   "target": "starfive",
   "subtarget": "generic",
   "pkgarch": "riscv64_generic",
+  "format": "apk",
   "feed": "awg"
 }

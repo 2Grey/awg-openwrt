@@ -3,5 +3,6 @@
   "target": "malta",
   "subtarget": "be64",
   "pkgarch": "mips64_mips64r2",
+  "format": "apk",
   "feed": "awg"
 }

@@ -2,9 +2,9 @@
   "version": 2,
   "architecture": "arm_arm1176jzf-s_vfp",
   "packages": {
-    "amneziawg-tools": "3.0.20260805-r1",
-    "kmod-amneziawg": "6.12.74.3.0.20260731-r1",
-    "luci-i18n-amneziawg-ru": "0.260808.35881",
-    "luci-proto-amneziawg": "3.0.0-r1"
+    "amneziawg-tools": "3.1.20260812-r1",
+    "kmod-amneziawg": "6.12.74.3.1.20260812-r1",
+    "luci-i18n-amneziawg-ru": "0",
+    "luci-proto-amneziawg": "3.1.0-r1"
   }
 }
