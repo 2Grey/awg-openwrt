@@ -1,0 +1,8 @@
+{
+  "version": "24.10.4",
+  "target": "bcm47xx",
+  "subtarget": "legacy",
+  "pkgarch": "mipsel_mips32",
+  "format": "ipk",
+  "feed": "awg"
+}

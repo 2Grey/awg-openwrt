@@ -1,0 +1,8 @@
+{
+  "version": "24.10.4",
+  "target": "malta",
+  "subtarget": "le",
+  "pkgarch": "mipsel_24kc",
+  "format": "ipk",
+  "feed": "awg"
+}

@@ -1,0 +1,8 @@
+{
+  "version": "24.10.4",
+  "target": "x86",
+  "subtarget": "64",
+  "pkgarch": "x86_64",
+  "format": "ipk",
+  "feed": "awg"
+}

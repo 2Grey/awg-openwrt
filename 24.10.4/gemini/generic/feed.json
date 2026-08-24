@@ -1,0 +1,8 @@
+{
+  "version": "24.10.4",
+  "target": "gemini",
+  "subtarget": "generic",
+  "pkgarch": "arm_fa526",
+  "format": "ipk",
+  "feed": "awg"
+}

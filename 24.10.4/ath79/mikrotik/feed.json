@@ -1,0 +1,8 @@
+{
+  "version": "24.10.4",
+  "target": "ath79",
+  "subtarget": "mikrotik",
+  "pkgarch": "mips_24kc",
+  "format": "ipk",
+  "feed": "awg"
+}
