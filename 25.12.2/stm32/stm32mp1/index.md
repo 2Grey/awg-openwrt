@@ -39,13 +39,17 @@ apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 ## Feed files
 
 - [amneziawg-tools-3.0.20260805-r1.apk](https://2grey.github.io/awg-openwrt/25.12.2/stm32/stm32mp1/amneziawg-tools-3.0.20260805-r1.apk)
+- [amneziawg-tools-3.1.20260812-r1.apk](https://2grey.github.io/awg-openwrt/25.12.2/stm32/stm32mp1/amneziawg-tools-3.1.20260812-r1.apk)
 - [amneziawg-tools_v25.12.2_arm_cortex-a7_neon-vfpv4_stm32_stm32mp1.apk](https://2grey.github.io/awg-openwrt/25.12.2/stm32/stm32mp1/amneziawg-tools_v25.12.2_arm_cortex-a7_neon-vfpv4_stm32_stm32mp1.apk)
 - [feed.json](https://2grey.github.io/awg-openwrt/25.12.2/stm32/stm32mp1/feed.json)
 - [index.json](https://2grey.github.io/awg-openwrt/25.12.2/stm32/stm32mp1/index.json)
 - [kmod-amneziawg-6.12.74.3.0.20260731-r1.apk](https://2grey.github.io/awg-openwrt/25.12.2/stm32/stm32mp1/kmod-amneziawg-6.12.74.3.0.20260731-r1.apk)
+- [kmod-amneziawg-6.12.74.3.1.20260812-r1.apk](https://2grey.github.io/awg-openwrt/25.12.2/stm32/stm32mp1/kmod-amneziawg-6.12.74.3.1.20260812-r1.apk)
 - [kmod-amneziawg_v25.12.2_arm_cortex-a7_neon-vfpv4_stm32_stm32mp1.apk](https://2grey.github.io/awg-openwrt/25.12.2/stm32/stm32mp1/kmod-amneziawg_v25.12.2_arm_cortex-a7_neon-vfpv4_stm32_stm32mp1.apk)
 - [luci-i18n-amneziawg-ru-0.260808.29089.apk](https://2grey.github.io/awg-openwrt/25.12.2/stm32/stm32mp1/luci-i18n-amneziawg-ru-0.260808.29089.apk)
+- [luci-i18n-amneziawg-ru-0.apk](https://2grey.github.io/awg-openwrt/25.12.2/stm32/stm32mp1/luci-i18n-amneziawg-ru-0.apk)
 - [luci-i18n-amneziawg-ru_v25.12.2_arm_cortex-a7_neon-vfpv4_stm32_stm32mp1.apk](https://2grey.github.io/awg-openwrt/25.12.2/stm32/stm32mp1/luci-i18n-amneziawg-ru_v25.12.2_arm_cortex-a7_neon-vfpv4_stm32_stm32mp1.apk)
 - [luci-proto-amneziawg-3.0.0-r1.apk](https://2grey.github.io/awg-openwrt/25.12.2/stm32/stm32mp1/luci-proto-amneziawg-3.0.0-r1.apk)
+- [luci-proto-amneziawg-3.1.0-r1.apk](https://2grey.github.io/awg-openwrt/25.12.2/stm32/stm32mp1/luci-proto-amneziawg-3.1.0-r1.apk)
 - [luci-proto-amneziawg_v25.12.2_arm_cortex-a7_neon-vfpv4_stm32_stm32mp1.apk](https://2grey.github.io/awg-openwrt/25.12.2/stm32/stm32mp1/luci-proto-amneziawg_v25.12.2_arm_cortex-a7_neon-vfpv4_stm32_stm32mp1.apk)
 - [packages.adb](https://2grey.github.io/awg-openwrt/25.12.2/stm32/stm32mp1/packages.adb)

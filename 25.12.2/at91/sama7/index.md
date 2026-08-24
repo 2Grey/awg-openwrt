@@ -39,13 +39,17 @@ apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 ## Feed files
 
 - [amneziawg-tools-3.0.20260805-r1.apk](https://2grey.github.io/awg-openwrt/25.12.2/at91/sama7/amneziawg-tools-3.0.20260805-r1.apk)
+- [amneziawg-tools-3.1.20260812-r1.apk](https://2grey.github.io/awg-openwrt/25.12.2/at91/sama7/amneziawg-tools-3.1.20260812-r1.apk)
 - [amneziawg-tools_v25.12.2_arm_cortex-a7_vfpv4_at91_sama7.apk](https://2grey.github.io/awg-openwrt/25.12.2/at91/sama7/amneziawg-tools_v25.12.2_arm_cortex-a7_vfpv4_at91_sama7.apk)
 - [feed.json](https://2grey.github.io/awg-openwrt/25.12.2/at91/sama7/feed.json)
 - [index.json](https://2grey.github.io/awg-openwrt/25.12.2/at91/sama7/index.json)
 - [kmod-amneziawg-6.12.74.3.0.20260731-r1.apk](https://2grey.github.io/awg-openwrt/25.12.2/at91/sama7/kmod-amneziawg-6.12.74.3.0.20260731-r1.apk)
+- [kmod-amneziawg-6.12.74.3.1.20260812-r1.apk](https://2grey.github.io/awg-openwrt/25.12.2/at91/sama7/kmod-amneziawg-6.12.74.3.1.20260812-r1.apk)
 - [kmod-amneziawg_v25.12.2_arm_cortex-a7_vfpv4_at91_sama7.apk](https://2grey.github.io/awg-openwrt/25.12.2/at91/sama7/kmod-amneziawg_v25.12.2_arm_cortex-a7_vfpv4_at91_sama7.apk)
 - [luci-i18n-amneziawg-ru-0.260808.27688.apk](https://2grey.github.io/awg-openwrt/25.12.2/at91/sama7/luci-i18n-amneziawg-ru-0.260808.27688.apk)
+- [luci-i18n-amneziawg-ru-0.apk](https://2grey.github.io/awg-openwrt/25.12.2/at91/sama7/luci-i18n-amneziawg-ru-0.apk)
 - [luci-i18n-amneziawg-ru_v25.12.2_arm_cortex-a7_vfpv4_at91_sama7.apk](https://2grey.github.io/awg-openwrt/25.12.2/at91/sama7/luci-i18n-amneziawg-ru_v25.12.2_arm_cortex-a7_vfpv4_at91_sama7.apk)
 - [luci-proto-amneziawg-3.0.0-r1.apk](https://2grey.github.io/awg-openwrt/25.12.2/at91/sama7/luci-proto-amneziawg-3.0.0-r1.apk)
+- [luci-proto-amneziawg-3.1.0-r1.apk](https://2grey.github.io/awg-openwrt/25.12.2/at91/sama7/luci-proto-amneziawg-3.1.0-r1.apk)
 - [luci-proto-amneziawg_v25.12.2_arm_cortex-a7_vfpv4_at91_sama7.apk](https://2grey.github.io/awg-openwrt/25.12.2/at91/sama7/luci-proto-amneziawg_v25.12.2_arm_cortex-a7_vfpv4_at91_sama7.apk)
 - [packages.adb](https://2grey.github.io/awg-openwrt/25.12.2/at91/sama7/packages.adb)
