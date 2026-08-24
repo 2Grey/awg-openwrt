@@ -214,6 +214,9 @@ jobs:
       image: ghcr.io/openwrt/sdk:x86-64-${{ inputs.version }}
       options: --user root
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Download release packages artifact
         uses: actions/download-artifact@v4
         with:
@@ -278,6 +281,21 @@ jobs:
                 ./*.apk
               "$APK_BIN" adbdump --format json packages.adb | \
                 "$INDEX_JSON_SCRIPT" -f apk -a "$pkgarch" - > index.json
+
+              # APK repository clients derive the download filename from the
+              # package name and version. Release assets use a device-specific
+              # suffix, so rename them and rebuild the signed index.
+              python3 "$GITHUB_WORKSPACE/.github/scripts/canonicalize-apk-filenames.py" \
+                index.json .
+              "$APK_BIN" mkndx \
+                --root "$SDK_DIR" \
+                --keys-dir "$SDK_DIR" \
+                --allow-untrusted \
+                --sign "$SDK_DIR/private-key.pem" \
+                --output packages.adb \
+                ./*.apk
+              "$APK_BIN" adbdump --format json packages.adb | \
+                "$INDEX_JSON_SCRIPT" -f apk -a "$pkgarch" - > index.json
             )
           done < <(find "$GITHUB_WORKSPACE/feed-publish" -mindepth 4 -maxdepth 4 -name feed.json -type f -print0)
 
@@ -308,6 +326,8 @@ jobs:
             grep -q "kmod-amneziawg" "$adb_dump"
             grep -q "luci-proto-amneziawg" "$adb_dump"
             grep -q "luci-i18n-amneziawg-ru" "$adb_dump"
+            python3 "$GITHUB_WORKSPACE/.github/scripts/canonicalize-apk-filenames.py" \
+              "$feed_dir/index.json" "$feed_dir"
             ! grep -q "busybox" "$adb_dump"
             ! grep -q "\blibc\b" "$adb_dump"
             ! grep -q "\bubus\b" "$adb_dump"
