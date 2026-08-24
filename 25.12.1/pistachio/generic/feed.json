@@ -3,5 +3,6 @@
   "target": "pistachio",
   "subtarget": "generic",
   "pkgarch": "mipsel_24kc_24kf",
+  "format": "apk",
   "feed": "awg"
 }

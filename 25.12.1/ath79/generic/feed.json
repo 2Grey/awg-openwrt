@@ -3,5 +3,6 @@
   "target": "ath79",
   "subtarget": "generic",
   "pkgarch": "mips_24kc",
+  "format": "apk",
   "feed": "awg"
 }
