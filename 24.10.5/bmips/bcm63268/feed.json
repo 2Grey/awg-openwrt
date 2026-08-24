@@ -1,0 +1,8 @@
+{
+  "version": "24.10.5",
+  "target": "bmips",
+  "subtarget": "bcm63268",
+  "pkgarch": "mips_mips32",
+  "format": "ipk",
+  "feed": "awg"
+}

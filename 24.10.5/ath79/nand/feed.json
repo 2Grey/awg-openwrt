@@ -1,0 +1,8 @@
+{
+  "version": "24.10.5",
+  "target": "ath79",
+  "subtarget": "nand",
+  "pkgarch": "mips_24kc",
+  "format": "ipk",
+  "feed": "awg"
+}

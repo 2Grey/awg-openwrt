@@ -1,0 +1,8 @@
+{
+  "version": "24.10.5",
+  "target": "realtek",
+  "subtarget": "rtl930x",
+  "pkgarch": "mips_24kc",
+  "format": "ipk",
+  "feed": "awg"
+}

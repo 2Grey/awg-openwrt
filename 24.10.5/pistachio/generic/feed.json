@@ -1,0 +1,8 @@
+{
+  "version": "24.10.5",
+  "target": "pistachio",
+  "subtarget": "generic",
+  "pkgarch": "mipsel_24kc_24kf",
+  "format": "ipk",
+  "feed": "awg"
+}

@@ -1,0 +1,8 @@
+{
+  "version": "24.10.5",
+  "target": "mvebu",
+  "subtarget": "cortexa72",
+  "pkgarch": "aarch64_cortex-a72",
+  "format": "ipk",
+  "feed": "awg"
+}
