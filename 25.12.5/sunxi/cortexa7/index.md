@@ -39,9 +39,13 @@ apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 ## Feed files
 
 - [amneziawg-tools-3.0.20260805-r1.apk](https://2grey.github.io/awg-openwrt/25.12.5/sunxi/cortexa7/amneziawg-tools-3.0.20260805-r1.apk)
+- [amneziawg-tools-3.1.20260812-r1.apk](https://2grey.github.io/awg-openwrt/25.12.5/sunxi/cortexa7/amneziawg-tools-3.1.20260812-r1.apk)
 - [feed.json](https://2grey.github.io/awg-openwrt/25.12.5/sunxi/cortexa7/feed.json)
 - [index.json](https://2grey.github.io/awg-openwrt/25.12.5/sunxi/cortexa7/index.json)
 - [kmod-amneziawg-6.12.94.3.0.20260731-r1.apk](https://2grey.github.io/awg-openwrt/25.12.5/sunxi/cortexa7/kmod-amneziawg-6.12.94.3.0.20260731-r1.apk)
+- [kmod-amneziawg-6.12.94.3.1.20260812-r1.apk](https://2grey.github.io/awg-openwrt/25.12.5/sunxi/cortexa7/kmod-amneziawg-6.12.94.3.1.20260812-r1.apk)
 - [luci-i18n-amneziawg-ru-0.260807.71636.apk](https://2grey.github.io/awg-openwrt/25.12.5/sunxi/cortexa7/luci-i18n-amneziawg-ru-0.260807.71636.apk)
+- [luci-i18n-amneziawg-ru-0.apk](https://2grey.github.io/awg-openwrt/25.12.5/sunxi/cortexa7/luci-i18n-amneziawg-ru-0.apk)
 - [luci-proto-amneziawg-3.0.0-r1.apk](https://2grey.github.io/awg-openwrt/25.12.5/sunxi/cortexa7/luci-proto-amneziawg-3.0.0-r1.apk)
+- [luci-proto-amneziawg-3.1.0-r1.apk](https://2grey.github.io/awg-openwrt/25.12.5/sunxi/cortexa7/luci-proto-amneziawg-3.1.0-r1.apk)
 - [packages.adb](https://2grey.github.io/awg-openwrt/25.12.5/sunxi/cortexa7/packages.adb)
