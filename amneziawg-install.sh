@@ -321,9 +321,24 @@ detect_installed_awg_version() {
     esac
 }
 
+extract_last_awg_release_from_log() {
+    sed -n 's/.*amneziawg: AmneziaWG \([^[:space:]]*\) loaded\..*/\1/p' |
+        tail -n 1
+}
+
+awg_profile_from_release() {
+    case "$1" in
+        3.1 | 3.1.*) printf '3.1\n' ;;
+        3.0 | 3.0.*) printf '3.0\n' ;;
+        1.* | 2.*) printf '2.0\n' ;;
+        *) return 1 ;;
+    esac
+}
+
 detect_running_awg_version() {
     RUNNING_AWG_VERSION=""
     RUNNING_AWG_IMPLEMENTATION=""
+    RUNNING_AWG_RELEASE=""
 
     if [ ! -e /sys/module/amneziawg ]; then
         modprobe amneziawg >/dev/null 2>&1 || true
@@ -337,12 +352,18 @@ detect_running_awg_version() {
     fi
 
     RUNNING_AWG_IMPLEMENTATION="kernel module"
-    RUNNING_AWG_RELEASE=$(cat /sys/module/amneziawg/version 2>/dev/null || true)
-    case "$RUNNING_AWG_RELEASE" in
-        3.1.*) RUNNING_AWG_VERSION="3.1" ;;
-        3.0.*) RUNNING_AWG_VERSION="3.0" ;;
-        *) RUNNING_AWG_VERSION="2.0" ;;
-    esac
+    if [ -r /sys/module/amneziawg/version ]; then
+        RUNNING_AWG_RELEASE=$(cat /sys/module/amneziawg/version 2>/dev/null || true)
+    fi
+
+    # Some OpenWrt builds omit MODULE_VERSION metadata, so sysfs has no
+    # version file. The load message still identifies the running module.
+    # Take the last match because a module can be replaced without a reboot.
+    if [ -z "$RUNNING_AWG_RELEASE" ] && command -v dmesg >/dev/null 2>&1; then
+        RUNNING_AWG_RELEASE=$(dmesg 2>/dev/null | extract_last_awg_release_from_log)
+    fi
+
+    RUNNING_AWG_VERSION=$(awg_profile_from_release "$RUNNING_AWG_RELEASE" 2>/dev/null || true)
 }
 
 config_get_value() {
@@ -449,9 +470,13 @@ select_awg_profile() {
     fi
 
     detect_running_awg_version
+    if [ "$RUNNING_AWG_IMPLEMENTATION" = "kernel module" ] &&
+        [ -z "$RUNNING_AWG_VERSION" ]; then
+        die "Unable to determine the active AmneziaWG kernel module version from sysfs or dmesg. Reload the module and run the script again."
+    fi
     if [ -n "$RUNNING_AWG_VERSION" ] &&
         [ "$(awg_version_rank "$RUNNING_AWG_VERSION")" -lt "$PROFILE_RANK" ]; then
-        die "The active $RUNNING_AWG_IMPLEMENTATION is AWG $RUNNING_AWG_VERSION, but profile $AWG_PROFILE requires a newer implementation. If packages were just upgraded, reboot the router and run this script again."
+        die "The active $RUNNING_AWG_IMPLEMENTATION is AWG $RUNNING_AWG_VERSION ($RUNNING_AWG_RELEASE), but profile $AWG_PROFILE requires a newer implementation. The module file may already be newer than the loaded module; if no AWG interface is active, reload it with: rmmod amneziawg && modprobe amneziawg"
     fi
 
     print_info "Using AWG $AWG_PROFILE connection profile on AWG $AWG_VERSION packages"
