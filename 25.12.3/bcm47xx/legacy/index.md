@@ -39,13 +39,17 @@ apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 ## Feed files
 
 - [amneziawg-tools-3.0.20260805-r1.apk](https://2grey.github.io/awg-openwrt/25.12.3/bcm47xx/legacy/amneziawg-tools-3.0.20260805-r1.apk)
+- [amneziawg-tools-3.1.20260812-r1.apk](https://2grey.github.io/awg-openwrt/25.12.3/bcm47xx/legacy/amneziawg-tools-3.1.20260812-r1.apk)
 - [amneziawg-tools_v25.12.3_mipsel_mips32_bcm47xx_legacy.apk](https://2grey.github.io/awg-openwrt/25.12.3/bcm47xx/legacy/amneziawg-tools_v25.12.3_mipsel_mips32_bcm47xx_legacy.apk)
 - [feed.json](https://2grey.github.io/awg-openwrt/25.12.3/bcm47xx/legacy/feed.json)
 - [index.json](https://2grey.github.io/awg-openwrt/25.12.3/bcm47xx/legacy/index.json)
 - [kmod-amneziawg-6.12.85.3.0.20260731-r1.apk](https://2grey.github.io/awg-openwrt/25.12.3/bcm47xx/legacy/kmod-amneziawg-6.12.85.3.0.20260731-r1.apk)
+- [kmod-amneziawg-6.12.85.3.1.20260812-r1.apk](https://2grey.github.io/awg-openwrt/25.12.3/bcm47xx/legacy/kmod-amneziawg-6.12.85.3.1.20260812-r1.apk)
 - [kmod-amneziawg_v25.12.3_mipsel_mips32_bcm47xx_legacy.apk](https://2grey.github.io/awg-openwrt/25.12.3/bcm47xx/legacy/kmod-amneziawg_v25.12.3_mipsel_mips32_bcm47xx_legacy.apk)
 - [luci-i18n-amneziawg-ru-0.260808.22103.apk](https://2grey.github.io/awg-openwrt/25.12.3/bcm47xx/legacy/luci-i18n-amneziawg-ru-0.260808.22103.apk)
+- [luci-i18n-amneziawg-ru-0.apk](https://2grey.github.io/awg-openwrt/25.12.3/bcm47xx/legacy/luci-i18n-amneziawg-ru-0.apk)
 - [luci-i18n-amneziawg-ru_v25.12.3_mipsel_mips32_bcm47xx_legacy.apk](https://2grey.github.io/awg-openwrt/25.12.3/bcm47xx/legacy/luci-i18n-amneziawg-ru_v25.12.3_mipsel_mips32_bcm47xx_legacy.apk)
 - [luci-proto-amneziawg-3.0.0-r1.apk](https://2grey.github.io/awg-openwrt/25.12.3/bcm47xx/legacy/luci-proto-amneziawg-3.0.0-r1.apk)
+- [luci-proto-amneziawg-3.1.0-r1.apk](https://2grey.github.io/awg-openwrt/25.12.3/bcm47xx/legacy/luci-proto-amneziawg-3.1.0-r1.apk)
 - [luci-proto-amneziawg_v25.12.3_mipsel_mips32_bcm47xx_legacy.apk](https://2grey.github.io/awg-openwrt/25.12.3/bcm47xx/legacy/luci-proto-amneziawg_v25.12.3_mipsel_mips32_bcm47xx_legacy.apk)
 - [packages.adb](https://2grey.github.io/awg-openwrt/25.12.3/bcm47xx/legacy/packages.adb)
