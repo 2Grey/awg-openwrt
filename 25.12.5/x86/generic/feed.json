@@ -3,6 +3,5 @@
   "target": "x86",
   "subtarget": "generic",
   "pkgarch": "i386_pentium4",
-  "format": "apk",
   "feed": "awg"
 }

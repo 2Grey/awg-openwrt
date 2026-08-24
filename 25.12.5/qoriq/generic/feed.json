@@ -3,6 +3,5 @@
   "target": "qoriq",
   "subtarget": "generic",
   "pkgarch": "powerpc64_e5500",
-  "format": "apk",
   "feed": "awg"
 }

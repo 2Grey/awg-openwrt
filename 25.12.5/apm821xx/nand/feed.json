@@ -3,6 +3,5 @@
   "target": "apm821xx",
   "subtarget": "nand",
   "pkgarch": "powerpc_464fp",
-  "format": "apk",
   "feed": "awg"
 }

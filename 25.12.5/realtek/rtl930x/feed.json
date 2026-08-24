@@ -3,6 +3,5 @@
   "target": "realtek",
   "subtarget": "rtl930x",
   "pkgarch": "mips_24kc",
-  "format": "apk",
   "feed": "awg"
 }

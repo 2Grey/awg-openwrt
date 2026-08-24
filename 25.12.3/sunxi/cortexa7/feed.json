@@ -3,5 +3,6 @@
   "target": "sunxi",
   "subtarget": "cortexa7",
   "pkgarch": "arm_cortex-a7_neon-vfpv4",
+  "format": "apk",
   "feed": "awg"
 }

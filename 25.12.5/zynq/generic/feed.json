@@ -3,6 +3,5 @@
   "target": "zynq",
   "subtarget": "generic",
   "pkgarch": "arm_cortex-a9_neon",
-  "format": "apk",
   "feed": "awg"
 }

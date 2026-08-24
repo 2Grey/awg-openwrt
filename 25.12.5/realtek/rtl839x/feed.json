@@ -3,6 +3,5 @@
   "target": "realtek",
   "subtarget": "rtl839x",
   "pkgarch": "mips_24kc",
-  "format": "apk",
   "feed": "awg"
 }

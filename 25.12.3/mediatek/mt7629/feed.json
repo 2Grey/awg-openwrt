@@ -3,5 +3,6 @@
   "target": "mediatek",
   "subtarget": "mt7629",
   "pkgarch": "arm_cortex-a7",
+  "format": "apk",
   "feed": "awg"
 }

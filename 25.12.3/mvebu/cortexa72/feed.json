@@ -3,5 +3,6 @@
   "target": "mvebu",
   "subtarget": "cortexa72",
   "pkgarch": "aarch64_cortex-a72",
+  "format": "apk",
   "feed": "awg"
 }

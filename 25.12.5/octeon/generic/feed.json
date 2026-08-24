@@ -3,6 +3,5 @@
   "target": "octeon",
   "subtarget": "generic",
   "pkgarch": "mips64_octeonplus",
-  "format": "apk",
   "feed": "awg"
 }

@@ -3,6 +3,5 @@
   "target": "mvebu",
   "subtarget": "cortexa9",
   "pkgarch": "arm_cortex-a9_vfpv3-d16",
-  "format": "apk",
   "feed": "awg"
 }

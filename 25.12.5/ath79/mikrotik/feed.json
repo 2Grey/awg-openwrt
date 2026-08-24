@@ -3,6 +3,5 @@
   "target": "ath79",
   "subtarget": "mikrotik",
   "pkgarch": "mips_24kc",
-  "format": "apk",
   "feed": "awg"
 }

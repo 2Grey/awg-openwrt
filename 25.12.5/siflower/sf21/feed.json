@@ -3,6 +3,5 @@
   "target": "siflower",
   "subtarget": "sf21",
   "pkgarch": "riscv64_generic",
-  "format": "apk",
   "feed": "awg"
 }

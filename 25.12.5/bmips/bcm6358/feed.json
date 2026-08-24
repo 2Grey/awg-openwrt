@@ -3,6 +3,5 @@
   "target": "bmips",
   "subtarget": "bcm6358",
   "pkgarch": "mips_mips32",
-  "format": "apk",
   "feed": "awg"
 }

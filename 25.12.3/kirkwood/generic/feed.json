@@ -3,5 +3,6 @@
   "target": "kirkwood",
   "subtarget": "generic",
   "pkgarch": "arm_xscale",
+  "format": "apk",
   "feed": "awg"
 }

@@ -3,6 +3,5 @@
   "target": "bcm47xx",
   "subtarget": "mips74k",
   "pkgarch": "mipsel_74kc",
-  "format": "apk",
   "feed": "awg"
 }

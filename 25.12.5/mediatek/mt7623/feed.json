@@ -3,6 +3,5 @@
   "target": "mediatek",
   "subtarget": "mt7623",
   "pkgarch": "arm_cortex-a7_neon-vfpv4",
-  "format": "apk",
   "feed": "awg"
 }

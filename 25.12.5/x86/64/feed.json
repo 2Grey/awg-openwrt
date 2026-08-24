@@ -3,6 +3,5 @@
   "target": "x86",
   "subtarget": "64",
   "pkgarch": "x86_64",
-  "format": "apk",
   "feed": "awg"
 }

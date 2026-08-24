@@ -3,6 +3,5 @@
   "target": "qualcommax",
   "subtarget": "ipq50xx",
   "pkgarch": "aarch64_cortex-a53",
-  "format": "apk",
   "feed": "awg"
 }

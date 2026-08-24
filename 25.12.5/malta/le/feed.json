@@ -3,6 +3,5 @@
   "target": "malta",
   "subtarget": "le",
   "pkgarch": "mipsel_24kc",
-  "format": "apk",
   "feed": "awg"
 }

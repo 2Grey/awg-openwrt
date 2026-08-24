@@ -3,6 +3,5 @@
   "target": "mediatek",
   "subtarget": "filogic",
   "pkgarch": "aarch64_cortex-a53",
-  "format": "apk",
   "feed": "awg"
 }
