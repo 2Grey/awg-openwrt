@@ -3,5 +3,6 @@
   "target": "ixp4xx",
   "subtarget": "generic",
   "pkgarch": "armeb_xscale",
+  "format": "apk",
   "feed": "awg"
 }

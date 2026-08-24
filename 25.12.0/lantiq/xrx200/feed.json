@@ -3,5 +3,6 @@
   "target": "lantiq",
   "subtarget": "xrx200",
   "pkgarch": "mips_24kc",
+  "format": "apk",
   "feed": "awg"
 }

@@ -3,5 +3,6 @@
   "target": "stm32",
   "subtarget": "stm32mp1",
   "pkgarch": "arm_cortex-a7_neon-vfpv4",
+  "format": "apk",
   "feed": "awg"
 }

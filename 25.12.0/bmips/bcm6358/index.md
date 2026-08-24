@@ -39,9 +39,13 @@ apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 ## Feed files
 
 - [amneziawg-tools-3.0.20260805-r1.apk](https://2grey.github.io/awg-openwrt/25.12.0/bmips/bcm6358/amneziawg-tools-3.0.20260805-r1.apk)
+- [amneziawg-tools_v25.12.0_mips_mips32_bmips_bcm6358.apk](https://2grey.github.io/awg-openwrt/25.12.0/bmips/bcm6358/amneziawg-tools_v25.12.0_mips_mips32_bmips_bcm6358.apk)
 - [feed.json](https://2grey.github.io/awg-openwrt/25.12.0/bmips/bcm6358/feed.json)
 - [index.json](https://2grey.github.io/awg-openwrt/25.12.0/bmips/bcm6358/index.json)
 - [kmod-amneziawg-6.12.71.3.0.20260731-r1.apk](https://2grey.github.io/awg-openwrt/25.12.0/bmips/bcm6358/kmod-amneziawg-6.12.71.3.0.20260731-r1.apk)
+- [kmod-amneziawg_v25.12.0_mips_mips32_bmips_bcm6358.apk](https://2grey.github.io/awg-openwrt/25.12.0/bmips/bcm6358/kmod-amneziawg_v25.12.0_mips_mips32_bmips_bcm6358.apk)
 - [luci-i18n-amneziawg-ru-0.260808.49257.apk](https://2grey.github.io/awg-openwrt/25.12.0/bmips/bcm6358/luci-i18n-amneziawg-ru-0.260808.49257.apk)
+- [luci-i18n-amneziawg-ru_v25.12.0_mips_mips32_bmips_bcm6358.apk](https://2grey.github.io/awg-openwrt/25.12.0/bmips/bcm6358/luci-i18n-amneziawg-ru_v25.12.0_mips_mips32_bmips_bcm6358.apk)
 - [luci-proto-amneziawg-3.0.0-r1.apk](https://2grey.github.io/awg-openwrt/25.12.0/bmips/bcm6358/luci-proto-amneziawg-3.0.0-r1.apk)
+- [luci-proto-amneziawg_v25.12.0_mips_mips32_bmips_bcm6358.apk](https://2grey.github.io/awg-openwrt/25.12.0/bmips/bcm6358/luci-proto-amneziawg_v25.12.0_mips_mips32_bmips_bcm6358.apk)
 - [packages.adb](https://2grey.github.io/awg-openwrt/25.12.0/bmips/bcm6358/packages.adb)

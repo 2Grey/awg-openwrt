@@ -3,5 +3,6 @@
   "target": "gemini",
   "subtarget": "generic",
   "pkgarch": "arm_fa526",
+  "format": "apk",
   "feed": "awg"
 }

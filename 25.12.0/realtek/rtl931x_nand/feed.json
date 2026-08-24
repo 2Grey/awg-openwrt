@@ -3,5 +3,6 @@
   "target": "realtek",
   "subtarget": "rtl931x_nand",
   "pkgarch": "mips_24kc",
+  "format": "apk",
   "feed": "awg"
 }
