@@ -1,0 +1,8 @@
+{
+  "version": "24.10.8",
+  "target": "qoriq",
+  "subtarget": "generic",
+  "pkgarch": "powerpc64_e5500",
+  "format": "ipk",
+  "feed": "awg"
+}

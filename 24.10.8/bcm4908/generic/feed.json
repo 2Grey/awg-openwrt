@@ -1,0 +1,8 @@
+{
+  "version": "24.10.8",
+  "target": "bcm4908",
+  "subtarget": "generic",
+  "pkgarch": "aarch64_cortex-a53",
+  "format": "ipk",
+  "feed": "awg"
+}

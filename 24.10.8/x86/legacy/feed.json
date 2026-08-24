@@ -1,0 +1,8 @@
+{
+  "version": "24.10.8",
+  "target": "x86",
+  "subtarget": "legacy",
+  "pkgarch": "i386_pentium-mmx",
+  "format": "ipk",
+  "feed": "awg"
+}

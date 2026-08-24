@@ -1,0 +1,8 @@
+{
+  "version": "24.10.8",
+  "target": "sunxi",
+  "subtarget": "cortexa8",
+  "pkgarch": "arm_cortex-a8_vfpv3",
+  "format": "ipk",
+  "feed": "awg"
+}

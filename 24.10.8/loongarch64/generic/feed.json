@@ -1,0 +1,8 @@
+{
+  "version": "24.10.8",
+  "target": "loongarch64",
+  "subtarget": "generic",
+  "pkgarch": "loongarch64_generic",
+  "format": "ipk",
+  "feed": "awg"
+}
