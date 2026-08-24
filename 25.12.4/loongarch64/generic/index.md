@@ -39,13 +39,17 @@ apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 ## Feed files
 
 - [amneziawg-tools-3.0.20260805-r1.apk](https://2grey.github.io/awg-openwrt/25.12.4/loongarch64/generic/amneziawg-tools-3.0.20260805-r1.apk)
+- [amneziawg-tools-3.1.20260812-r1.apk](https://2grey.github.io/awg-openwrt/25.12.4/loongarch64/generic/amneziawg-tools-3.1.20260812-r1.apk)
 - [amneziawg-tools_v25.12.4_loongarch64_generic_loongarch64_generic.apk](https://2grey.github.io/awg-openwrt/25.12.4/loongarch64/generic/amneziawg-tools_v25.12.4_loongarch64_generic_loongarch64_generic.apk)
 - [feed.json](https://2grey.github.io/awg-openwrt/25.12.4/loongarch64/generic/feed.json)
 - [index.json](https://2grey.github.io/awg-openwrt/25.12.4/loongarch64/generic/index.json)
 - [kmod-amneziawg-6.12.87.3.0.20260731-r1.apk](https://2grey.github.io/awg-openwrt/25.12.4/loongarch64/generic/kmod-amneziawg-6.12.87.3.0.20260731-r1.apk)
+- [kmod-amneziawg-6.12.87.3.1.20260812-r1.apk](https://2grey.github.io/awg-openwrt/25.12.4/loongarch64/generic/kmod-amneziawg-6.12.87.3.1.20260812-r1.apk)
 - [kmod-amneziawg_v25.12.4_loongarch64_generic_loongarch64_generic.apk](https://2grey.github.io/awg-openwrt/25.12.4/loongarch64/generic/kmod-amneziawg_v25.12.4_loongarch64_generic_loongarch64_generic.apk)
 - [luci-i18n-amneziawg-ru-0.260807.38950.apk](https://2grey.github.io/awg-openwrt/25.12.4/loongarch64/generic/luci-i18n-amneziawg-ru-0.260807.38950.apk)
+- [luci-i18n-amneziawg-ru-0.apk](https://2grey.github.io/awg-openwrt/25.12.4/loongarch64/generic/luci-i18n-amneziawg-ru-0.apk)
 - [luci-i18n-amneziawg-ru_v25.12.4_loongarch64_generic_loongarch64_generic.apk](https://2grey.github.io/awg-openwrt/25.12.4/loongarch64/generic/luci-i18n-amneziawg-ru_v25.12.4_loongarch64_generic_loongarch64_generic.apk)
 - [luci-proto-amneziawg-3.0.0-r1.apk](https://2grey.github.io/awg-openwrt/25.12.4/loongarch64/generic/luci-proto-amneziawg-3.0.0-r1.apk)
+- [luci-proto-amneziawg-3.1.0-r1.apk](https://2grey.github.io/awg-openwrt/25.12.4/loongarch64/generic/luci-proto-amneziawg-3.1.0-r1.apk)
 - [luci-proto-amneziawg_v25.12.4_loongarch64_generic_loongarch64_generic.apk](https://2grey.github.io/awg-openwrt/25.12.4/loongarch64/generic/luci-proto-amneziawg_v25.12.4_loongarch64_generic_loongarch64_generic.apk)
 - [packages.adb](https://2grey.github.io/awg-openwrt/25.12.4/loongarch64/generic/packages.adb)
