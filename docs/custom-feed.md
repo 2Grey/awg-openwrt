@@ -29,6 +29,26 @@ Feed публикуется workflow `.github/workflows/build-feed.yml` в ве�
 
 `https://2grey.github.io/awg-openwrt/`
 
+## Автоматическая установка
+
+Установщик сам определяет точную версию OpenWrt и `target/subtarget`, добавляет
+ключ подписи и feed, обновляет индекс и устанавливает `amneziawg-tools`,
+`kmod-amneziawg` и `luci-proto-amneziawg`:
+
+```sh
+sh <(wget -O - https://raw.githubusercontent.com/2Grey/awg-openwrt/refs/heads/master/amneziawg-feed-install.sh)
+```
+
+Чтобы также установить русскую локализацию LuCI:
+
+```sh
+sh <(wget -O - https://raw.githubusercontent.com/2Grey/awg-openwrt/refs/heads/master/amneziawg-feed-install.sh) -r
+```
+
+Скрипт рассчитан на официальные стабильные сборки OpenWrt, для которых уже
+опубликован feed. Повторный запуск безопасен: существующая запись `awg`
+заменяется актуальным URL без создания дублей.
+
 Навигация на сайте построена по уровням:
 
 `/<openwrt-version>/`

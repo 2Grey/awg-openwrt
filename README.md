@@ -10,6 +10,15 @@ OpenWrt 25.x and later.
 
 [Detailed documentation](docs/custom-feed.md)
 
+Install the packages from the signed feed (the exact OpenWrt version and target
+are detected automatically):
+
+```sh
+sh <(wget -O - https://raw.githubusercontent.com/2Grey/awg-openwrt/refs/heads/master/amneziawg-feed-install.sh)
+```
+
+Add `-r` to also install the Russian LuCI translation.
+
 ## AWG 3.1 Support
 
 The `master` branch contains an aligned set of AWG 3.1 components:
