@@ -1,0 +1,8 @@
+{
+  "version": "24.10.6",
+  "target": "lantiq",
+  "subtarget": "xway_legacy",
+  "pkgarch": "mips_24kc",
+  "format": "ipk",
+  "feed": "awg"
+}

@@ -1,0 +1,8 @@
+{
+  "version": "24.10.6",
+  "target": "armsr",
+  "subtarget": "armv8",
+  "pkgarch": "aarch64_generic",
+  "format": "ipk",
+  "feed": "awg"
+}

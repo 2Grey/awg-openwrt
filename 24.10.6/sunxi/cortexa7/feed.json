@@ -1,0 +1,8 @@
+{
+  "version": "24.10.6",
+  "target": "sunxi",
+  "subtarget": "cortexa7",
+  "pkgarch": "arm_cortex-a7_neon-vfpv4",
+  "format": "ipk",
+  "feed": "awg"
+}

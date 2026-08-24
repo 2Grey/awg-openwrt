@@ -1,0 +1,8 @@
+{
+  "version": "24.10.6",
+  "target": "mvebu",
+  "subtarget": "cortexa53",
+  "pkgarch": "aarch64_cortex-a53",
+  "format": "ipk",
+  "feed": "awg"
+}

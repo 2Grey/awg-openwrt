@@ -1,0 +1,53 @@
+Package: amneziawg-tools
+Version: 3.1.20260812-r1
+Depends: libc, ip, ip, kmod-amneziawg
+License: GPL-2.0
+Section: net
+URL: https://amnezia.org/
+Architecture: armeb_xscale
+Installed-Size: 92160
+Filename: amneziawg-tools_v24.10.6_armeb_xscale_ixp4xx_generic.ipk
+Size: 35803
+SHA256sum: 66c3e685db81ad6ba774eb1941e4a590b69e41972c07e018fbd7435f92cd01c3
+Description:  Amnezia VPN — simple and free app to run a self-hosted VPN with
+ high privacy requirements.
+ 
+ This package provides the userspace control program for AmneziaWG,
+ `awg`, a netifd protocol helper, and a re-resolve watchdog script.
+
+Package: kmod-amneziawg
+Version: 6.6.127.3.1.20260812-r1
+Depends: kernel (=6.6.127~76ca90079004eb00fc078f9beb40ea03-r1), kmod-udptunnel4, kmod-udptunnel6, kmod-crypto-lib-chacha20poly1305, kmod-crypto-lib-curve25519
+Section: kernel
+Architecture: armeb_xscale
+Installed-Size: 102400
+Filename: kmod-amneziawg_v24.10.6_armeb_xscale_ixp4xx_generic.ipk
+Size: 42418
+SHA256sum: ca0547d346704254535c5c64e34ba41cd6f8b672b8a88f31d656a51757e25305
+Description:  AmneziaWG VPN Kernel Module
+
+Package: luci-i18n-amneziawg-ru
+Version: 0
+Depends: libc, luci-proto-amneziawg
+License: Apache-2.0
+Section: luci
+Architecture: all
+Installed-Size: 20480
+Filename: luci-i18n-amneziawg-ru_v24.10.6_armeb_xscale_ixp4xx_generic.ipk
+Size: 4248
+SHA256sum: 0796a7abbaef1950516e7bf53496e30a64af7f3f86bb5def181a28e667e6e0ff
+Description:  Translation for luci-proto-amneziawg - Русский (Russian)
+
+Package: luci-proto-amneziawg
+Version: 3.1.0-r1
+Depends: libc, amneziawg-tools, ucode, luci-lib-uqr, resolveip
+License: Apache-2.0
+Section: luci
+URL: https://github.com/openwrt/luci
+Architecture: all
+Installed-Size: 102400
+Filename: luci-proto-amneziawg_v24.10.6_armeb_xscale_ixp4xx_generic.ipk
+Size: 29848
+SHA256sum: eb8544c6dabdee229b4f73b966579ed1007c8d311f808c28c4a33a9cab79daa8
+Description:  Provides support and Web UI for AmneziaWG VPN
+
