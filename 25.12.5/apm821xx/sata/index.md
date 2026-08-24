@@ -39,9 +39,13 @@ apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 ## Feed files
 
 - [amneziawg-tools-3.0.20260805-r1.apk](https://2grey.github.io/awg-openwrt/25.12.5/apm821xx/sata/amneziawg-tools-3.0.20260805-r1.apk)
+- [amneziawg-tools_v25.12.5_powerpc_464fp_apm821xx_sata.apk](https://2grey.github.io/awg-openwrt/25.12.5/apm821xx/sata/amneziawg-tools_v25.12.5_powerpc_464fp_apm821xx_sata.apk)
 - [feed.json](https://2grey.github.io/awg-openwrt/25.12.5/apm821xx/sata/feed.json)
 - [index.json](https://2grey.github.io/awg-openwrt/25.12.5/apm821xx/sata/index.json)
 - [kmod-amneziawg-6.12.94.3.0.20260731-r1.apk](https://2grey.github.io/awg-openwrt/25.12.5/apm821xx/sata/kmod-amneziawg-6.12.94.3.0.20260731-r1.apk)
+- [kmod-amneziawg_v25.12.5_powerpc_464fp_apm821xx_sata.apk](https://2grey.github.io/awg-openwrt/25.12.5/apm821xx/sata/kmod-amneziawg_v25.12.5_powerpc_464fp_apm821xx_sata.apk)
 - [luci-i18n-amneziawg-ru-0.260807.65845.apk](https://2grey.github.io/awg-openwrt/25.12.5/apm821xx/sata/luci-i18n-amneziawg-ru-0.260807.65845.apk)
+- [luci-i18n-amneziawg-ru_v25.12.5_powerpc_464fp_apm821xx_sata.apk](https://2grey.github.io/awg-openwrt/25.12.5/apm821xx/sata/luci-i18n-amneziawg-ru_v25.12.5_powerpc_464fp_apm821xx_sata.apk)
 - [luci-proto-amneziawg-3.0.0-r1.apk](https://2grey.github.io/awg-openwrt/25.12.5/apm821xx/sata/luci-proto-amneziawg-3.0.0-r1.apk)
+- [luci-proto-amneziawg_v25.12.5_powerpc_464fp_apm821xx_sata.apk](https://2grey.github.io/awg-openwrt/25.12.5/apm821xx/sata/luci-proto-amneziawg_v25.12.5_powerpc_464fp_apm821xx_sata.apk)
 - [packages.adb](https://2grey.github.io/awg-openwrt/25.12.5/apm821xx/sata/packages.adb)

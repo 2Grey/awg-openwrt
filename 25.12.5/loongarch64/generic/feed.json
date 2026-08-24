@@ -3,5 +3,6 @@
   "target": "loongarch64",
   "subtarget": "generic",
   "pkgarch": "loongarch64_generic",
+  "format": "apk",
   "feed": "awg"
 }

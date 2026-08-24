@@ -3,5 +3,6 @@
   "target": "x86",
   "subtarget": "legacy",
   "pkgarch": "i386_pentium-mmx",
+  "format": "apk",
   "feed": "awg"
 }
