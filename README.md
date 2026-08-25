@@ -1,85 +1,69 @@
-![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/2grey/awg-openwrt/total?style=for-the-badge&link=https%3A%2F%2Fgithub.com%2F2Grey%2Fawg-openwrt%2Freleases)
+# Пакеты AmneziaWG для роутеров с прошивкой OpenWrt
 
-# AmneziAWG packages for routers running OpenWRT
+[English](README.en.md) | Russian
+
+![AmneziaWG2.0](https://img.shields.io/badge/AmneziaWG-2.0-green)
+![AmneziaWG3.0](https://img.shields.io/badge/AmneziaWG-3.0-orange)
+![AmneziaWG3.1](https://img.shields.io/badge/AmneziaWG-3.1-red)
+
+![OpenWrt 24](https://img.shields.io/badge/OpenWrt-24.10.4_~_24.10.8-blue)
+![OpenWrt 25](https://img.shields.io/badge/OpenWrt-25.12.0_~_25.12.5-teal)
 
 ## Custom package feed (GitHub Pages)
 
-The repository also publishes a full-featured [OpenWRT package feed](https://2grey.github.io/awg-openwrt/)
-with signed IPK repositories for OpenWrt 24.x and signed APK repositories for
-OpenWrt 25.x and later.
+В репозитории также публикуется полнофункциональный [репозиторий пакетов OpenWrt](https://2grey.github.io/awg-openwrt/), включающий подписанные репозитории IPK для OpenWrt 24.x и подписанные репозитории APK для OpenWrt 25.x и более поздних версий.
 
-[Detailed documentation](docs/custom-feed.md)
+## Установка
 
-Install the packages from the signed feed (the exact OpenWrt version and target
-are detected automatically):
+### Через Custom package feed
 
-```sh
-sh <(wget -O - https://raw.githubusercontent.com/2Grey/awg-openwrt/refs/heads/master/amneziawg-feed-install.sh)
-```
+1. Установите пакеты из подписанного репозитория (точная версия OpenWrt и целевая платформа определяются автоматически):  
+    
+    Для установки русской локализации добавьте флаг `-r` к команде.
 
-Add `-r` to also install the Russian LuCI translation.
+    ```sh
+    sh <(wget -O - https://raw.githubusercontent.com/2Grey/awg-openwrt/refs/heads/master/amneziawg-feed-install.sh)
+    ```
 
-## AWG 3.1 Support
+2. Перезагрузите роутер для загрузки новых модулей ядра
+3. Настройте новый интерфейс с протоколом `AmneziaWG VPN`
 
-The `master` branch contains an aligned set of AWG 3.1 components:
+### Через скрипт настройки
 
-- `kmod-amneziawg` — `v3.1.20260812`;
-- `amneziawg-tools` — `v3.1.20260812`;
-- `luci-proto-amneziawg` — Web interface and import/export of AWG 3.1 configurations.
+Если вам нужно только установить пакеты, используйте скрипт `amneziawg-install` - он автоматически скачает пакеты из этого репозитория под ваше устройство, а также предложит сразу настроить интерфейс с протоколом AmneziaWG.
 
-The netifd and LuCI support `HeaderProtectionKey`, `ContentPaddingAddition`,
-`RekeyAfterTime`, `RekeyTimeout`, `RejectAfterTime`, `KeepaliveTimeout`,
-`MaxHandshakeAttempts`, `RandomTrailers`, `DisableCookies`, the `H1-H4`
-ranges, and the `PersistentKeepalive` range.
+Если вы согласитесь, потребуется ввести запрошенные параметры конфигурации.  
+При этом скрипт создаст интерфейс, настроит для него правила фаерволла, а также включит маршрутизацию адресов из AllowedIPs; по умолчанию это весь IPv4- и IPv6-трафик (установит в настройках Peer галочку Route Allowed IPs).
 
-`RandomTrailers` and `DisableCookies` accept `on` or `off`. `RandomTrailers`
-must have the same value on both sides. A 3.1 implementation remains compatible
-with existing AWG 3.0 configurations when both new settings are absent or off.
-
-Ranges are specified as `lower-upper` (for example, `20-30`) or as a single number.  
-When using `HeaderProtectionKey`, the `S1-S4` parameters must be at least 12.
-
-## Automatic configuration of AmneziaWG for OpenWRT version 24.10.4 ~ 25.12.5
-
-The `master` branch builds an aligned AWG 3.1 stack: `kmod-amneziawg`
-`v3.1.20260812`, `amneziawg-tools` `v3.1.20260812`, and an AWG 3.1-aware
-LuCI/netifd integration.
-
-The UI and configuration import/export support
-`HeaderProtectionKey`, `ContentPaddingAddition`, customizable timing ranges,
-`RandomTrailers`, `DisableCookies`, `H1-H4` ranges, and
-`PersistentKeepalive` ranges.
-
-A range is written as
-`lower-upper` (for example, `20-30`). When header protection is enabled, each
-of `S1-S4` must be at least 12.
-
-1. If your router has enough available ROM, I recommend using the script described below only to install the necessary packages, and use podkop from user [@itdoginfo](https://github.com/itdoginfo) for selective traffic routing into the tunnel - the setup process is described in the [documentation](https://podkop.net/docs/tunnels/awg_settings/)
-
-2. If you only need to install packages, I added the amneziawg-install script - it will automatically download packages from this repository for your device (only for the stable version of OpenWRT), and also offer to immediately configure the interface with the AmneziaWG protocol.  
-If the user agrees, you will need to enter the config parameters that the script will request.  
-The script will create an interface, configure firewall rules for it, and also **enable redirection of all traffic through the AmneziaWG tunnel** (check the Route Allowed IPs box in the Peer settings).  
-To run the script, connect to the router via SSH, enter the command and follow the instructions on the screen:
+Для запуска скрипта подключитесь к роутеру по SSH, введите команду и следуйте инструкциям на экране.
 
 ```sh
 sh <(wget -O - https://raw.githubusercontent.com/2Grey/awg-openwrt/refs/heads/master/amneziawg-install.sh)
 ```
 
-3. There is also a non-interactive mode for simple package installation (without questions about configuring an interface with the AmneziaWG protocol and installing the `luci-i18n-amneziawg-ru` package):
+> [!IMPORTANT]
+> При чистой установке скрипт может загрузить модуль ядра и настроить интерфейс без перезагрузки.
+> Если после обновления в памяти остался старый модуль ядра, перезагрузите роутер и повторно запустите скрипт.
 
-```sh
-sh <(wget -O - https://raw.githubusercontent.com/2Grey/awg-openwrt/refs/heads/master/amneziawg-install.sh) -en
-```
+Дополнительные флаги скрипта:
 
-The installer can configure AWG 2.0, 3.0, and 3.1 connection profiles. A ready
-AmneziaWG configuration with one `[Peer]` section can be imported directly;
-`auto` detects the minimum required profile:
+| Флаг | Описание                           |
+|------|------------------------------------|
+| -e   | НЕ устанавливать пакет локализации |
+| -n   | НЕ настраивать интерфейс AmneziaWG |
+| -a   | Профиль подключения: 2.0, 3.0, 3.1 или авто (по умолчанию: авто) |
+| -c   | Импортировать параметры подключения из .conf файла |
+| -i   | Имя интерфейса OpenWrt (по умолчанию: awg1) |
+
+Установщик может настраивать профили подключения AWG 2.0, 3.0 и 3.1
+
+Для импорта подходит конфигурация, содержащая ровно одну секцию `[Peer]`. Конфигурации с несколькими узлами настраивайте через LuCI.
 
 ```sh
 sh amneziawg-install.sh -e -a auto -c /root/client.conf
 ```
 
-To enter settings interactively and force a particular compatibility profile:
+Чтобы интерактивно ввести настройки для определенного профиля подключения:
 
 ```sh
 sh amneziawg-install.sh -a 2.0
@@ -87,18 +71,22 @@ sh amneziawg-install.sh -a 3.0
 sh amneziawg-install.sh -a 3.1
 ```
 
-The script verifies the version reported by the installed `amneziawg-tools`
-and refuses to configure a newer profile on older release assets. If an older
-kernel module is still loaded after an upgrade, reboot the router and run the
-script again.
-4. In addition, for automatic configuration you can also use the [script](https://github.com/itdoginfo/domain-routing-openwrt) from user [@itdoginfo](https://github.com/itdoginfo).  
-This script allows you to automatically download the necessary packages from those collected here and configure [point-by-point bypass of blocking by domains](https://habr.com/ru/articles/767464/) (instructions in Russian).  
-Suitable if you have a weak router with insufficient ROM to install podkop and its dependencies
+> [!NOTE]
+> Скрипт проверяет версию, указанную установленным `amneziawg-tools`,
+и отказывается настраивать более новый профиль для более старых версий.
+> Если после обновления все еще загружен более старый модуль ядра, перезагрузите маршрутизатор и запустите скрипт снова.
 
-# Building packages for all devices that support OpenWRT
+### Ручная установка пакетов
 
-A script has been added to the repository that parses data on supported platforms from the OpenWRT page and automatically starts building AmneziaWG packages for all devices.
-At the moment I have collected packages for all devices for OpenWRT versions:
+Скачайте три обязательных пакета — `amneziawg-tools_*`, `kmod-amneziawg_*` и `luci-proto-amneziawg_*` — со страницы [релизов](https://github.com/2Grey/awg-openwrt/releases) под вашу платформу. Для русской локализации дополнительно скачайте необязательный пакет `luci-i18n-amneziawg-ru_*`. В OpenWrt 24.10 используются пакеты `.ipk`, а в OpenWrt 25.12 — `.apk`.
+
+#### Выбор пакетов для своего устройства
+
+В соответствии с пунктом [Указываем переменные для сборки](https://github.com/itdoginfo/domain-routing-openwrt/wiki/Amnezia-WG-Build#%D1%83%D0%BA%D0%B0%D0%B7%D1%8B%D0%B2%D0%B0%D0%B5%D0%BC%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5-%D0%B4%D0%BB%D1%8F-%D1%81%D0%B1%D0%BE%D1%80%D0%BA%D0%B8) определить target и subtarget вашего устройства.
+
+Далее перейдите на страницу релиза, соответствующего вашей версии OpenWrt, и с помощью поиска по странице (Ctrl+F) найдите три обязательных пакета для своего устройства. Их имена оканчиваются на `target_subtarget.ipk` для OpenWrt 24.10 или на `target_subtarget.apk` для OpenWrt 25.12.
+
+#### Список поддерживаемых версий OpenWrt
 
 1. [25.12.5](https://github.com/2Grey/awg-openwrt/releases/tag/v25.12.5) – AWG-3.1
 2. [25.12.4](https://github.com/2Grey/awg-openwrt/releases/tag/v25.12.4) – AWG-3.1
@@ -112,36 +100,33 @@ At the moment I have collected packages for all devices for OpenWRT versions:
 10. [24.10.5](https://github.com/2Grey/awg-openwrt/releases/tag/v24.10.5) – AWG-3.1
 11. [24.10.4](https://github.com/2Grey/awg-openwrt/releases/tag/v24.10.4) – AWG-3.1
 
-For builds for older versions of OpenWRT, see the [Slava-Shchipunov](https://github.com/Slava-Shchipunov/awg-openwrt) repository.
+## Сборка пакетов
 
-## Selecting packages for your device
+В репозитории есть скрипт, который получает с сайта OpenWrt список поддерживаемых платформ и автоматически запускает сборку пакетов AmneziaWG для всех устройств.
 
-In accordance with the paragraph [Specify variables for builds](https://github.com/itdoginfo/domain-routing-openwrt/wiki/Amnezia-WG-Build#%D1%83%D0%BA%D0%B0%D0%B7%D1%8B%D0%B2%D0%B0%D0%B5%D0%BC%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5-%D0%B4%D0%BB%D1%8F-%D1%81%D0%B1%D0%BE%D1%80%D0%BA%D0%B8) (instructions in Russian) determine `target` and `subtarget` of your device.  
-Then go to the release page corresponding to your OpenWRT version, then search the page (Ctrl+F) to find 3 packages whose names end in `target_subtarget.ipk` corresponding to your device.  
-For AWG 2.0, 3.0, and 3.1, the Russian localization package luci-i18n-amneziawg-ru is also available
+Сборки для более старых версий OpenWrt доступны в репозитории [Slava-Shchipunov/awg-openwrt](https://github.com/Slava-Shchipunov/awg-openwrt).
 
-## How to run a build for all supported devices
+### Сборка для всех поддерживаемых устройств
 
-1. Create a fork of this repository
-2. Switch to the Actions tab and enable Github actions (they are disabled for forks by default)
-3. Then go to the Code tab => Releases (on the right side of the screen) => Draft a new release
-4. Click Choose a tag and create a new tag in the vX.X.X format, where you need to substitute the required OpenWRT version for X.X.X, for example, v23.05.4
-5. Select the `master` branch as the target
-6. Enter Release title
-7. Click the green Publish release button at the bottom
+1. Создайте форк этого репозитория.
+2. Перейдите на вкладку **Actions** и включите GitHub Actions — по умолчанию они отключены в форках.
+3. Перейдите на вкладку **Code**, откройте раздел **Releases** в правой части страницы и нажмите **Draft a new release**.
+4. Нажмите **Choose a tag** и создайте тег в формате `vX.X.X`, где `X.X.X` — требуемая версия OpenWrt, например `v24.10.8`.
+5. В качестве целевой ветки выберите `master`.
+6. Укажите название релиза.
+7. Нажмите **Publish release**. Создание тега запустит сборку пакетов.
 
-For public repositories, Github provides unlimited use of runners, I had up to 20 parallel jobs running. Each job takes about 10-15 minutes, the total build time is about 60 minutes.
+Для публичных репозиториев GitHub предоставляет бесплатные стандартные раннеры. В имеющихся workflow одновременно запускалось до 20 задач. Каждая задача обычно занимает 10–15 минут, а полная сборка — около 60 минут.
 
-## Building packages for a specific platform
+### Сборка для определённой платформы
 
-You can see how to start building AWG 1.0 packages for a specific platform in the [wiki instructions](https://github.com/itdoginfo/domain-routing-openwrt/wiki/Amnezia-WG-Build) (instructions in Russian). Building for one device will take about 2 hours.
+Инструкция по сборке пакетов AWG 1.0 для определённой платформы приведена в [Wiki](https://github.com/itdoginfo/domain-routing-openwrt/wiki/Amnezia-WG-Build). Такая сборка занимает около двух часов.
 
-AWG 2.0, 3.0, and 3.1 can be built for a specific platform as follows:
+Текущий стек AWG 3.1, совместимый с профилями подключения AWG 2.0 и 3.0, для определённых платформ можно собрать следующим образом:
 
-1. Create a fork of this repository
-2. Switch to the Actions tab and enable Github actions (they are disabled for forks by default)
-3. On the left in the list of actions, select the Create Release on Tag action
-4. On the right, click the Run workflow button
-5. In the opened list, specify the OpenWRT version (for example, 24.10.3), a list of targets separated by commas (for example, stm32,ramips), a list of subtargets separated by commas (for example, stm32mp1,mt7621). The build will be performed only for existing target/subtarget pairs
-6. Click the green Run workflow button
-   Building for one device will take about 10-15 minutes. A release with the specified OpenWRT version should be created
+1. Создайте форк этого репозитория.
+2. Перейдите на вкладку **Actions** и включите GitHub Actions — по умолчанию они отключены в форках.
+3. В списке workflow слева выберите **Create Release on Tag**.
+4. Нажмите **Run workflow**.
+5. Укажите версию OpenWrt, например `24.10.8`; список `target` через запятую, например `stm32,ramips`; и список `subtarget` через запятую, например `stm32mp1,mt7621`. Сборка будет выполнена только для существующих пар `target/subtarget`.
+6. Нажмите **Run workflow**. Сборка для одного устройства обычно занимает 10–15 минут; после её завершения будет создан релиз для указанной версии OpenWrt.
