@@ -143,6 +143,6 @@ The **Build OpenWrt Snapshot** workflow checks the current OpenWrt Snapshot revi
 
 To start it manually, open **Actions → Build OpenWrt Snapshot → Run workflow**. Leave `target` and `subtarget` empty to build every available platform. To run a selective build, provide both comma-separated lists.
 
-The workflow also runs every third day of the month at `21:17 UTC` using the `17 21 */3 * *` schedule and checks every available `target/subtarget` pair.
+The workflow also runs every third day of the month at `21:17 UTC` using the `17 21 */3 * *` schedule and checks every supported `target/subtarget` pair. `microchipsw/lan969x` is temporarily skipped because its Snapshot SDK cannot package `kmod-crypto-xxhash` while `xxhash.ko` is built into the kernel.
 
 GitHub runs scheduled workflows only from the repository's default branch. GitHub Actions must also be enabled in forks.

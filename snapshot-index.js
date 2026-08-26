@@ -5,6 +5,13 @@ const core = require('@actions/core');
 const filterTargets = parseList(process.argv[2]);
 const filterSubtargets = parseList(process.argv[3]);
 const snapshotRoot = 'https://downloads.openwrt.org/snapshots/targets/';
+const excludedBuilds = [
+  {
+    target: 'microchipsw',
+    subtarget: 'lan969x',
+    reason: 'Snapshot SDK fails while packaging kmod-crypto-xxhash because xxhash.ko is built into the kernel',
+  },
+];
 
 function parseList(value = '') {
   return value.split(',').map(item => item.trim()).filter(Boolean);
@@ -142,6 +149,14 @@ async function main() {
       }
 
       for (const subtarget of subtargets) {
+        const excludedBuild = excludedBuilds.find(
+          item => item.target === target && item.subtarget === subtarget
+        );
+        if (excludedBuild) {
+          core.warning(`Skipping ${target}/${subtarget}: ${excludedBuild.reason}`);
+          continue;
+        }
+
         try {
           configs.push(await getBuildDetails(target, subtarget));
         } catch (error) {

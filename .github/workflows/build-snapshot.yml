@@ -235,16 +235,72 @@ jobs:
 
           ls -la awgrelease/
 
-      - name: Publish Snapshot prerelease
+      - name: Upload Snapshot packages for publishing
         if: steps.existing.outputs.result != 'true'
-        uses: softprops/action-gh-release@v2
+        uses: actions/upload-artifact@v4
         with:
-          tag_name: ${{ matrix.build_env.releaseTag }}
-          name: OpenWrt Snapshot ${{ matrix.build_env.revision }}
-          body: |
-            Automated AmneziaWG packages for OpenWrt Snapshot `${{ matrix.build_env.revision }}`.
-            Select assets matching the exact target, subtarget and kernel ABI of the installed Snapshot.
-          prerelease: true
-          make_latest: false
-          overwrite_files: true
-          files: awgrelease/*.apk
+          name: snapshot-packages-${{ matrix.build_env.revision }}-${{ matrix.build_env.target }}-${{ matrix.build_env.subtarget }}
+          path: awgrelease/*.apk
+          if-no-files-found: error
+          retention-days: 3
+
+  publish:
+    name: Publish Snapshot prereleases
+    runs-on: ubuntu-latest
+    needs: [discover, build]
+    if: always() && needs.discover.result == 'success'
+    steps:
+      - name: Download newly built Snapshot packages
+        id: download
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          pattern: snapshot-packages-*
+          path: snapshot-artifacts
+          merge-multiple: true
+
+      - name: Publish packages grouped by Snapshot revision
+        if: steps.download.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+
+          assets=(snapshot-artifacts/*.apk)
+          if [ "${#assets[@]}" -eq 0 ]; then
+            echo "No new Snapshot packages to publish."
+            exit 0
+          fi
+
+          declare -A release_tags=()
+          for asset in "${assets[@]}"; do
+            asset_name=$(basename "$asset")
+            artifact_postfix="${asset_name#*_}"
+            release_tag="${artifact_postfix%%_*}"
+            release_tags["$release_tag"]=1
+          done
+
+          while IFS= read -r release_tag; do
+            revision="${release_tag#snapshot-}"
+            release_assets=()
+
+            for asset in "${assets[@]}"; do
+              case "$(basename "$asset")" in
+                *_"${release_tag}"_*.apk) release_assets+=("$asset") ;;
+              esac
+            done
+
+            if ! gh release view "$release_tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+              gh release create "$release_tag" \
+                --repo "$GITHUB_REPOSITORY" \
+                --target "$GITHUB_SHA" \
+                --title "OpenWrt Snapshot $revision" \
+                --notes "Automated AmneziaWG packages for OpenWrt Snapshot $revision. Select assets matching the exact target, subtarget and kernel ABI of the installed Snapshot." \
+                --prerelease
+            fi
+
+            gh release upload "$release_tag" "${release_assets[@]}" \
+              --repo "$GITHUB_REPOSITORY" \
+              --clobber
+          done < <(printf '%s\n' "${!release_tags[@]}" | sort)
