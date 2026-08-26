@@ -74,6 +74,14 @@ sh amneziawg-install.sh -a 3.1
 > The script checks the version reported by the installed `amneziawg-tools` and refuses to configure a newer profile when the installed version does not support it.
 > If an older kernel module is still loaded after an upgrade, reboot the router and run the script again.
 
+### Checking router information
+
+The script prints the OpenWrt and LuCI versions, the `target` and `subtarget`, versions of installed packages from this repository, and the version of the loaded AmneziaWG kernel module:
+
+```sh
+sh <(wget -O - https://raw.githubusercontent.com/2Grey/awg-openwrt/refs/heads/master/amneziawg-check.sh)
+```
+
 ### Manual package installation
 
 Download the three required packages for your platform from the [Releases](https://github.com/2Grey/awg-openwrt/releases) page: `amneziawg-tools_*`, `kmod-amneziawg_*`, and `luci-proto-amneziawg_*`. For Russian localization, also download the optional `luci-i18n-amneziawg-ru_*` package. OpenWrt 24.10 uses `.ipk` packages, while OpenWrt 25.12 uses `.apk` packages.

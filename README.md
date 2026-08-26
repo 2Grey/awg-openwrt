@@ -76,6 +76,14 @@ sh amneziawg-install.sh -a 3.1
 и отказывается настраивать более новый профиль для более старых версий.
 > Если после обновления все еще загружен более старый модуль ядра, перезагрузите маршрутизатор и запустите скрипт снова.
 
+### Проверка информации о роутере
+
+Скрипт выводит версию OpenWrt и LuCI, `target` и `subtarget`, версии установленных пакетов из этого репозитория, а также версию загруженного модуля ядра AmneziaWG:
+
+```sh
+sh <(wget -O - https://raw.githubusercontent.com/2Grey/awg-openwrt/refs/heads/master/amneziawg-check.sh)
+```
+
 ### Ручная установка пакетов
 
 Скачайте три обязательных пакета — `amneziawg-tools_*`, `kmod-amneziawg_*` и `luci-proto-amneziawg_*` — со страницы [релизов](https://github.com/2Grey/awg-openwrt/releases) под вашу платформу. Для русской локализации дополнительно скачайте необязательный пакет `luci-i18n-amneziawg-ru_*`. В OpenWrt 24.10 используются пакеты `.ipk`, а в OpenWrt 25.12 — `.apk`.
