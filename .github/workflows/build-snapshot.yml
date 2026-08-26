@@ -1,0 +1,250 @@
+name: Build OpenWrt Snapshot
+
+on:
+  schedule:
+    # Every third day of the month at 21:17 UTC (01:17 in Europe/Samara).
+    - cron: "17 21 */3 * *"
+  workflow_dispatch:
+    inputs:
+      targets:
+        description: "Snapshot targets, comma-separated; empty means all"
+        required: false
+        type: string
+      subtargets:
+        description: "Snapshot subtargets, comma-separated; empty means all"
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-openwrt-snapshot
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      targets: ${{ steps.inputs.outputs.targets }}
+      subtargets: ${{ steps.inputs.outputs.subtargets }}
+    steps:
+      - name: Prepare target filters
+        id: inputs
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          MANUAL_TARGETS: ${{ inputs.targets }}
+          MANUAL_SUBTARGETS: ${{ inputs.subtargets }}
+        run: |
+          set -euo pipefail
+
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            TARGET_FILTERS="$MANUAL_TARGETS"
+            SUBTARGET_FILTERS="$MANUAL_SUBTARGETS"
+          else
+            TARGET_FILTERS=""
+            SUBTARGET_FILTERS=""
+          fi
+
+          if { [ -z "$TARGET_FILTERS" ] && [ -n "$SUBTARGET_FILTERS" ]; } || \
+             { [ -n "$TARGET_FILTERS" ] && [ -z "$SUBTARGET_FILTERS" ]; }; then
+            echo "Set both target and subtarget filters, or leave both empty to build all platforms."
+            exit 1
+          fi
+
+          echo "targets=$TARGET_FILTERS" >> "$GITHUB_OUTPUT"
+          echo "subtargets=$SUBTARGET_FILTERS" >> "$GITHUB_OUTPUT"
+
+  discover:
+    runs-on: ubuntu-latest
+    needs: prepare
+    outputs:
+      job-config: ${{ steps.config.outputs.job-config }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.16.0"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Discover current Snapshot builds
+        id: config
+        env:
+          TARGETS: ${{ needs.prepare.outputs.targets }}
+          SUBTARGETS: ${{ needs.prepare.outputs.subtargets }}
+        run: node snapshot-index.js "$TARGETS" "$SUBTARGETS"
+
+  build:
+    name: "${{ matrix.build_env.revision }} - ${{ matrix.build_env.target }}/${{ matrix.build_env.subtarget }}"
+    runs-on: ubuntu-latest
+    needs: discover
+    strategy:
+      fail-fast: false
+      matrix:
+        build_env: ${{ fromJson(needs.discover.outputs.job-config) }}
+
+    steps:
+      - name: Check whether this Snapshot ABI is already published
+        id: existing
+        uses: actions/github-script@v7
+        env:
+          RELEASE_TAG: ${{ matrix.build_env.releaseTag }}
+          ARTIFACT_POSTFIX: ${{ matrix.build_env.artifactPostfix }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          result-encoding: string
+          script: |
+            const requiredPackages = [
+              'amneziawg-tools',
+              'kmod-amneziawg',
+              'luci-proto-amneziawg',
+              'luci-i18n-amneziawg-ru',
+            ];
+
+            try {
+              const { data: release } = await github.rest.repos.getReleaseByTag({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                tag: process.env.RELEASE_TAG,
+              });
+              const assets = await github.paginate(github.rest.repos.listReleaseAssets, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: release.id,
+                per_page: 100,
+              });
+              const names = new Set(assets.map(asset => asset.name));
+              return requiredPackages.every(name =>
+                names.has(`${name}_${process.env.ARTIFACT_POSTFIX}.apk`)
+              );
+            } catch (error) {
+              if (error.status === 404) {
+                return false;
+              }
+              throw error;
+            }
+
+      - name: Report unchanged Snapshot
+        if: steps.existing.outputs.result == 'true'
+        run: echo "Packages for this OpenWrt Snapshot ABI are already published."
+
+      - name: Checkout AWG source code
+        if: steps.existing.outputs.result != 'true'
+        uses: actions/checkout@v4
+
+      - name: Install build prerequisites
+        if: steps.existing.outputs.result != 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pyelftools zstd
+
+      - name: Cache OpenWrt Snapshot SDK
+        if: steps.existing.outputs.result != 'true'
+        id: cache-sdk
+        uses: actions/cache@v4
+        with:
+          path: openwrt-sdk-*/
+          key: ${{ runner.os }}-snapshot-sdk-${{ matrix.build_env.revision }}-${{ matrix.build_env.target }}-${{ matrix.build_env.subtarget }}-${{ matrix.build_env.vermagic }}
+
+      - name: Download and extract OpenWrt Snapshot SDK
+        if: steps.existing.outputs.result != 'true' && steps.cache-sdk.outputs.cache-hit != 'true'
+        env:
+          SDK_FILE: ${{ matrix.build_env.sdkFile }}
+          SDK_URL: ${{ matrix.build_env.sdkUrl }}
+        run: |
+          set -euo pipefail
+          wget -O "$SDK_FILE" "$SDK_URL"
+
+          case "$SDK_FILE" in
+            *.tar.zst) tar --zstd -xf "$SDK_FILE" ;;
+            *.tar.xz) tar -xf "$SDK_FILE" ;;
+            *) echo "Unsupported SDK archive: $SDK_FILE"; exit 1 ;;
+          esac
+
+      - name: Configure Snapshot SDK
+        if: steps.existing.outputs.result != 'true'
+        run: |
+          set -euo pipefail
+          SDK_DIR=$(find . -maxdepth 1 -name "openwrt-sdk-*" -type d -print -quit)
+          if [ -z "$SDK_DIR" ]; then
+            echo "OpenWrt Snapshot SDK directory was not found."
+            exit 1
+          fi
+
+          WORKSPACE_DIR=$(pwd)
+          cd "$SDK_DIR"
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
+
+          cp -r "$WORKSPACE_DIR/kmod-amneziawg" package/
+          cp -r "$WORKSPACE_DIR/amneziawg-tools" package/
+          cp -r "$WORKSPACE_DIR/luci-proto-amneziawg" package/
+
+          {
+            echo "CONFIG_PACKAGE_kmod-amneziawg=m"
+            echo "CONFIG_PACKAGE_amneziawg-tools=y"
+            echo "CONFIG_PACKAGE_luci-proto-amneziawg=y"
+            echo "CONFIG_PACKAGE_luci-i18n-amneziawg-ru=y"
+          } > .config
+          make defconfig
+
+      - name: Build AmneziaWG packages
+        if: steps.existing.outputs.result != 'true'
+        run: |
+          set -euo pipefail
+          SDK_DIR=$(find . -maxdepth 1 -name "openwrt-sdk-*" -type d -print -quit)
+          cd "$SDK_DIR"
+
+          make package/kmod-amneziawg/{download,prepare} V=s
+          make package/kmod-amneziawg/compile V=s
+          make package/luci-proto-amneziawg/{download,prepare} V=s
+          make package/luci-proto-amneziawg/compile V=s
+          make package/amneziawg-tools/{download,prepare} V=s
+          make package/amneziawg-tools/compile V=s
+
+      - name: Prepare Snapshot artifacts
+        if: steps.existing.outputs.result != 'true'
+        env:
+          ARTIFACT_POSTFIX: ${{ matrix.build_env.artifactPostfix }}
+        run: |
+          set -euo pipefail
+          SDK_DIR=$(find . -maxdepth 1 -name "openwrt-sdk-*" -type d -print -quit)
+          mkdir -p awgrelease
+
+          copy_package() {
+            package_name="$1"
+            search_root="$2"
+            source_file=$(find "$search_root" -type f -name "${package_name}-*.apk" -print -quit)
+            if [ -z "$source_file" ]; then
+              echo "Package was not built: $package_name"
+              exit 1
+            fi
+            cp "$source_file" "awgrelease/${package_name}_${ARTIFACT_POSTFIX}.apk"
+          }
+
+          copy_package "amneziawg-tools" "$SDK_DIR/bin/packages"
+          copy_package "luci-proto-amneziawg" "$SDK_DIR/bin/packages"
+          copy_package "luci-i18n-amneziawg-ru" "$SDK_DIR/bin/packages"
+          copy_package "kmod-amneziawg" "$SDK_DIR/bin/targets"
+
+          ls -la awgrelease/
+
+      - name: Publish Snapshot prerelease
+        if: steps.existing.outputs.result != 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ matrix.build_env.releaseTag }}
+          name: OpenWrt Snapshot ${{ matrix.build_env.revision }}
+          body: |
+            Automated AmneziaWG packages for OpenWrt Snapshot `${{ matrix.build_env.revision }}`.
+            Select assets matching the exact target, subtarget and kernel ABI of the installed Snapshot.
+          prerelease: true
+          make_latest: false
+          overwrite_files: true
+          files: awgrelease/*.apk

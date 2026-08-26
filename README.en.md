@@ -136,3 +136,13 @@ The current AWG 3.1 stack, which is compatible with AWG 2.0 and 3.0 connection p
 4. Click **Run workflow**.
 5. Enter the OpenWrt version, for example `24.10.8`; a comma-separated list of `target` values, for example `stm32,ramips`; and a comma-separated list of `subtarget` values, for example `stm32mp1,mt7621`. Only existing `target/subtarget` pairs are built.
 6. Click **Run workflow**. A build for one device usually takes 10–15 minutes; after it completes, a release is created for the specified OpenWrt version.
+
+### Building for OpenWrt Snapshot
+
+The **Build OpenWrt Snapshot** workflow checks the current OpenWrt Snapshot revision and kernel ABI, builds APK packages, and publishes them as a prerelease. If all four packages for that revision, platform, and ABI have already been published, the duplicate build is skipped.
+
+To start it manually, open **Actions → Build OpenWrt Snapshot → Run workflow**. Leave `target` and `subtarget` empty to build every available platform. To run a selective build, provide both comma-separated lists.
+
+The workflow also runs every third day of the month at `21:17 UTC` using the `17 21 */3 * *` schedule and checks every available `target/subtarget` pair.
+
+GitHub runs scheduled workflows only from the repository's default branch. GitHub Actions must also be enabled in forks.
