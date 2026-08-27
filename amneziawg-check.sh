@@ -167,9 +167,9 @@ print_luci_parser() {
 
     if [ ! -r "$LUCI_PROTOCOL_FILE" ]; then
         printf 'AWG 3.x range support: parser file not found\n'
-    elif grep -q 'validateUint16Range(null, pconf.peer_persistentkeepalive' "$LUCI_PROTOCOL_FILE"; then
+    elif grep -q 'validateUint16Range' "$LUCI_PROTOCOL_FILE"; then
         printf 'AWG 3.x range support: present\n'
-    elif grep -q "stubValidator.apply('port', pconf.peer_persistentkeepalive" "$LUCI_PROTOCOL_FILE"; then
+    elif grep -q 'PersistentKeepAlive setting is invalid' "$LUCI_PROTOCOL_FILE"; then
         printf 'AWG 3.x range support: missing (legacy parser detected)\n'
     else
         printf 'AWG 3.x range support: unknown parser version\n'

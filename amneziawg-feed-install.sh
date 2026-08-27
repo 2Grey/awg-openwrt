@@ -132,7 +132,9 @@ verify_luci_parser() {
         die "Installed LuCI parser was not found at $LUCI_PROTOCOL_FILE."
     fi
 
-    if ! grep -q 'validateUint16Range(null, pconf.peer_persistentkeepalive' "$LUCI_PROTOCOL_FILE"; then
+    # LuCI minifies packaged JavaScript, so do not depend on whitespace or
+    # the exact call expression used in the source file.
+    if ! grep -q 'validateUint16Range' "$LUCI_PROTOCOL_FILE"; then
         die "The LuCI parser on disk is outdated and does not accept AWG 3.x PersistentKeepalive ranges. Reinstall luci-proto-amneziawg and run this installer again."
     fi
 

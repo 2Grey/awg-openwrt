@@ -38,7 +38,7 @@ printf '%s\n' \
     'unrelated-package' \
     > "$APK_WORLD_FILE"
 printf '%s\n' \
-    "if (!stubValidator.apply('port', pconf.peer_persistentkeepalive || '0'))" \
+    "if(!stubValidator.apply('port',pconf.peer_persistentkeepalive||'0'))return _('PersistentKeepAlive setting is invalid')" \
     > "$LUCI_PROTOCOL_FILE"
 
 LEGACY_OUTPUT=$(print_legacy_feeds)
@@ -53,9 +53,10 @@ PARSER_OUTPUT=$(print_luci_parser)
 assert_contains 'legacy parser detected' "$PARSER_OUTPUT" "legacy LuCI parser is identified"
 
 printf '%s\n' \
-    'if (validateUint16Range(null, pconf.peer_persistentkeepalive || "0") !== true)' \
+    'function validateUint16Range(e,n){return validateUnsignedIntegerRange(e,n,65535)}' \
+    'if(validateUint16Range(null,pconf.peer_persistentkeepalive||"0")!==true)' \
     > "$LUCI_PROTOCOL_FILE"
 PARSER_OUTPUT=$(print_luci_parser)
-assert_contains 'range support: present' "$PARSER_OUTPUT" "current LuCI parser is identified"
+assert_contains 'range support: present' "$PARSER_OUTPUT" "minified current LuCI parser is identified"
 
 exit "$FAILED"

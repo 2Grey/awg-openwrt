@@ -93,9 +93,10 @@ assert_equal \
 
 LUCI_PROTOCOL_FILE="$TEST_DIR/amneziawg.js"
 printf '%s\n' \
-    'if (validateUint16Range(null, pconf.peer_persistentkeepalive || "0") !== true)' \
+    'function validateUint16Range(e,n){return validateUnsignedIntegerRange(e,n,65535)}' \
+    'if(validateUint16Range(null,pconf.peer_persistentkeepalive||"0")!==true)' \
     > "$LUCI_PROTOCOL_FILE"
 verify_luci_parser >/dev/null
-assert_equal "0" "$?" "AWG 3.x LuCI parser marker accepted"
+assert_equal "0" "$?" "minified AWG 3.x LuCI parser marker accepted"
 
 exit "$FAILED"
