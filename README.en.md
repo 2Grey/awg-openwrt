@@ -25,8 +25,14 @@ This repository also publishes a full-featured [OpenWrt package feed](https://2g
    sh <(wget -O - https://raw.githubusercontent.com/2Grey/awg-openwrt/refs/heads/master/amneziawg-feed-install.sh)
    ```
 
+   When migrating from `Slava-Shchipunov/awg-openwrt`, the installer removes
+   the legacy feed, resets APK constraints left by local-file installations,
+   and replaces a conflicting `luci-app-amneziawg` package with
+   `luci-proto-amneziawg`. Existing interface configuration is not removed.
+
 2. Reboot the router to load the new kernel modules.
-3. Create a new interface using the `AmneziaWG VPN` protocol.
+3. Hard-refresh LuCI (`Ctrl+F5`) or open it in a private browser window.
+4. Create a new interface using the `AmneziaWG VPN` protocol.
 
 ### Via the setup script
 
@@ -76,7 +82,9 @@ sh amneziawg-install.sh -a 3.1
 
 ### Checking router information
 
-The script prints the OpenWrt and LuCI versions, the `target` and `subtarget`, versions of installed packages from this repository, and the version of the loaded AmneziaWG kernel module:
+The script prints the OpenWrt and LuCI versions, the `target` and `subtarget`,
+both LuCI package variants, legacy feeds, AWG constraints from `/etc/apk/world`,
+the actual LuCI parser status, and the loaded AmneziaWG kernel module version:
 
 ```sh
 sh <(wget -O - https://raw.githubusercontent.com/2Grey/awg-openwrt/refs/heads/master/amneziawg-check.sh)

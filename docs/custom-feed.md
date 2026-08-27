@@ -49,6 +49,13 @@ sh <(wget -O - https://raw.githubusercontent.com/2Grey/awg-openwrt/refs/heads/ma
 опубликован feed. Повторный запуск безопасен: существующая запись `awg`
 заменяется актуальным URL без создания дублей.
 
+При переходе с `Slava-Shchipunov/awg-openwrt` скрипт перед обновлением ключа и
+индексов сообщает об обнаруженном legacy feed и удаляет его. На OpenWrt 25.x
+установленные AWG-пакеты переводятся на доступные в новом feed версии через
+`apk upgrade --available`; это также снимает identity-hash ограничения,
+созданные при установке локальных APK-файлов. Конфликтующий
+`luci-app-amneziawg` удаляется перед установкой `luci-proto-amneziawg`.
+
 Навигация на сайте построена по уровням:
 
 `/<openwrt-version>/`

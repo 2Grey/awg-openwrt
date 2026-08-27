@@ -10,6 +10,13 @@ AWG_VERSION="1.0"
 AWG_PROFILE="auto"
 CONFIG_FILE=""
 INTERFACE_NAME="awg1"
+LEGACY_FEED_PATTERN="slava-shchipunov.github.io/awg-openwrt"
+LEGACY_FEED_SED_PATTERN="slava-shchipunov\.github\.io/awg-openwrt"
+
+APK_REPOSITORIES_FILE=${APK_REPOSITORIES_FILE:-/etc/apk/repositories}
+APK_REPOSITORIES_DIR=${APK_REPOSITORIES_DIR:-/etc/apk/repositories.d}
+OPKG_FEED_CONFIG=${OPKG_FEED_CONFIG:-/etc/opkg/customfeeds.conf}
+LUCI_PROTOCOL_FILE=${LUCI_PROTOCOL_FILE:-/www/luci-static/resources/protocol/amneziawg.js}
 
 ASK_FOR_TRANSLATION=1
 ASK_FOR_INTERFACE_CONFIG=1
@@ -123,6 +130,60 @@ is_pkg_installed() {
         opkg) opkg list-installed 2>/dev/null | grep -q "^${CHECK_PACKAGE_NAME} " ;;
         *) die "Unsupported package manager: $PKG_MANAGER" ;;
     esac
+}
+
+remove_pkg() {
+    REMOVE_PACKAGE_NAME=$1
+
+    case "$PKG_MANAGER" in
+        apk) apk del "$REMOVE_PACKAGE_NAME" ;;
+        opkg) opkg remove "$REMOVE_PACKAGE_NAME" ;;
+        *) die "Unsupported package manager: $PKG_MANAGER" ;;
+    esac
+}
+
+remove_legacy_feed_from_file() {
+    LEGACY_CONFIG_FILE=$1
+    [ -f "$LEGACY_CONFIG_FILE" ] || return 0
+    grep -F -q "$LEGACY_FEED_PATTERN" "$LEGACY_CONFIG_FILE" 2>/dev/null || return 0
+
+    if [ "${LEGACY_FEED_NOTICE_SHOWN:-0}" -eq 0 ]; then
+        print_info "Legacy awg-openwrt feed detected. It will be removed to avoid package and signing-key conflicts:"
+        LEGACY_FEED_NOTICE_SHOWN=1
+    fi
+    printf '  %s\n' "$LEGACY_CONFIG_FILE"
+    LEGACY_TEMP_FILE="${LEGACY_CONFIG_FILE}.awg-migrate.$$"
+    if ! sed "\\|$LEGACY_FEED_SED_PATTERN|d" "$LEGACY_CONFIG_FILE" > "$LEGACY_TEMP_FILE" ||
+        ! cat "$LEGACY_TEMP_FILE" > "$LEGACY_CONFIG_FILE"; then
+        rm -f "$LEGACY_TEMP_FILE"
+        die "Unable to remove the legacy feed from $LEGACY_CONFIG_FILE."
+    fi
+    rm -f "$LEGACY_TEMP_FILE"
+}
+
+remove_legacy_feeds() {
+    LEGACY_FEED_NOTICE_SHOWN=0
+
+    remove_legacy_feed_from_file "$OPKG_FEED_CONFIG"
+    remove_legacy_feed_from_file "$APK_REPOSITORIES_FILE"
+    for LEGACY_CONFIG_FILE in "$APK_REPOSITORIES_DIR"/*.list; do
+        remove_legacy_feed_from_file "$LEGACY_CONFIG_FILE"
+    done
+}
+
+remove_conflicting_luci_package() {
+    DESIRED_LUCI_PACKAGE=$1
+    case "$DESIRED_LUCI_PACKAGE" in
+        luci-proto-amneziawg) CONFLICTING_LUCI_PACKAGE="luci-app-amneziawg" ;;
+        luci-app-amneziawg) CONFLICTING_LUCI_PACKAGE="luci-proto-amneziawg" ;;
+        *) die "Unsupported LuCI package: $DESIRED_LUCI_PACKAGE" ;;
+    esac
+
+    if is_pkg_installed "$CONFLICTING_LUCI_PACKAGE"; then
+        print_info "$CONFLICTING_LUCI_PACKAGE conflicts with $DESIRED_LUCI_PACKAGE and will be removed before installation."
+        remove_pkg "$CONFLICTING_LUCI_PACKAGE" ||
+            die "Unable to remove conflicting package $CONFLICTING_LUCI_PACKAGE."
+    fi
 }
 
 install_local_pkg() {
@@ -498,6 +559,7 @@ install_awg_packages() {
     BASE_URL="https://github.com/2Grey/awg-openwrt/releases/download/"
 
     detect_base_awg_version
+    remove_conflicting_luci_package "$LUCI_PACKAGE_NAME"
 
     AWG_DIR=$(mktemp -d /tmp/amneziawg.XXXXXX) ||
         die "Unable to create a temporary download directory."
@@ -508,15 +570,7 @@ install_awg_packages() {
     detect_installed_awg_version
     print_info "Detected installed AWG stack: $AWG_VERSION"
 
-    # Either LuCI package provides the interface; update the selected variant,
-    # but do not install it alongside the legacy alternative.
-    if is_pkg_installed "$LUCI_PACKAGE_NAME"; then
-        install_release_package "$LUCI_PACKAGE_NAME"
-    elif is_pkg_installed "luci-proto-amneziawg" || is_pkg_installed "luci-app-amneziawg"; then
-        printf 'A different AmneziaWG LuCI package is already installed; leaving it unchanged\n'
-    else
-        install_release_package "$LUCI_PACKAGE_NAME"
-    fi
+    install_release_package "$LUCI_PACKAGE_NAME"
 
     if [ "$AWG_VERSION" != "1.0" ] && [ "$ASK_FOR_TRANSLATION" -eq 1 ]; then
         if ask_yes_no \
@@ -529,6 +583,28 @@ install_awg_packages() {
     fi
 
     cleanup_downloads
+}
+
+verify_luci_parser() {
+    case "$AWG_VERSION" in
+        3.0 | 3.1) ;;
+        *) return 0 ;;
+    esac
+
+    if [ ! -r "$LUCI_PROTOCOL_FILE" ]; then
+        die "Installed LuCI parser was not found at $LUCI_PROTOCOL_FILE."
+    fi
+
+    if ! grep -q 'validateUint16Range(null, pconf.peer_persistentkeepalive' "$LUCI_PROTOCOL_FILE"; then
+        die "The LuCI parser on disk is outdated and does not accept AWG 3.x PersistentKeepalive ranges. Reinstall $LUCI_PACKAGE_NAME and run this installer again."
+    fi
+
+    print_info "Verified the installed AWG 3.x LuCI parser."
+}
+
+print_post_install_instructions() {
+    print_info "Reboot the router before using the updated AmneziaWG kernel module."
+    print_info "After reboot, hard-refresh LuCI (Ctrl+F5) or open it in a private browser window to avoid cached JavaScript."
 }
 
 read_prompt() {
@@ -999,23 +1075,22 @@ configure_amneziawg_interface() {
 main() {
     parse_options "$@"
     detect_package_manager
+    remove_legacy_feeds
     check_repo
     install_awg_packages
+    verify_luci_parser
 
-    if [ "$ASK_FOR_INTERFACE_CONFIG" -eq 0 ]; then
-        return
+    if [ "$ASK_FOR_INTERFACE_CONFIG" -eq 1 ]; then
+        if [ -n "$CONFIG_FILE" ]; then
+            configure_amneziawg_interface
+        elif ask_yes_no "Do you want to configure the amneziawg interface? (y/N):" "n"; then
+            configure_amneziawg_interface
+        else
+            print_info "Skipping amneziawg interface configuration."
+        fi
     fi
 
-    if [ -n "$CONFIG_FILE" ]; then
-        configure_amneziawg_interface
-        return
-    fi
-
-    if ask_yes_no "Do you want to configure the amneziawg interface? (y/N):" "n"; then
-        configure_amneziawg_interface
-    else
-        print_info "Skipping amneziawg interface configuration."
-    fi
+    print_post_install_instructions
 }
 
 trap cleanup_downloads 0

@@ -4,6 +4,13 @@
 # Keep this script compatible with BusyBox ash used by OpenWrt.
 
 UNKNOWN="unknown"
+LEGACY_FEED_PATTERN="slava-shchipunov.github.io/awg-openwrt"
+
+APK_REPOSITORIES_FILE=${APK_REPOSITORIES_FILE:-/etc/apk/repositories}
+APK_REPOSITORIES_DIR=${APK_REPOSITORIES_DIR:-/etc/apk/repositories.d}
+APK_WORLD_FILE=${APK_WORLD_FILE:-/etc/apk/world}
+OPKG_CONFIG_DIR=${OPKG_CONFIG_DIR:-/etc/opkg}
+LUCI_PROTOCOL_FILE=${LUCI_PROTOCOL_FILE:-/www/luci-static/resources/protocol/amneziawg.js}
 
 get_json_value() {
     JSON=$1
@@ -97,6 +104,7 @@ print_awg_packages() {
     for PACKAGE_NAME in \
         amneziawg-tools \
         kmod-amneziawg \
+        luci-app-amneziawg \
         luci-proto-amneziawg \
         luci-i18n-amneziawg-ru; do
         PACKAGE_VERSION=$(installed_package_version "$PACKAGE_NAME" 2>/dev/null || true)
@@ -107,6 +115,65 @@ print_awg_packages() {
     done
 
     [ "$FOUND_PACKAGE" -eq 1 ] || printf '(none)\n'
+}
+
+print_legacy_feed_file() {
+    LEGACY_CONFIG_FILE=$1
+    [ -f "$LEGACY_CONFIG_FILE" ] || return 0
+    grep -F -q "$LEGACY_FEED_PATTERN" "$LEGACY_CONFIG_FILE" 2>/dev/null || return 0
+
+    awk -v file="$LEGACY_CONFIG_FILE" -v pattern="$LEGACY_FEED_PATTERN" '
+        index($0, pattern) { printf "%s:%d:%s\n", file, NR, $0 }
+    ' "$LEGACY_CONFIG_FILE"
+    LEGACY_FEED_FOUND=1
+}
+
+print_legacy_feeds() {
+    LEGACY_FEED_FOUND=0
+    printf '\nLegacy awg-openwrt feeds:\n'
+
+    print_legacy_feed_file "$APK_REPOSITORIES_FILE"
+    for LEGACY_CONFIG_FILE in "$APK_REPOSITORIES_DIR"/*.list "$OPKG_CONFIG_DIR"/*.conf; do
+        print_legacy_feed_file "$LEGACY_CONFIG_FILE"
+    done
+
+    [ "$LEGACY_FEED_FOUND" -eq 1 ] || printf '(none)\n'
+}
+
+print_apk_world_constraints() {
+    printf '\nAmneziaWG APK world constraints:\n'
+    if [ "$PACKAGE_MANAGER" != "apk" ]; then
+        printf '(not applicable: apk is not active)\n'
+        return
+    fi
+    if [ ! -r "$APK_WORLD_FILE" ]; then
+        printf '(world file not found)\n'
+        return
+    fi
+
+    APK_WORLD_MATCHES=$(grep -E \
+        '^(amneziawg-tools|kmod-amneziawg|luci-app-amneziawg|luci-proto-amneziawg|luci-i18n-amneziawg-ru)([^[:alnum:]_-].*)?$' \
+        "$APK_WORLD_FILE" 2>/dev/null || true)
+    if [ -n "$APK_WORLD_MATCHES" ]; then
+        printf '%s\n' "$APK_WORLD_MATCHES"
+    else
+        printf '(none)\n'
+    fi
+}
+
+print_luci_parser() {
+    printf '\nInstalled LuCI parser:\n'
+    printf 'Path: %s\n' "$LUCI_PROTOCOL_FILE"
+
+    if [ ! -r "$LUCI_PROTOCOL_FILE" ]; then
+        printf 'AWG 3.x range support: parser file not found\n'
+    elif grep -q 'validateUint16Range(null, pconf.peer_persistentkeepalive' "$LUCI_PROTOCOL_FILE"; then
+        printf 'AWG 3.x range support: present\n'
+    elif grep -q "stubValidator.apply('port', pconf.peer_persistentkeepalive" "$LUCI_PROTOCOL_FILE"; then
+        printf 'AWG 3.x range support: missing (legacy parser detected)\n'
+    else
+        printf 'AWG 3.x range support: unknown parser version\n'
+    fi
 }
 
 print_loaded_awg_version() {
@@ -135,6 +202,9 @@ main() {
     detect_package_manager
     print_release_info
     print_awg_packages
+    print_legacy_feeds
+    print_apk_world_constraints
+    print_luci_parser
     print_loaded_awg_version
     printf '#####################################\n'
 }

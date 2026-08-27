@@ -25,8 +25,15 @@
     sh <(wget -O - https://raw.githubusercontent.com/2Grey/awg-openwrt/refs/heads/master/amneziawg-feed-install.sh)
     ```
 
+    При переходе с `Slava-Shchipunov/awg-openwrt` установщик удалит старую
+    запись feed, снимет APK-ограничения, оставшиеся после установки локальных
+    файлов, и заменит конфликтующий `luci-app-amneziawg` на
+    `luci-proto-amneziawg`. Конфигурация интерфейсов при этом не удаляется.
+
 2. Перезагрузите роутер для загрузки новых модулей ядра
-3. Настройте новый интерфейс с протоколом `AmneziaWG VPN`
+3. Выполните жесткое обновление страницы LuCI (`Ctrl+F5`) или откройте ее в
+   приватном окне
+4. Настройте новый интерфейс с протоколом `AmneziaWG VPN`
 
 ### Через скрипт настройки
 
@@ -78,7 +85,10 @@ sh amneziawg-install.sh -a 3.1
 
 ### Проверка информации о роутере
 
-Скрипт выводит версию OpenWrt и LuCI, `target` и `subtarget`, версии установленных пакетов из этого репозитория, а также версию загруженного модуля ядра AmneziaWG:
+Скрипт выводит версию OpenWrt и LuCI, `target` и `subtarget`, версии обоих
+вариантов LuCI-пакета, legacy feeds, AWG-ограничения из `/etc/apk/world`,
+состояние фактического LuCI-парсера и версию загруженного модуля ядра
+AmneziaWG:
 
 ```sh
 sh <(wget -O - https://raw.githubusercontent.com/2Grey/awg-openwrt/refs/heads/master/amneziawg-check.sh)
