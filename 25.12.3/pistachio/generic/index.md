@@ -45,6 +45,7 @@ apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 - [index.json](https://2grey.github.io/awg-openwrt/25.12.3/pistachio/generic/index.json)
 - [kmod-amneziawg-6.12.85.3.0.20260731-r1.apk](https://2grey.github.io/awg-openwrt/25.12.3/pistachio/generic/kmod-amneziawg-6.12.85.3.0.20260731-r1.apk)
 - [kmod-amneziawg-6.12.85.3.1.20260812-r1.apk](https://2grey.github.io/awg-openwrt/25.12.3/pistachio/generic/kmod-amneziawg-6.12.85.3.1.20260812-r1.apk)
+- [kmod-amneziawg-6.12.85.3.1.20260828-r1.apk](https://2grey.github.io/awg-openwrt/25.12.3/pistachio/generic/kmod-amneziawg-6.12.85.3.1.20260828-r1.apk)
 - [kmod-amneziawg_v25.12.3_mipsel_24kc_24kf_pistachio_generic.apk](https://2grey.github.io/awg-openwrt/25.12.3/pistachio/generic/kmod-amneziawg_v25.12.3_mipsel_24kc_24kf_pistachio_generic.apk)
 - [luci-i18n-amneziawg-ru-0.260808.22690.apk](https://2grey.github.io/awg-openwrt/25.12.3/pistachio/generic/luci-i18n-amneziawg-ru-0.260808.22690.apk)
 - [luci-i18n-amneziawg-ru-0.apk](https://2grey.github.io/awg-openwrt/25.12.3/pistachio/generic/luci-i18n-amneziawg-ru-0.apk)
