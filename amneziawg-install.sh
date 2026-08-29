@@ -20,6 +20,7 @@ LUCI_PROTOCOL_FILE=${LUCI_PROTOCOL_FILE:-/www/luci-static/resources/protocol/amn
 
 ASK_FOR_TRANSLATION=1
 ASK_FOR_INTERFACE_CONFIG=1
+SKIP_PACKAGE_INSTALL=0
 
 print_info() {
     printf '\033[32;1m%s\033[0m\n' "$*"
@@ -36,10 +37,11 @@ die() {
 
 usage() {
     cat <<EOF
-Usage: ${0##*/} [-h] [-e] [-n] [-a 2.0|3.0|3.1|auto] [-c FILE] [-i NAME]
+Usage: ${0##*/} [-h] [-e] [-n] [-s] [-a 2.0|3.0|3.1|auto] [-c FILE] [-i NAME]
     -h    show this help
     -e    do not install 'luci-i18n-amneziawg-ru' package
     -n    do not configure the amneziawg interface
+    -s    skip package installation and use the installed AmneziaWG packages
     -a    connection profile: 2.0, 3.0, 3.1, or auto (default: auto)
     -c    import connection settings from an AmneziaWG .conf file
     -i    OpenWrt interface name (default: awg1)
@@ -51,7 +53,7 @@ EOF
 }
 
 parse_options() {
-    while getopts ":a:c:ehi:n" OPT; do
+    while getopts ":a:c:ehi:ns" OPT; do
         case "$OPT" in
             h)
                 usage
@@ -62,6 +64,7 @@ parse_options() {
             a) AWG_PROFILE=$OPTARG ;;
             c) CONFIG_FILE=$OPTARG ;;
             i) INTERFACE_NAME=$OPTARG ;;
+            s) SKIP_PACKAGE_INSTALL=1 ;;
             :)
                 printf 'Option -%s requires an argument\n' "$OPTARG" >&2
                 usage >&2
@@ -232,7 +235,7 @@ download_package() {
     DOWNLOAD_BASE_URL=$4
 
     DOWNLOAD_FILE="${DOWNLOAD_PACKAGE_NAME}${DOWNLOAD_POSTFIX}.${PKG_EXT}"
-    if wget -q -O "$DOWNLOAD_DIR/$DOWNLOAD_FILE" "${DOWNLOAD_BASE_URL}${DOWNLOAD_FILE}" &&
+    if wget -O "$DOWNLOAD_DIR/$DOWNLOAD_FILE" "${DOWNLOAD_BASE_URL}${DOWNLOAD_FILE}" &&
         [ -s "$DOWNLOAD_DIR/$DOWNLOAD_FILE" ]; then
         printf '%s\n' "$DOWNLOAD_FILE"
         return 0
@@ -246,7 +249,7 @@ download_package() {
     esac
 
     DOWNLOAD_FILE="${DOWNLOAD_PACKAGE_NAME}${DOWNLOAD_POSTFIX}.${DOWNLOAD_FALLBACK_EXT}"
-    if wget -q -O "$DOWNLOAD_DIR/$DOWNLOAD_FILE" "${DOWNLOAD_BASE_URL}${DOWNLOAD_FILE}" &&
+    if wget -O "$DOWNLOAD_DIR/$DOWNLOAD_FILE" "${DOWNLOAD_BASE_URL}${DOWNLOAD_FILE}" &&
         [ -s "$DOWNLOAD_DIR/$DOWNLOAD_FILE" ]; then
         printf '%s\n' "$DOWNLOAD_FILE"
         return 0
@@ -305,7 +308,7 @@ install_release_package() {
             "$AWG_DIR" \
             "${BASE_URL}v${VERSION}/"
     ); then
-        die "Error downloading ${INSTALL_PACKAGE_NAME}. Please, install ${INSTALL_PACKAGE_NAME} manually and run the script again"
+        die "Error downloading ${INSTALL_PACKAGE_NAME} from GitHub release v${VERSION}. Review the wget errors above and check access to GitHub release assets, the system date, and free space in /tmp."
     fi
     printf '%s file downloaded successfully\n' "$INSTALL_PACKAGE_NAME"
 
@@ -585,6 +588,33 @@ install_awg_packages() {
     cleanup_downloads
 }
 
+use_installed_awg_packages() {
+    VERSION=$(ubus call system board 2>/dev/null | jsonfilter -e '@.release.version' 2>/dev/null)
+    [ -n "$VERSION" ] || die "Unable to detect the OpenWrt version."
+
+    detect_base_awg_version
+
+    for REQUIRED_PACKAGE in kmod-amneziawg amneziawg-tools "$LUCI_PACKAGE_NAME"; do
+        if ! is_pkg_installed "$REQUIRED_PACKAGE"; then
+            die "Option -s requires the installed package ${REQUIRED_PACKAGE}. Install the complete AmneziaWG package set or run the script without -s."
+        fi
+    done
+
+    detect_installed_awg_version
+    print_info "Skipping package installation; using the installed AWG $AWG_VERSION stack."
+}
+
+prepare_awg_packages() {
+    if [ "$SKIP_PACKAGE_INSTALL" -eq 1 ]; then
+        use_installed_awg_packages
+        return
+    fi
+
+    remove_legacy_feeds
+    check_repo
+    install_awg_packages
+}
+
 verify_luci_parser() {
     case "$AWG_VERSION" in
         3.0 | 3.1) ;;
@@ -605,8 +635,13 @@ verify_luci_parser() {
 }
 
 print_post_install_instructions() {
-    print_info "Reboot the router before using the updated AmneziaWG kernel module."
-    print_info "After reboot, hard-refresh LuCI (Ctrl+F5) or open it in a private browser window to avoid cached JavaScript."
+    if [ "$SKIP_PACKAGE_INSTALL" -eq 1 ]; then
+        print_info "Package installation was skipped. If an older kernel module was loaded before the packages were replaced manually, reboot the router before using AmneziaWG."
+        print_info "Hard-refresh LuCI (Ctrl+F5) or open it in a private browser window to avoid cached JavaScript."
+    else
+        print_info "Reboot the router before using the updated AmneziaWG kernel module."
+        print_info "After reboot, hard-refresh LuCI (Ctrl+F5) or open it in a private browser window to avoid cached JavaScript."
+    fi
 }
 
 read_prompt() {
@@ -1077,9 +1112,7 @@ configure_amneziawg_interface() {
 main() {
     parse_options "$@"
     detect_package_manager
-    remove_legacy_feeds
-    check_repo
-    install_awg_packages
+    prepare_awg_packages
     verify_luci_parser
 
     if [ "$ASK_FOR_INTERFACE_CONFIG" -eq 1 ]; then
