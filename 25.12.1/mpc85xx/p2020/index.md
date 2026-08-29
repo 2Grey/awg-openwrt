@@ -45,6 +45,7 @@ apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 - [index.json](https://2grey.github.io/awg-openwrt/25.12.1/mpc85xx/p2020/index.json)
 - [kmod-amneziawg-6.12.74.3.0.20260731-r1.apk](https://2grey.github.io/awg-openwrt/25.12.1/mpc85xx/p2020/kmod-amneziawg-6.12.74.3.0.20260731-r1.apk)
 - [kmod-amneziawg-6.12.74.3.1.20260812-r1.apk](https://2grey.github.io/awg-openwrt/25.12.1/mpc85xx/p2020/kmod-amneziawg-6.12.74.3.1.20260812-r1.apk)
+- [kmod-amneziawg-6.12.74.3.1.20260828-r1.apk](https://2grey.github.io/awg-openwrt/25.12.1/mpc85xx/p2020/kmod-amneziawg-6.12.74.3.1.20260828-r1.apk)
 - [kmod-amneziawg_v25.12.1_powerpc_8548_mpc85xx_p2020.apk](https://2grey.github.io/awg-openwrt/25.12.1/mpc85xx/p2020/kmod-amneziawg_v25.12.1_powerpc_8548_mpc85xx_p2020.apk)
 - [luci-i18n-amneziawg-ru-0.260808.37696.apk](https://2grey.github.io/awg-openwrt/25.12.1/mpc85xx/p2020/luci-i18n-amneziawg-ru-0.260808.37696.apk)
 - [luci-i18n-amneziawg-ru-0.apk](https://2grey.github.io/awg-openwrt/25.12.1/mpc85xx/p2020/luci-i18n-amneziawg-ru-0.apk)
