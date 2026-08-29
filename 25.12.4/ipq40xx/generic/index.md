@@ -45,6 +45,7 @@ apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 - [index.json](https://2grey.github.io/awg-openwrt/25.12.4/ipq40xx/generic/index.json)
 - [kmod-amneziawg-6.12.87.3.0.20260731-r1.apk](https://2grey.github.io/awg-openwrt/25.12.4/ipq40xx/generic/kmod-amneziawg-6.12.87.3.0.20260731-r1.apk)
 - [kmod-amneziawg-6.12.87.3.1.20260812-r1.apk](https://2grey.github.io/awg-openwrt/25.12.4/ipq40xx/generic/kmod-amneziawg-6.12.87.3.1.20260812-r1.apk)
+- [kmod-amneziawg-6.12.87.3.1.20260828-r1.apk](https://2grey.github.io/awg-openwrt/25.12.4/ipq40xx/generic/kmod-amneziawg-6.12.87.3.1.20260828-r1.apk)
 - [kmod-amneziawg_v25.12.4_arm_cortex-a7_neon-vfpv4_ipq40xx_generic.apk](https://2grey.github.io/awg-openwrt/25.12.4/ipq40xx/generic/kmod-amneziawg_v25.12.4_arm_cortex-a7_neon-vfpv4_ipq40xx_generic.apk)
 - [luci-i18n-amneziawg-ru-0.260807.37638.apk](https://2grey.github.io/awg-openwrt/25.12.4/ipq40xx/generic/luci-i18n-amneziawg-ru-0.260807.37638.apk)
 - [luci-i18n-amneziawg-ru-0.apk](https://2grey.github.io/awg-openwrt/25.12.4/ipq40xx/generic/luci-i18n-amneziawg-ru-0.apk)

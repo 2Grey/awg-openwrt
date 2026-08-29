@@ -45,6 +45,7 @@ apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 - [index.json](https://2grey.github.io/awg-openwrt/25.12.4/mediatek/filogic/index.json)
 - [kmod-amneziawg-6.12.87.3.0.20260731-r1.apk](https://2grey.github.io/awg-openwrt/25.12.4/mediatek/filogic/kmod-amneziawg-6.12.87.3.0.20260731-r1.apk)
 - [kmod-amneziawg-6.12.87.3.1.20260812-r1.apk](https://2grey.github.io/awg-openwrt/25.12.4/mediatek/filogic/kmod-amneziawg-6.12.87.3.1.20260812-r1.apk)
+- [kmod-amneziawg-6.12.87.3.1.20260828-r1.apk](https://2grey.github.io/awg-openwrt/25.12.4/mediatek/filogic/kmod-amneziawg-6.12.87.3.1.20260828-r1.apk)
 - [kmod-amneziawg_v25.12.4_aarch64_cortex-a53_mediatek_filogic.apk](https://2grey.github.io/awg-openwrt/25.12.4/mediatek/filogic/kmod-amneziawg_v25.12.4_aarch64_cortex-a53_mediatek_filogic.apk)
 - [luci-i18n-amneziawg-ru-0.260807.37658.apk](https://2grey.github.io/awg-openwrt/25.12.4/mediatek/filogic/luci-i18n-amneziawg-ru-0.260807.37658.apk)
 - [luci-i18n-amneziawg-ru-0.apk](https://2grey.github.io/awg-openwrt/25.12.4/mediatek/filogic/luci-i18n-amneziawg-ru-0.apk)

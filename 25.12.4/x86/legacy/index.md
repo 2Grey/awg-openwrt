@@ -45,6 +45,7 @@ apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 - [index.json](https://2grey.github.io/awg-openwrt/25.12.4/x86/legacy/index.json)
 - [kmod-amneziawg-6.12.87.3.0.20260731-r1.apk](https://2grey.github.io/awg-openwrt/25.12.4/x86/legacy/kmod-amneziawg-6.12.87.3.0.20260731-r1.apk)
 - [kmod-amneziawg-6.12.87.3.1.20260812-r1.apk](https://2grey.github.io/awg-openwrt/25.12.4/x86/legacy/kmod-amneziawg-6.12.87.3.1.20260812-r1.apk)
+- [kmod-amneziawg-6.12.87.3.1.20260828-r1.apk](https://2grey.github.io/awg-openwrt/25.12.4/x86/legacy/kmod-amneziawg-6.12.87.3.1.20260828-r1.apk)
 - [kmod-amneziawg_v25.12.4_i386_pentium-mmx_x86_legacy.apk](https://2grey.github.io/awg-openwrt/25.12.4/x86/legacy/kmod-amneziawg_v25.12.4_i386_pentium-mmx_x86_legacy.apk)
 - [luci-i18n-amneziawg-ru-0.260807.39680.apk](https://2grey.github.io/awg-openwrt/25.12.4/x86/legacy/luci-i18n-amneziawg-ru-0.260807.39680.apk)
 - [luci-i18n-amneziawg-ru-0.apk](https://2grey.github.io/awg-openwrt/25.12.4/x86/legacy/luci-i18n-amneziawg-ru-0.apk)
