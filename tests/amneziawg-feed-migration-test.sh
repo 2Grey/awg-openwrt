@@ -37,6 +37,20 @@ assert_not_contains() {
     printf 'ok - %s\n' "$TEST_NAME"
 }
 
+assert_contains() {
+    PATTERN=$1
+    FILE=$2
+    TEST_NAME=$3
+
+    if ! grep -F -q "$PATTERN" "$FILE"; then
+        printf 'not ok - %s: missing pattern "%s" in %s\n' \
+            "$TEST_NAME" "$PATTERN" "$FILE" >&2
+        FAILED=1
+        return
+    fi
+    printf 'ok - %s\n' "$TEST_NAME"
+}
+
 mkdir -p "$TEST_DIR/apk-repositories.d" "$TEST_DIR/opkg"
 APK_REPOSITORIES_FILE="$TEST_DIR/apk-repositories"
 APK_REPOSITORIES_DIR="$TEST_DIR/apk-repositories.d"
@@ -75,21 +89,13 @@ remove_conflicting_luci_package "luci-proto-amneziawg" >/dev/null
 assert_equal "luci-app-amneziawg" "$REMOVED_PACKAGE" \
     "legacy LuCI package removed before luci-proto installation"
 
-APK_COMMAND=""
-is_package_installed() {
-    case "$1" in
-        amneziawg-tools | kmod-amneziawg | luci-proto-amneziawg) return 0 ;;
-        *) return 1 ;;
-    esac
-}
-apk() {
-    APK_COMMAND=$*
-}
-upgrade_installed_apk_packages >/dev/null
-assert_equal \
-    "upgrade --available amneziawg-tools kmod-amneziawg luci-proto-amneziawg" \
-    "$APK_COMMAND" \
-    "APK migration resets local-file identity pins"
+assert_not_contains '^[[:space:]]*apk[[:space:]][[:space:]]*upgrade' \
+    "$SCRIPT_DIR/amneziawg-feed-install.sh" \
+    "feed installer never runs unsupported apk package upgrades"
+assert_contains \
+    "apk add --upgrade --latest amneziawg-tools kmod-amneziawg luci-proto-amneziawg" \
+    "$SCRIPT_DIR/amneziawg-feed-install.sh" \
+    "APK migration updates only named AmneziaWG world constraints"
 
 LUCI_PROTOCOL_FILE="$TEST_DIR/amneziawg.js"
 printf '%s\n' \

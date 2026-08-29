@@ -26,9 +26,10 @@ This repository also publishes a full-featured [OpenWrt package feed](https://2g
    ```
 
    When migrating from `Slava-Shchipunov/awg-openwrt`, the installer removes
-   the legacy feed, resets APK constraints left by local-file installations,
-   and replaces a conflicting `luci-app-amneziawg` package with
-   `luci-proto-amneziawg`. Existing interface configuration is not removed.
+   the legacy feed, replaces identity-hash constraints only for AWG packages
+   installed from local files, and replaces a conflicting
+   `luci-app-amneziawg` package with `luci-proto-amneziawg`. Existing interface
+   configuration is not removed.
 
 2. Reboot the router to load the new kernel modules.
 3. Hard-refresh LuCI (`Ctrl+F5`) or open it in a private browser window.

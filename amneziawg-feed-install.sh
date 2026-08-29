@@ -105,28 +105,6 @@ remove_conflicting_luci_package() {
     fi
 }
 
-upgrade_installed_apk_packages() {
-    APK_UPGRADE_PACKAGES=""
-    for APK_PACKAGE_NAME in \
-        amneziawg-tools \
-        kmod-amneziawg \
-        luci-proto-amneziawg \
-        luci-i18n-amneziawg-ru; do
-        if is_package_installed "$APK_PACKAGE_NAME"; then
-            APK_UPGRADE_PACKAGES="$APK_UPGRADE_PACKAGES $APK_PACKAGE_NAME"
-        fi
-    done
-
-    if [ -n "$APK_UPGRADE_PACKAGES" ]; then
-        info "Migrating installed AmneziaWG packages to versions available from the new feed..."
-        # --available resets version and identity-hash constraints left by
-        # installation from local APK files.
-        # shellcheck disable=SC2086
-        apk upgrade --available $APK_UPGRADE_PACKAGES ||
-            die "Unable to migrate installed AmneziaWG packages to the new feed."
-    fi
-}
-
 verify_luci_parser() {
     if [ ! -r "$LUCI_PROTOCOL_FILE" ]; then
         die "Installed LuCI parser was not found at $LUCI_PROTOCOL_FILE."
@@ -273,9 +251,11 @@ install_with_apk() {
     apk update || die "Unable to update package indexes. Check that a feed exists for this exact OpenWrt build."
 
     remove_conflicting_luci_package "luci-proto-amneziawg"
-    upgrade_installed_apk_packages
 
     info "Installing AmneziaWG packages..."
+    # Adding named repository packages updates only their world constraints,
+    # including identity-hash pins left by local APK file installations.
+    # Do not use apk upgrade: OpenWrt does not support package-wide upgrades.
     if [ "$INSTALL_TRANSLATION" -eq 1 ]; then
         apk add --upgrade --latest amneziawg-tools kmod-amneziawg luci-proto-amneziawg luci-i18n-amneziawg-ru ||
             die "Unable to install AmneziaWG packages."
