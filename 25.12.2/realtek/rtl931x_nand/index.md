@@ -45,6 +45,7 @@ apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 - [index.json](https://2grey.github.io/awg-openwrt/25.12.2/realtek/rtl931x_nand/index.json)
 - [kmod-amneziawg-6.12.74.3.0.20260731-r1.apk](https://2grey.github.io/awg-openwrt/25.12.2/realtek/rtl931x_nand/kmod-amneziawg-6.12.74.3.0.20260731-r1.apk)
 - [kmod-amneziawg-6.12.74.3.1.20260812-r1.apk](https://2grey.github.io/awg-openwrt/25.12.2/realtek/rtl931x_nand/kmod-amneziawg-6.12.74.3.1.20260812-r1.apk)
+- [kmod-amneziawg-6.12.74.3.1.20260828-r1.apk](https://2grey.github.io/awg-openwrt/25.12.2/realtek/rtl931x_nand/kmod-amneziawg-6.12.74.3.1.20260828-r1.apk)
 - [kmod-amneziawg_v25.12.2_mips_24kc_realtek_rtl931x_nand.apk](https://2grey.github.io/awg-openwrt/25.12.2/realtek/rtl931x_nand/kmod-amneziawg_v25.12.2_mips_24kc_realtek_rtl931x_nand.apk)
 - [luci-i18n-amneziawg-ru-0.260808.29740.apk](https://2grey.github.io/awg-openwrt/25.12.2/realtek/rtl931x_nand/luci-i18n-amneziawg-ru-0.260808.29740.apk)
 - [luci-i18n-amneziawg-ru-0.apk](https://2grey.github.io/awg-openwrt/25.12.2/realtek/rtl931x_nand/luci-i18n-amneziawg-ru-0.apk)

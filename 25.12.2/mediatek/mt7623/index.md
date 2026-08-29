@@ -45,6 +45,7 @@ apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 - [index.json](https://2grey.github.io/awg-openwrt/25.12.2/mediatek/mt7623/index.json)
 - [kmod-amneziawg-6.12.74.3.0.20260731-r1.apk](https://2grey.github.io/awg-openwrt/25.12.2/mediatek/mt7623/kmod-amneziawg-6.12.74.3.0.20260731-r1.apk)
 - [kmod-amneziawg-6.12.74.3.1.20260812-r1.apk](https://2grey.github.io/awg-openwrt/25.12.2/mediatek/mt7623/kmod-amneziawg-6.12.74.3.1.20260812-r1.apk)
+- [kmod-amneziawg-6.12.74.3.1.20260828-r1.apk](https://2grey.github.io/awg-openwrt/25.12.2/mediatek/mt7623/kmod-amneziawg-6.12.74.3.1.20260828-r1.apk)
 - [kmod-amneziawg_v25.12.2_arm_cortex-a7_neon-vfpv4_mediatek_mt7623.apk](https://2grey.github.io/awg-openwrt/25.12.2/mediatek/mt7623/kmod-amneziawg_v25.12.2_arm_cortex-a7_neon-vfpv4_mediatek_mt7623.apk)
 - [luci-i18n-amneziawg-ru-0.260808.28102.apk](https://2grey.github.io/awg-openwrt/25.12.2/mediatek/mt7623/luci-i18n-amneziawg-ru-0.260808.28102.apk)
 - [luci-i18n-amneziawg-ru-0.apk](https://2grey.github.io/awg-openwrt/25.12.2/mediatek/mt7623/luci-i18n-amneziawg-ru-0.apk)

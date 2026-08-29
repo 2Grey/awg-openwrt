@@ -45,6 +45,7 @@ apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 - [index.json](https://2grey.github.io/awg-openwrt/25.12.2/lantiq/xrx200/index.json)
 - [kmod-amneziawg-6.12.74.3.0.20260731-r1.apk](https://2grey.github.io/awg-openwrt/25.12.2/lantiq/xrx200/kmod-amneziawg-6.12.74.3.0.20260731-r1.apk)
 - [kmod-amneziawg-6.12.74.3.1.20260812-r1.apk](https://2grey.github.io/awg-openwrt/25.12.2/lantiq/xrx200/kmod-amneziawg-6.12.74.3.1.20260812-r1.apk)
+- [kmod-amneziawg-6.12.74.3.1.20260828-r1.apk](https://2grey.github.io/awg-openwrt/25.12.2/lantiq/xrx200/kmod-amneziawg-6.12.74.3.1.20260828-r1.apk)
 - [kmod-amneziawg_v25.12.2_mips_24kc_lantiq_xrx200.apk](https://2grey.github.io/awg-openwrt/25.12.2/lantiq/xrx200/kmod-amneziawg_v25.12.2_mips_24kc_lantiq_xrx200.apk)
 - [luci-i18n-amneziawg-ru-0.260808.28242.apk](https://2grey.github.io/awg-openwrt/25.12.2/lantiq/xrx200/luci-i18n-amneziawg-ru-0.260808.28242.apk)
 - [luci-i18n-amneziawg-ru-0.apk](https://2grey.github.io/awg-openwrt/25.12.2/lantiq/xrx200/luci-i18n-amneziawg-ru-0.apk)
