@@ -45,6 +45,7 @@ apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 - [index.json](https://2grey.github.io/awg-openwrt/25.12.0/qualcommax/ipq807x/index.json)
 - [kmod-amneziawg-6.12.71.3.0.20260731-r1.apk](https://2grey.github.io/awg-openwrt/25.12.0/qualcommax/ipq807x/kmod-amneziawg-6.12.71.3.0.20260731-r1.apk)
 - [kmod-amneziawg-6.12.71.3.1.20260812-r1.apk](https://2grey.github.io/awg-openwrt/25.12.0/qualcommax/ipq807x/kmod-amneziawg-6.12.71.3.1.20260812-r1.apk)
+- [kmod-amneziawg-6.12.71.3.1.20260828-r1.apk](https://2grey.github.io/awg-openwrt/25.12.0/qualcommax/ipq807x/kmod-amneziawg-6.12.71.3.1.20260828-r1.apk)
 - [kmod-amneziawg_v25.12.0_aarch64_cortex-a53_qualcommax_ipq807x.apk](https://2grey.github.io/awg-openwrt/25.12.0/qualcommax/ipq807x/kmod-amneziawg_v25.12.0_aarch64_cortex-a53_qualcommax_ipq807x.apk)
 - [luci-i18n-amneziawg-ru-0.260808.42950.apk](https://2grey.github.io/awg-openwrt/25.12.0/qualcommax/ipq807x/luci-i18n-amneziawg-ru-0.260808.42950.apk)
 - [luci-i18n-amneziawg-ru-0.apk](https://2grey.github.io/awg-openwrt/25.12.0/qualcommax/ipq807x/luci-i18n-amneziawg-ru-0.apk)
