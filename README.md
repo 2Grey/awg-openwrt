@@ -9,6 +9,27 @@
 ![OpenWrt 24](https://img.shields.io/badge/OpenWrt-24.10.4_~_24.10.8-blue)
 ![OpenWrt 25](https://img.shields.io/badge/OpenWrt-25.12.0_~_25.12.5-teal)
 
+## Поддержка AWG 3.1
+
+В ветке `master` содержится согласованный набор компонентов AWG 3.1:
+
+- `kmod-amneziawg` — `v3.1.20260828`;
+- `amneziawg-tools` — `v3.1.20260812`;
+- `luci-proto-amneziawg` — `v3.1.0` — веб-интерфейс, а также импорт и экспорт конфигураций AWG 3.1.
+
+В netifd и LuCI реализована поддержка параметров `HeaderProtectionKey`,
+`ContentPaddingAddition`, `RekeyAfterTime`, `RekeyTimeout`, `RejectAfterTime`,
+`KeepaliveTimeout`, `MaxHandshakeAttempts`, `RandomTrailers`, `DisableCookies`,
+диапазонов `H1-H4` и диапазона `PersistentKeepalive`.
+
+Параметры `RandomTrailers` и `DisableCookies` принимают значения `on` или `off`.
+Параметр `RandomTrailers` должен иметь одинаковое значение на обеих сторонах.
+Реализация AWG 3.1 сохраняет совместимость с существующими конфигурациями
+AWG 3.0, если оба новых параметра отсутствуют или имеют значение `off`.
+
+Диапазоны задаются в формате `нижняя-верхняя` (например, `20-30`) либо одним числом.  
+При использовании `HeaderProtectionKey` значения параметров `S1-S4` должны быть не меньше 12.
+
 ## Custom package feed (GitHub Pages)
 
 В репозитории также публикуется полнофункциональный [репозиторий пакетов OpenWrt](https://2grey.github.io/awg-openwrt/), включающий подписанные репозитории IPK для OpenWrt 24.x и подписанные репозитории APK для OpenWrt 25.x и более поздних версий.

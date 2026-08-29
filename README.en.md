@@ -9,6 +9,26 @@ English | [Russian](README.md)
 ![OpenWrt 24](https://img.shields.io/badge/OpenWrt-24.10.4_~_24.10.8-blue)
 ![OpenWrt 25](https://img.shields.io/badge/OpenWrt-25.12.0_~_25.12.5-teal)
 
+## AWG 3.1 Support
+
+The `master` branch contains an aligned set of AWG 3.1 components:
+
+- `kmod-amneziawg` — `v3.1.20260828`;
+- `amneziawg-tools` — `v3.1.20260812`;
+- `luci-proto-amneziawg` — `v3.1.0` — Web interface and import/export of AWG 3.1 configurations.
+
+The netifd and LuCI support `HeaderProtectionKey`, `ContentPaddingAddition`,
+`RekeyAfterTime`, `RekeyTimeout`, `RejectAfterTime`, `KeepaliveTimeout`,
+`MaxHandshakeAttempts`, `RandomTrailers`, `DisableCookies`, the `H1-H4`
+ranges, and the `PersistentKeepalive` range.
+
+`RandomTrailers` and `DisableCookies` accept `on` or `off`. `RandomTrailers`
+must have the same value on both sides. A 3.1 implementation remains compatible
+with existing AWG 3.0 configurations when both new settings are absent or off.
+
+Ranges are specified as `lower-upper` (for example, `20-30`) or as a single number.  
+When using `HeaderProtectionKey`, the `S1-S4` parameters must be at least 12.
+
 ## Custom package feed (GitHub Pages)
 
 This repository also publishes a full-featured [OpenWrt package feed](https://2grey.github.io/awg-openwrt/) with signed IPK repositories for OpenWrt 24.x and signed APK repositories for OpenWrt 25.x and later.
