@@ -3,7 +3,7 @@
   "architecture": "armeb_xscale",
   "packages": {
     "amneziawg-tools": "3.1.20260812-r1",
-    "kmod-amneziawg": "6.6.127.3.1.20260812-r1",
+    "kmod-amneziawg": "6.6.127.3.1.20260828-r1",
     "luci-i18n-amneziawg-ru": "0",
     "luci-proto-amneziawg": "3.1.0-r1"
   }
