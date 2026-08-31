@@ -47,8 +47,10 @@ This repository also publishes a full-featured [OpenWrt package feed](https://2g
 
    When migrating from `Slava-Shchipunov/awg-openwrt`, the installer removes
    the legacy feed, replaces identity-hash constraints only for AWG packages
-   installed from local files, and replaces a conflicting
-   `luci-app-amneziawg` package with `luci-proto-amneziawg`. Existing interface
+   installed from local files.
+
+   Before installing `luci-proto-amneziawg`, the script removes the conflicting
+   `luci-app-amneziawg` package if it is installed. Existing interface
    configuration is not removed.
 
 2. Reboot the router to load the new kernel modules.
@@ -79,6 +81,7 @@ Additional script options:
 | `-n` | Do not configure the AmneziaWG interface |
 | `-a` | Connection profile: 2.0, 3.0, 3.1, or auto (default: auto) |
 | `-c` | Import connection settings from a `.conf` file |
+| `-s` | Skip package installation and use the installed AmneziaWG packages |
 | `-i` | OpenWrt interface name (default: `awg1`) |
 
 The installer can configure AWG 2.0, 3.0, and 3.1 connection profiles.
