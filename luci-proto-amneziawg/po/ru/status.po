@@ -46,3 +46,78 @@ msgstr "включено"
 
 msgid "disabled"
 msgstr "отключено"
+
+msgid "%dd ago"
+msgstr "%d дн. назад"
+
+msgid "No handshake recorded"
+msgstr "Рукопожатий ещё не было"
+
+msgid "Never connected"
+msgstr "Подключений не было"
+
+msgid "Recent handshake"
+msgstr "Недавнее рукопожатие"
+
+msgid "A recent handshake was recorded. This does not continuously test connectivity."
+msgstr "Недавно было зафиксировано рукопожатие. Это не означает непрерывную проверку соединения."
+
+msgid "No recent handshake"
+msgstr "Нет недавнего рукопожатия"
+
+msgid "The last handshake is older than three minutes. An idle peer may still be configured correctly."
+msgstr "Последнее рукопожатие было более трёх минут назад. При этом неактивный узел может быть настроен правильно."
+
+msgid "Copy"
+msgstr "Копировать"
+
+msgid "Copied"
+msgstr "Скопировано"
+
+msgid "Unable to copy the value."
+msgstr "Не удалось скопировать значение."
+
+msgid "Configured peers will appear here when the interface reports them."
+msgstr "Настроенные узлы появятся здесь, когда интерфейс сообщит о них."
+
+msgid "AmneziaWG peers"
+msgstr "Узлы AmneziaWG"
+
+msgid "Traffic"
+msgstr "Трафик"
+
+msgid "Actions"
+msgstr "Действия"
+
+msgid "Not available"
+msgstr "Недоступно"
+
+msgid "Details"
+msgstr "Подробнее"
+
+msgid "Interface is running"
+msgstr "Интерфейс запущен"
+
+msgid "Interface details"
+msgstr "Сведения об интерфейсе"
+
+msgid "Peers"
+msgstr "Узлы"
+
+msgid "Handshake and traffic information reported by running AmneziaWG interfaces."
+msgstr "Рукопожатия и трафик, о которых сообщают запущенные интерфейсы AmneziaWG."
+
+msgid "%d interface(s)"
+msgstr "Интерфейсов: %d"
+
+msgid "Create an AmneziaWG interface or start an existing one to see its status here."
+msgstr "Создайте интерфейс AmneziaWG или запустите существующий, чтобы увидеть здесь его состояние."
+
+msgid "Open network interfaces"
+msgstr "Открыть сетевые интерфейсы"
+
+msgid "Unable to load AmneziaWG status."
+msgstr "Не удалось загрузить состояние AmneziaWG."
+
+msgid "The page will retry automatically."
+msgstr "Страница автоматически повторит попытку."

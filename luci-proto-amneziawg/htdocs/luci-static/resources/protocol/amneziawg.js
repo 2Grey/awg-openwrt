@@ -30,6 +30,17 @@ var generatePsk = rpc.declare({
 
 var qrIcon = '<svg viewBox="0 0 29 29" xmlns="http://www.w3.org/2000/svg"><path fill="#fff" d="M0 0h29v29H0z"/><path d="M4 4h1v1H4zM5 4h1v1H5zM6 4h1v1H6zM7 4h1v1H7zM8 4h1v1H8zM9 4h1v1H9zM10 4h1v1h-1zM12 4h1v1h-1zM13 4h1v1h-1zM14 4h1v1h-1zM15 4h1v1h-1zM16 4h1v1h-1zM18 4h1v1h-1zM19 4h1v1h-1zM20 4h1v1h-1zM21 4h1v1h-1zM22 4h1v1h-1zM23 4h1v1h-1zM24 4h1v1h-1zM4 5h1v1H4zM10 5h1v1h-1zM12 5h1v1h-1zM14 5h1v1h-1zM16 5h1v1h-1zM18 5h1v1h-1zM24 5h1v1h-1zM4 6h1v1H4zM6 6h1v1H6zM7 6h1v1H7zM8 6h1v1H8zM10 6h1v1h-1zM12 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM21 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM4 7h1v1H4zM6 7h1v1H6zM7 7h1v1H7zM8 7h1v1H8zM10 7h1v1h-1zM12 7h1v1h-1zM13 7h1v1h-1zM14 7h1v1h-1zM15 7h1v1h-1zM18 7h1v1h-1zM20 7h1v1h-1zM21 7h1v1h-1zM22 7h1v1h-1zM24 7h1v1h-1zM4 8h1v1H4zM6 8h1v1H6zM7 8h1v1H7zM8 8h1v1H8zM10 8h1v1h-1zM16 8h1v1h-1zM18 8h1v1h-1zM20 8h1v1h-1zM21 8h1v1h-1zM22 8h1v1h-1zM24 8h1v1h-1zM4 9h1v1H4zM10 9h1v1h-1zM12 9h1v1h-1zM13 9h1v1h-1zM15 9h1v1h-1zM18 9h1v1h-1zM24 9h1v1h-1zM4 10h1v1H4zM5 10h1v1H5zM6 10h1v1H6zM7 10h1v1H7zM8 10h1v1H8zM9 10h1v1H9zM10 10h1v1h-1zM12 10h1v1h-1zM14 10h1v1h-1zM16 10h1v1h-1zM18 10h1v1h-1zM19 10h1v1h-1zM20 10h1v1h-1zM21 10h1v1h-1zM22 10h1v1h-1zM23 10h1v1h-1zM24 10h1v1h-1zM13 11h1v1h-1zM14 11h1v1h-1zM15 11h1v1h-1zM16 11h1v1h-1zM4 12h1v1H4zM5 12h1v1H5zM8 12h1v1H8zM9 12h1v1H9zM10 12h1v1h-1zM13 12h1v1h-1zM15 12h1v1h-1zM19 12h1v1h-1zM21 12h1v1h-1zM22 12h1v1h-1zM23 12h1v1h-1zM24 12h1v1h-1zM5 13h1v1H5zM6 13h1v1H6zM8 13h1v1H8zM11 13h1v1h-1zM13 13h1v1h-1zM14 13h1v1h-1zM15 13h1v1h-1zM16 13h1v1h-1zM19 13h1v1h-1zM22 13h1v1h-1zM4 14h1v1H4zM5 14h1v1H5zM9 14h1v1H9zM10 14h1v1h-1zM11 14h1v1h-1zM15 14h1v1h-1zM18 14h1v1h-1zM19 14h1v1h-1zM20 14h1v1h-1zM21 14h1v1h-1zM22 14h1v1h-1zM23 14h1v1h-1zM7 15h1v1H7zM8 15h1v1H8zM9 15h1v1H9zM11 15h1v1h-1zM12 15h1v1h-1zM13 15h1v1h-1zM17 15h1v1h-1zM18 15h1v1h-1zM20 15h1v1h-1zM21 15h1v1h-1zM23 15h1v1h-1zM4 16h1v1H4zM6 16h1v1H6zM10 16h1v1h-1zM11 16h1v1h-1zM13 16h1v1h-1zM14 16h1v1h-1zM16 16h1v1h-1zM17 16h1v1h-1zM18 16h1v1h-1zM22 16h1v1h-1zM23 16h1v1h-1zM24 16h1v1h-1zM12 17h1v1h-1zM16 17h1v1h-1zM17 17h1v1h-1zM18 17h1v1h-1zM4 18h1v1H4zM5 18h1v1H5zM6 18h1v1H6zM7 18h1v1H7zM8 18h1v1H8zM9 18h1v1H9zM10 18h1v1h-1zM14 18h1v1h-1zM16 18h1v1h-1zM17 18h1v1h-1zM21 18h1v1h-1zM22 18h1v1h-1zM23 18h1v1h-1zM4 19h1v1H4zM10 19h1v1h-1zM12 19h1v1h-1zM13 19h1v1h-1zM15 19h1v1h-1zM16 19h1v1h-1zM19 19h1v1h-1zM21 19h1v1h-1zM23 19h1v1h-1zM24 19h1v1h-1zM4 20h1v1H4zM6 20h1v1H6zM7 20h1v1H7zM8 20h1v1H8zM10 20h1v1h-1zM12 20h1v1h-1zM13 20h1v1h-1zM15 20h1v1h-1zM18 20h1v1h-1zM19 20h1v1h-1zM20 20h1v1h-1zM22 20h1v1h-1zM23 20h1v1h-1zM24 20h1v1h-1zM4 21h1v1H4zM6 21h1v1H6zM7 21h1v1H7zM8 21h1v1H8zM10 21h1v1h-1zM13 21h1v1h-1zM15 21h1v1h-1zM16 21h1v1h-1zM19 21h1v1h-1zM21 21h1v1h-1zM23 21h1v1h-1zM24 21h1v1h-1zM4 22h1v1H4zM6 22h1v1H6zM7 22h1v1H7zM8 22h1v1H8zM10 22h1v1h-1zM13 22h1v1h-1zM15 22h1v1h-1zM18 22h1v1h-1zM19 22h1v1h-1zM20 22h1v1h-1zM21 22h1v1h-1zM22 22h1v1h-1zM4 23h1v1H4zM10 23h1v1h-1zM12 23h1v1h-1zM13 23h1v1h-1zM14 23h1v1h-1zM17 23h1v1h-1zM18 23h1v1h-1zM20 23h1v1h-1zM22 23h1v1h-1zM4 24h1v1H4zM5 24h1v1H5zM6 24h1v1H6zM7 24h1v1H7zM8 24h1v1H8zM9 24h1v1H9zM10 24h1v1h-1zM12 24h1v1h-1zM13 24h1v1h-1zM14 24h1v1h-1zM16 24h1v1h-1zM17 24h1v1h-1zM18 24h1v1h-1zM22 24h1v1h-1zM24 24h1v1h-1z"/></svg>';
 
+function ensureStylesheet() {
+	if (document.querySelector('link[data-amneziawg-styles]'))
+		return;
+
+	document.head.appendChild(E('link', {
+		'rel': 'stylesheet',
+		'href': L.resource('amneziawg.css'),
+		'data-amneziawg-styles': ''
+	}));
+}
+
 function validateBase64(section_id, value) {
 	if (value.length == 0)
 		return true;
@@ -111,6 +122,22 @@ function generateDescription(name, texts) {
 	]);
 }
 
+var cbiSettingGroup = form.DummyValue.extend({
+	renderWidget: function() {
+		return E('div', { 'class': 'awg-setting-group' }, [
+			E('h4', [ this.groupTitle ]),
+			this.groupDescription ? E('p', [ this.groupDescription ]) : ''
+		]);
+	}
+});
+
+function addSettingGroup(section, tab, option, title, description) {
+	var group = section.taboption(tab, cbiSettingGroup, option, ' ');
+	group.groupTitle = title;
+	group.groupDescription = description;
+	return group;
+}
+
 function buildSVGQRCode(data, code) {
 	// pixel size 3 for mobile browser
 	const options = {
@@ -137,6 +164,51 @@ function buildSVGQRCode(data, code) {
 			_('QR code generation failed. The configuration may be too large.')
 		]));
 	}
+}
+
+function fallbackCopyText(value) {
+	return new Promise(function(resolve, reject) {
+		var input = E('textarea', {
+			'style': 'position:fixed;left:-9999px;top:-9999px',
+			'readonly': ''
+		}, [ value ]);
+
+		document.body.appendChild(input);
+		input.select();
+
+		try {
+			if (document.execCommand('copy'))
+				resolve();
+			else
+				reject(new Error('copy command failed'));
+		}
+		catch (error) {
+			reject(error);
+		}
+		finally {
+			document.body.removeChild(input);
+		}
+	});
+}
+
+function copyText(value) {
+	if (navigator.clipboard && navigator.clipboard.writeText)
+		return navigator.clipboard.writeText(value).catch(function() {
+			return fallbackCopyText(value);
+		});
+
+	return fallbackCopyText(value);
+}
+
+function downloadText(value, filename) {
+	var blob = new Blob([ value ], { type: 'text/plain;charset=utf-8' }),
+	    url = URL.createObjectURL(blob),
+	    link = E('a', { 'href': url, 'download': filename });
+
+	document.body.appendChild(link);
+	link.click();
+	document.body.removeChild(link);
+	window.setTimeout(function() { URL.revokeObjectURL(url); }, 0);
 }
 
 var cbiKeyPairGenerate = form.DummyValue.extend({
@@ -193,6 +265,7 @@ return network.registerProtocol('amneziawg', {
 
 	renderFormOptions: function(s) {
 		var o, ss, ss2;
+		ensureStylesheet();
 
 		// -- general ---------------------------------------------------------------------
 
@@ -262,6 +335,9 @@ return network.registerProtocol('amneziawg', {
         }
         catch(e) {}
 
+		addSettingGroup(s, 'amneziawg', '_awg_group_junk', _('Junk packets'),
+			_('Packet count and size values used to disguise AmneziaWG traffic. Importing a known-good configuration is recommended.'));
+
         o = s.taboption('amneziawg', form.Value, 'awg_jc', _('Jc'), _('Junk packet count.'));
         o.datatype = 'uinteger';
         o.placeholder = '0';
@@ -276,6 +352,9 @@ return network.registerProtocol('amneziawg', {
         o.datatype = 'uinteger';
         o.placeholder = '0';
         o.optional = true;
+
+		addSettingGroup(s, 'amneziawg', '_awg_group_padding', _('Packet padding'),
+			_('Junk header sizes for handshake, cookie reply and transport packets.'));
 
         o = s.taboption('amneziawg', form.Value, 'awg_s1', _('S1'), _('Handshake initiation packet junk header size.'));
         o.datatype = 'uinteger';
@@ -294,8 +373,11 @@ return network.registerProtocol('amneziawg', {
 		
 		o = s.taboption('amneziawg', form.Value, 'awg_s4', _('S4'), _('Transport packet junk header size.'));
         o.datatype = 'uinteger';
-        o.placeholder = '0';
+		o.placeholder = '0';
         o.optional = true;
+
+		addSettingGroup(s, 'amneziawg', '_awg_group_headers', _('Packet type headers'),
+			_('Packet type values must match the configuration on the remote peer.'));
 
         o = s.taboption('amneziawg', form.Value, 'awg_h1', _('H1'), _('Handshake initiation packet type header.'));
 		o.validate = validateUint32Range;
@@ -314,8 +396,11 @@ return network.registerProtocol('amneziawg', {
 
         o = s.taboption('amneziawg', form.Value, 'awg_h4', _('H4'), _('Transport packet type header.'));
 		o.validate = validateUint32Range;
-        o.placeholder = '4';
+		o.placeholder = '4';
         o.optional = true;
+
+		addSettingGroup(s, 'amneziawg', '_awg_group_signatures', _('Special packet signatures'),
+			_('Optional signatures for special junk packets.'));
 		
 		o = s.taboption('amneziawg', form.Value, 'awg_i1', _('I1'), _('First special junk packet signature.'));
         o.datatype = 'string';
@@ -334,8 +419,11 @@ return network.registerProtocol('amneziawg', {
         o.optional = true;
 		
 		o = s.taboption('amneziawg', form.Value, 'awg_i5', _('I5'), _('Fifth special junk packet signature.'));
-        o.datatype = 'string';
+		o.datatype = 'string';
         o.optional = true;
+
+		addSettingGroup(s, 'amneziawg', '_awg_group_protection', _('Header protection'),
+			_('AWG 3.x header protection settings. The key and S1-S4 values must match on both sides.'));
 
 		o = s.taboption('amneziawg', form.Value, 'awg_header_protection_key', _('Header Protection Key'), _('AWG 3.x. Base64 key used to protect packet headers. The same key is required on both sides; S1-S4 must each be at least 12.'));
 		o.password = true;
@@ -372,6 +460,9 @@ return network.registerProtocol('amneziawg', {
 		o.placeholder = _('disabled');
 		o.optional = true;
 
+		addSettingGroup(s, 'amneziawg', '_awg_group_timing', _('Handshake timing'),
+			_('Advanced AWG 3.x timing values. Leave them at their defaults unless the peer configuration specifies them.'));
+
 		o = s.taboption('amneziawg', form.Value, 'awg_rekey_after_time', _('Rekey After Time'), _('AWG 3.x. Seconds before initiating a new handshake; accepts a number or range.'));
 		o.validate = validateUint16Range;
 		o.placeholder = _('default');
@@ -396,6 +487,9 @@ return network.registerProtocol('amneziawg', {
 		o.validate = validateUint16Range;
 		o.placeholder = _('default');
 		o.optional = true;
+
+		addSettingGroup(s, 'amneziawg', '_awg_group_awg31', _('AWG 3.1 options'),
+			_('Optional traffic-shaping and active-probing resistance settings. Values must match on both sides where noted.'));
 
 		o = s.taboption('amneziawg', form.Flag, 'awg_random_trailers', _('Random Trailers'), _('AWG 3.1. Append a random trailer to packets to vary their sizes. This setting must be identical on both sides.'));
 		o.default = o.disabled;
@@ -423,29 +517,43 @@ return network.registerProtocol('amneziawg', {
 		ss.modaltitle = _('Edit peer');
 		ss.sortable = true;
 
-		ss.handleDragConfig = function(ev) {
-			ev.stopPropagation();
-			ev.preventDefault();
-			ev.dataTransfer.dropEffect = 'copy';
-		};
+			ss.handleDragConfig = function(ev) {
+				ev.stopPropagation();
+				ev.preventDefault();
+				ev.dataTransfer.dropEffect = 'copy';
+				ev.currentTarget.classList.add('awg-drag-active');
+			};
 
-		ss.handleDropConfig = function(mode, ev) {
-			var file = ev.dataTransfer.files[0],
-			    nodes = ev.currentTarget,
-			    input = nodes.querySelector('textarea'),
-			    reader = new FileReader();
+			ss.handleDragLeaveConfig = function(ev) {
+				ev.currentTarget.classList.remove('awg-drag-active');
+			};
 
-			if (file) {
+			ss.loadConfigFile = function(nodes, file) {
+				var input = nodes.querySelector('textarea'),
+				    fileName = nodes.querySelector('.awg-import-file'),
+				    reader = new FileReader();
+
+				if (!file)
+					return;
+
 				reader.onload = function(rev) {
 					input.value = rev.target.result.trim();
-					ss.handleApplyConfig(mode, nodes, file.name, ev);
+					nodes.setAttribute('data-filename', file.name);
+					fileName.textContent = _('Selected file: %s').format(file.name);
 				};
 
 				reader.readAsText(file);
-			}
+			};
 
-			ev.stopPropagation();
-			ev.preventDefault();
+			ss.handleDropConfig = function(mode, ev) {
+				var file = ev.dataTransfer.files[0],
+				    nodes = ev.currentTarget;
+
+				nodes.classList.remove('awg-drag-active');
+				this.loadConfigFile(nodes, file);
+
+				ev.stopPropagation();
+				ev.preventDefault();
 		};
 
 		ss.parseConfig = function(data) {
@@ -572,11 +680,13 @@ return network.registerProtocol('amneziawg', {
 			return config;
 		};
 
-		ss.handleApplyConfig = function(mode, nodes, comment, ev) {
-			var input = nodes.querySelector('textarea').value,
-			    error = nodes.querySelector('.alert-message'),
-			    cancel = nodes.nextElementSibling.querySelector('.btn'),
-			    config = this.parseConfig(input);
+			ss.handleApplyConfig = function(mode, nodes, comment, ev) {
+				var input = nodes.querySelector('textarea').value,
+				    error = nodes.querySelector('.alert-message'),
+				    cancel = nodes.nextElementSibling.querySelector('.btn'),
+				    config = this.parseConfig(input);
+
+				comment = comment || nodes.getAttribute('data-filename');
 
 			if (typeof(config) == 'string') {
 				error.firstChild.data = _('Cannot parse configuration: %s').format(config);
@@ -687,23 +797,39 @@ return network.registerProtocol('amneziawg', {
 			    headNode = mapNode.parentNode.querySelector('h4'),
 			    parent = this.map;
 
-			var nodes = E('div', {
-				'dragover': this.handleDragConfig,
-				'drop': this.handleDropConfig.bind(this, mode)
-			}, [
-				E([], (mode == 'full') ? [
+				var nodes = E('div', {
+					'class': 'awg-import-panel',
+					'dragover': this.handleDragConfig,
+					'dragleave': this.handleDragLeaveConfig,
+					'drop': this.handleDropConfig.bind(this, mode)
+				}, [
+					E([], (mode == 'full') ? [
 					E('p', _('Drag or paste a valid <em>*.conf</em> file below to configure the local AmneziaWG interface.'))
 				] : [
 					E('p', _('Paste or drag a AmneziaWG configuration (commonly <em>wg0.conf</em>) from another system below to create a matching peer entry allowing that system to connect to the local AmneziaWG interface.')),
 					E('p', _('To configure fully the local AmneziaWG interface from an existing (e.g. provider supplied) configuration file, use the <strong><a class="full-import" href="#">configuration import</a></strong> instead.'))
 				]),
-				E('p', [
-					E('textarea', {
-						'placeholder': (mode == 'full')
-							? _('Paste or drag supplied AmneziaWG configuration file…')
-							: _('Paste or drag AmneziaWG peer configuration (wg0.conf) file…'),
-						'style': 'height:5em;width:100%; white-space:pre'
-					})
+					E('div', { 'class': 'awg-import-actions' }, [
+						E('label', { 'class': 'btn cbi-button' }, [
+							_('Choose .conf file…'),
+							E('input', {
+								'type': 'file',
+								'accept': '.conf,text/plain',
+								'style': 'display:none',
+								'change': function(ev) {
+									ss.loadConfigFile(nodes, ev.currentTarget.files[0]);
+								}
+							})
+						]),
+						E('span', { 'class': 'awg-import-file' }, [ _('No file selected') ])
+					]),
+					E('p', [
+						E('textarea', {
+							'class': 'awg-import-textarea',
+							'placeholder': (mode == 'full')
+								? _('Paste or drag supplied AmneziaWG configuration file…')
+								: _('Paste or drag AmneziaWG peer configuration (wg0.conf) file…')
+						})
 				]),
 				E('div', {
 					'class': 'alert-message',
@@ -1081,13 +1207,13 @@ return network.registerProtocol('amneziawg', {
 
 				qrs = qrm.section(form.NamedSection, 'config');
 
-				function handleConfigChange(ev, section_id, value) {
-					var code = this.map.findElement('.qr-code'),
-					    conf = this.map.findElement('.client-config'),
-					    endpoint = this.section.getUIElement(section_id, 'endpoint'),
-					    ips = this.section.getUIElement(section_id, 'allowed_ips');
-					    eips = this.section.getUIElement(section_id, 'addresses');
-					    dns = this.section.getUIElement(section_id, 'dns_servers');
+					function handleConfigChange(ev, section_id, value) {
+						var code = this.map.findElement('.qr-code'),
+						    conf = this.map.findElement('.client-config'),
+						    endpoint = this.section.getUIElement(section_id, 'endpoint'),
+						    ips = this.section.getUIElement(section_id, 'allowed_ips'),
+						    eips = this.section.getUIElement(section_id, 'addresses'),
+						    dns = this.section.getUIElement(section_id, 'dns_servers');
 
 					if (this.isValid(section_id)) {
 						conf.firstChild.data = configGenerator(endpoint.getValue(), ips.getValue(), eips.getValue(), dns.getValue());
@@ -1119,23 +1245,24 @@ return network.registerProtocol('amneziawg', {
 				eips.forEach(function(eip) { qro.value(eip) });
 				qro.onchange = handleConfigChange;
 
-				qro = qrs.option(form.DummyValue, 'output');
-				qro.renderWidget = function() {
-					var peer_config = configGenerator(hostnames[0], ips, eips, dns);
+					qro = qrs.option(form.DummyValue, 'output');
+					qro.renderWidget = function() {
+						var peer_config = configGenerator(hostnames[0], ips, eips, dns);
 
-					var node = E('div', {
-						'style': 'display:flex;flex-wrap:wrap;align-items:center;gap:.5em;width:100%'
-					}, [
-						E('div', {
-							'class': 'qr-code',
-							'style': 'text-align:center'
+						var node = E('div', {
+							'class': 'awg-config-export'
 						}, [
-							E('em', { 'class': 'spinning' }, [ _('Generating QR code…') ])
-						]),
-						E('pre', {
-							'class': 'client-config',
-							'style': 'flex:1;white-space:pre;overflow:auto',
-							'click': function(ev) {
+							E('div', { 'class': 'alert-message warning awg-export-note' }, [
+								_('This configuration and QR code contain a private key. Keep them secret.')
+							]),
+							E('div', {
+								'class': 'qr-code'
+							}, [
+								E('em', { 'class': 'spinning' }, [ _('Generating QR code…') ])
+							]),
+							E('pre', {
+								'class': 'client-config',
+								'click': function(ev) {
 								var sel = window.getSelection(),
 								    range = document.createRange();
 
@@ -1143,11 +1270,36 @@ return network.registerProtocol('amneziawg', {
 
 								sel.removeAllRanges();
 								sel.addRange(range);
-							}
-						}, [ peer_config ])
-					]);
+								}
+							}, [ peer_config ]),
+							E('div', { 'class': 'awg-export-actions' }, [
+								E('button', {
+									'class': 'btn cbi-button',
+									'type': 'button',
+									'click': function(ev) {
+										var button = ev.currentTarget,
+										    original = button.textContent,
+										    config = node.querySelector('.client-config').textContent;
 
-					buildSVGQRCode(peer_config, node.firstChild);
+										return copyText(config).then(function() {
+											button.textContent = _('Copied');
+											window.setTimeout(function() { button.textContent = original; }, 1500);
+										}, function() {
+											ui.addNotification(null, E('p', [ _('Unable to copy the configuration.') ]), 'error');
+										});
+									}
+								}, [ _('Copy configuration') ]),
+								E('button', {
+									'class': 'btn cbi-button',
+									'type': 'button',
+									'click': function() {
+										downloadText(node.querySelector('.client-config').textContent, 'amneziawg-peer.conf');
+									}
+								}, [ _('Download .conf') ])
+							])
+						]);
+
+						buildSVGQRCode(peer_config, node.querySelector('.qr-code'));
 
 					return node;
 				};

@@ -15,7 +15,7 @@
 
 - `kmod-amneziawg` — `v3.1.20260828`;
 - `amneziawg-tools` — `v3.1.20260812`;
-- `luci-proto-amneziawg` — `v3.1.0` — веб-интерфейс, а также импорт и экспорт конфигураций AWG 3.1.
+- `luci-proto-amneziawg` — `v3.1.1` — веб-интерфейс, а также импорт и экспорт конфигураций AWG 3.1.
 
 В netifd и LuCI реализована поддержка параметров `HeaderProtectionKey`,
 `ContentPaddingAddition`, `RekeyAfterTime`, `RekeyTimeout`, `RejectAfterTime`,
