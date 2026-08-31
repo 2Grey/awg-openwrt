@@ -1,0 +1,412 @@
+.awg-status-page {
+	--awg-border: rgba(127, 127, 127, .25);
+	--awg-muted: rgba(127, 127, 127, .9);
+	--awg-surface: rgba(127, 127, 127, .06);
+	--awg-green: #16803a;
+	--awg-amber: #a16207;
+	--awg-gray: #667085;
+}
+
+.awg-page-heading,
+.awg-interface-header,
+.awg-interface-title,
+.awg-copy-value,
+.awg-peer-traffic,
+.awg-peer-actions,
+.awg-loading {
+	display: flex;
+	align-items: center;
+}
+
+.awg-page-heading,
+.awg-interface-header {
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.awg-page-heading {
+	margin-bottom: 1rem;
+}
+
+.awg-page-heading h2,
+.awg-page-heading p,
+.awg-interface-title h3 {
+	margin: 0;
+}
+
+.awg-page-heading p {
+	margin-top: .25rem;
+	color: var(--awg-muted);
+}
+
+.awg-interface-count {
+	white-space: nowrap;
+	padding: .35rem .65rem;
+	border: 1px solid var(--awg-border);
+	border-radius: 999px;
+	background: var(--awg-surface);
+}
+
+.awg-interface-card {
+	margin: 0 0 1.25rem;
+	border: 1px solid var(--awg-border);
+	border-radius: .55rem;
+	background: var(--background-color-high, transparent);
+	overflow: hidden;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+}
+
+.awg-interface-header {
+	padding: 1rem;
+	border-bottom: 1px solid var(--awg-border);
+}
+
+.awg-interface-title {
+	gap: .75rem;
+}
+
+.awg-interface-title img {
+	width: 36px;
+	height: 36px;
+}
+
+.awg-interface-title h3 {
+	margin-bottom: .3rem;
+}
+
+.awg-status-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: .4em;
+	font-size: .85em;
+	font-weight: 600;
+}
+
+.awg-status-dot {
+	width: .6em;
+	height: .6em;
+	border-radius: 50%;
+	background: currentColor;
+	box-shadow: 0 0 0 3px rgba(127, 127, 127, .15);
+}
+
+.awg-status-recent {
+	color: var(--awg-green);
+}
+
+.awg-status-stale {
+	color: var(--awg-amber);
+}
+
+.awg-status-never {
+	color: var(--awg-gray);
+}
+
+.awg-interface-summary {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(7rem, 1fr)) minmax(13rem, 1.5fr);
+	gap: .75rem;
+	padding: 1rem;
+	background: var(--awg-surface);
+	border-bottom: 1px solid var(--awg-border);
+}
+
+.awg-interface-summary > div {
+	min-width: 0;
+}
+
+.awg-interface-summary span,
+.awg-interface-summary strong {
+	display: block;
+}
+
+.awg-interface-summary > div > span:first-child {
+	margin-bottom: .2rem;
+	font-size: .82em;
+	color: var(--awg-muted);
+}
+
+.awg-summary-key {
+	position: relative;
+	padding-right: 4.75rem;
+}
+
+.awg-summary-key strong {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-family: monospace;
+}
+
+.awg-summary-key .awg-copy-button {
+	position: absolute;
+	right: 0;
+	top: .2rem;
+}
+
+.awg-copy-value {
+	justify-content: space-between;
+	gap: .5rem;
+	max-width: 100%;
+}
+
+.awg-copy-value > :first-child {
+	min-width: 0;
+}
+
+.awg-break-all {
+	word-break: break-all;
+}
+
+.awg-peer-table {
+	width: 100%;
+}
+
+.awg-peer-row {
+	display: grid;
+	grid-template-columns: minmax(10rem, 1.25fr) minmax(10rem, 1fr) minmax(8rem, .9fr) minmax(12rem, 1.2fr) auto;
+	align-items: center;
+	gap: .75rem;
+	padding: .75rem 1rem;
+	border-bottom: 1px solid var(--awg-border);
+}
+
+.awg-peer-row:last-child {
+	border-bottom: 0;
+}
+
+.awg-peer-head {
+	padding-top: .55rem;
+	padding-bottom: .55rem;
+	font-size: .82em;
+	font-weight: 600;
+	color: var(--awg-muted);
+	background: var(--awg-surface);
+}
+
+.awg-peer-identity,
+.awg-handshake {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: .25rem;
+	min-width: 0;
+}
+
+.awg-key-short {
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	color: var(--awg-muted);
+}
+
+.awg-peer-endpoint {
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+.awg-peer-traffic {
+	align-items: flex-start;
+	flex-direction: column;
+	gap: .15rem;
+	font-variant-numeric: tabular-nums;
+}
+
+.awg-handshake-time {
+	font-size: .85em;
+	color: var(--awg-muted);
+}
+
+.awg-peer-actions {
+	justify-content: flex-end;
+}
+
+.awg-empty,
+.awg-loading {
+	justify-content: center;
+	flex-direction: column;
+	gap: .65rem;
+	min-height: 14rem;
+	padding: 2rem;
+	text-align: center;
+	border: 1px dashed var(--awg-border);
+	border-radius: .55rem;
+	background: var(--awg-surface);
+}
+
+.awg-empty img {
+	width: 48px;
+	height: 48px;
+}
+
+.awg-empty h3,
+.awg-empty p {
+	margin: 0;
+}
+
+.awg-empty-compact {
+	min-height: 5rem;
+	border: 0;
+	border-radius: 0;
+}
+
+.awg-empty-compact span {
+	color: var(--awg-muted);
+}
+
+.awg-loading {
+	flex-direction: row;
+	min-height: 10rem;
+	border: 0;
+	background: transparent;
+}
+
+.awg-status-error {
+	margin-top: 1rem;
+}
+
+.awg-status-error p {
+	margin: .4rem 0;
+}
+
+.awg-setting-group {
+	margin: 1rem 0 .25rem;
+	padding: .75rem 1rem;
+	border-left: .25rem solid var(--primary-color, #337ab7);
+	background: rgba(127, 127, 127, .06);
+}
+
+.awg-setting-group h4,
+.awg-setting-group p {
+	margin: 0;
+}
+
+.awg-setting-group p {
+	margin-top: .25rem;
+	color: rgba(127, 127, 127, .95);
+}
+
+.awg-import-panel {
+	padding: 1rem;
+	border: 2px dashed rgba(127, 127, 127, .35);
+	border-radius: .5rem;
+	background: rgba(127, 127, 127, .05);
+	transition: border-color .15s, background-color .15s;
+}
+
+.awg-import-panel.awg-drag-active {
+	border-color: var(--primary-color, #337ab7);
+	background: rgba(51, 122, 183, .08);
+}
+
+.awg-import-actions,
+.awg-export-actions {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: .5rem;
+}
+
+.awg-import-file {
+	color: rgba(127, 127, 127, .95);
+}
+
+.awg-import-textarea {
+	box-sizing: border-box;
+	width: 100%;
+	min-height: 10rem;
+	resize: vertical;
+	white-space: pre;
+	font-family: monospace;
+}
+
+.awg-config-export {
+	display: grid;
+	grid-template-columns: minmax(220px, auto) minmax(18rem, 1fr);
+	align-items: start;
+	gap: 1rem;
+	width: 100%;
+}
+
+.awg-config-export .qr-code {
+	text-align: center;
+}
+
+.awg-config-export .client-config {
+	box-sizing: border-box;
+	max-width: 100%;
+	max-height: 24rem;
+	margin: 0;
+	overflow: auto;
+	white-space: pre;
+}
+
+.awg-export-note,
+.awg-export-actions {
+	grid-column: 1 / -1;
+}
+
+@media (max-width: 1100px) {
+	.awg-interface-summary {
+		grid-template-columns: repeat(2, minmax(7rem, 1fr));
+	}
+
+	.awg-summary-key {
+		grid-column: 1 / -1;
+	}
+
+	.awg-peer-head {
+		display: none;
+	}
+
+	.awg-peer-row:not(.awg-peer-head) {
+		grid-template-columns: minmax(0, 1fr) auto;
+		gap: .65rem 1rem;
+		padding: 1rem;
+	}
+
+	.awg-peer-identity,
+	.awg-peer-endpoint,
+	.awg-peer-traffic,
+	.awg-peer-row [data-label] {
+		grid-column: 1;
+	}
+
+	.awg-peer-row [data-label]::before {
+		content: attr(data-label);
+		display: block;
+		margin-bottom: .2rem;
+		font-size: .78em;
+		font-weight: 600;
+		color: var(--awg-muted);
+	}
+
+	.awg-peer-actions {
+		grid-column: 2;
+		grid-row: 1;
+	}
+}
+
+@media (max-width: 600px) {
+	.awg-page-heading,
+	.awg-interface-header {
+		align-items: stretch;
+		flex-direction: column;
+	}
+
+	.awg-interface-count {
+		align-self: flex-start;
+	}
+
+	.awg-interface-summary {
+		grid-template-columns: 1fr 1fr;
+	}
+
+	.awg-config-export {
+		grid-template-columns: 1fr;
+	}
+
+	.awg-config-export > * {
+		grid-column: 1;
+	}
+}

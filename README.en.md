@@ -15,7 +15,7 @@ The `master` branch contains an aligned set of AWG 3.1 components:
 
 - `kmod-amneziawg` — `v3.1.20260828`;
 - `amneziawg-tools` — `v3.1.20260812`;
-- `luci-proto-amneziawg` — `v3.1.0` — Web interface and import/export of AWG 3.1 configurations.
+- `luci-proto-amneziawg` — `v3.1.1` — Web interface and import/export of AWG 3.1 configurations.
 
 The netifd and LuCI support `HeaderProtectionKey`, `ContentPaddingAddition`,
 `RekeyAfterTime`, `RekeyTimeout`, `RejectAfterTime`, `KeepaliveTimeout`,

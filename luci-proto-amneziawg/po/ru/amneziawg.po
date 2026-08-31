@@ -243,3 +243,69 @@ msgstr ""
 "Не определен фиксированный порт прослушивания интерфейса, поэтому узлы могут "
 "оказаться не в состоянии инициировать соединения с этим экземпляром "
 "AmneziaWG!"
+
+msgid "Junk packets"
+msgstr "Мусорные пакеты"
+
+msgid "Packet count and size values used to disguise AmneziaWG traffic. Importing a known-good configuration is recommended."
+msgstr "Количество и размеры пакетов, используемые для маскировки трафика AmneziaWG. Рекомендуется импортировать заведомо рабочую конфигурацию."
+
+msgid "Packet padding"
+msgstr "Заполнение пакетов"
+
+msgid "Junk header sizes for handshake, cookie reply and transport packets."
+msgstr "Размеры мусорных заголовков для пакетов рукопожатия, ответа cookie и транспортных пакетов."
+
+msgid "Packet type headers"
+msgstr "Заголовки типов пакетов"
+
+msgid "Packet type values must match the configuration on the remote peer."
+msgstr "Значения типов пакетов должны совпадать с конфигурацией удалённого узла."
+
+msgid "Special packet signatures"
+msgstr "Сигнатуры специальных пакетов"
+
+msgid "Optional signatures for special junk packets."
+msgstr "Необязательные сигнатуры специальных мусорных пакетов."
+
+msgid "Header protection"
+msgstr "Защита заголовков"
+
+msgid "AWG 3.x header protection settings. The key and S1-S4 values must match on both sides."
+msgstr "Настройки защиты заголовков AWG 3.x. Ключ и значения S1-S4 должны совпадать на обеих сторонах."
+
+msgid "Handshake timing"
+msgstr "Таймеры рукопожатия"
+
+msgid "Advanced AWG 3.x timing values. Leave them at their defaults unless the peer configuration specifies them."
+msgstr "Расширенные таймеры AWG 3.x. Оставьте значения по умолчанию, если в конфигурации узла не указаны другие."
+
+msgid "AWG 3.1 options"
+msgstr "Параметры AWG 3.1"
+
+msgid "Optional traffic-shaping and active-probing resistance settings. Values must match on both sides where noted."
+msgstr "Необязательные параметры изменения трафика и защиты от активного зондирования. Там, где это указано, значения должны совпадать на обеих сторонах."
+
+msgid "Selected file: %s"
+msgstr "Выбран файл: %s"
+
+msgid "Choose .conf file…"
+msgstr "Выбрать файл .conf…"
+
+msgid "No file selected"
+msgstr "Файл не выбран"
+
+msgid "This configuration and QR code contain a private key. Keep them secret."
+msgstr "Эта конфигурация и QR-код содержат закрытый ключ. Не передавайте их посторонним."
+
+msgid "Copy configuration"
+msgstr "Копировать конфигурацию"
+
+msgid "Unable to copy the configuration."
+msgstr "Не удалось скопировать конфигурацию."
+
+msgid "Download .conf"
+msgstr "Скачать .conf"
+
+msgid "Copied"
+msgstr "Скопировано"
