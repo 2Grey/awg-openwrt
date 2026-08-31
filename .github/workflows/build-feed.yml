@@ -27,12 +27,12 @@ jobs:
       package-format: ${{ steps.prepare-inputs.outputs.package-format }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: "20.16.0"
+          node-version: "24"
 
       - name: Prepare build inputs
         id: prepare-inputs
@@ -215,7 +215,7 @@ jobs:
       options: --user root
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Download release packages artifact
         uses: actions/download-artifact@v4
@@ -501,7 +501,7 @@ jobs:
     if: ${{ always() }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Restore existing GitHub Pages content
         run: |

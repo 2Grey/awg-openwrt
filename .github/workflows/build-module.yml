@@ -34,12 +34,12 @@ jobs:
       job-config: ${{ steps.generate-config.outputs.job-config }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: '20.16.0'
+          node-version: '24'
 
       - name: Get OpenWRT version from inputs or tag
         run: |
@@ -81,7 +81,7 @@ jobs:
 
     steps:
       - name: Checkout AWG source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Install Python dependencies
         run: |
