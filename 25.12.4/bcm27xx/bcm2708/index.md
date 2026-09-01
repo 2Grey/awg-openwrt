@@ -52,5 +52,6 @@ apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 - [luci-i18n-amneziawg-ru_v25.12.4_arm_arm1176jzf-s_vfp_bcm27xx_bcm2708.apk](https://2grey.github.io/awg-openwrt/25.12.4/bcm27xx/bcm2708/luci-i18n-amneziawg-ru_v25.12.4_arm_arm1176jzf-s_vfp_bcm27xx_bcm2708.apk)
 - [luci-proto-amneziawg-3.0.0-r1.apk](https://2grey.github.io/awg-openwrt/25.12.4/bcm27xx/bcm2708/luci-proto-amneziawg-3.0.0-r1.apk)
 - [luci-proto-amneziawg-3.1.0-r1.apk](https://2grey.github.io/awg-openwrt/25.12.4/bcm27xx/bcm2708/luci-proto-amneziawg-3.1.0-r1.apk)
+- [luci-proto-amneziawg-3.1.1-r1.apk](https://2grey.github.io/awg-openwrt/25.12.4/bcm27xx/bcm2708/luci-proto-amneziawg-3.1.1-r1.apk)
 - [luci-proto-amneziawg_v25.12.4_arm_arm1176jzf-s_vfp_bcm27xx_bcm2708.apk](https://2grey.github.io/awg-openwrt/25.12.4/bcm27xx/bcm2708/luci-proto-amneziawg_v25.12.4_arm_arm1176jzf-s_vfp_bcm27xx_bcm2708.apk)
 - [packages.adb](https://2grey.github.io/awg-openwrt/25.12.4/bcm27xx/bcm2708/packages.adb)
