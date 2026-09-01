@@ -306,9 +306,6 @@ jobs:
       - name: APK feed smoke tests
         run: |
           set -euo pipefail
-          SDK_DIR="${OPENWRT_SDK_DIR:-/builder}"
-          SDK_DIR=$(cd "$SDK_DIR" && pwd)
-          APK_BIN="$SDK_DIR/staging_dir/host/bin/apk"
           test -s "$GITHUB_WORKSPACE/feed-publish/keys/awg-openwrt-feed.pem"
 
           feed_count=0
@@ -321,26 +318,14 @@ jobs:
             test -s "$feed_dir/packages.adb"
             test -s "$feed_dir/index.json"
 
-            adb_dump="$RUNNER_TEMP/packages-$feed_count.adb.dump"
-            "$APK_BIN" adbdump "$feed_dir/packages.adb" > "$adb_dump"
-            grep -q "amneziawg-tools" "$adb_dump"
-            grep -q "kmod-amneziawg" "$adb_dump"
-            grep -q "luci-proto-amneziawg" "$adb_dump"
-            grep -q "luci-i18n-amneziawg-ru" "$adb_dump"
+            python3 "$GITHUB_WORKSPACE/.github/scripts/validate-feed-index.py" \
+              "$feed_dir/index.json" \
+              amneziawg-tools \
+              kmod-amneziawg \
+              luci-proto-amneziawg \
+              luci-i18n-amneziawg-ru
             python3 "$GITHUB_WORKSPACE/.github/scripts/canonicalize-apk-filenames.py" \
               "$feed_dir/index.json" "$feed_dir"
-            if grep -q "busybox" "$adb_dump"; then
-              echo "Unexpected busybox package in APK feed" >&2
-              exit 1
-            fi
-            if grep -q "\blibc\b" "$adb_dump"; then
-              echo "Unexpected libc package in APK feed" >&2
-              exit 1
-            fi
-            if grep -q "\bubus\b" "$adb_dump"; then
-              echo "Unexpected ubus package in APK feed" >&2
-              exit 1
-            fi
           done < <(find "$GITHUB_WORKSPACE/feed-publish" -mindepth 3 -maxdepth 3 -type d -print0)
           test "$feed_count" -gt 0
 
