@@ -49,4 +49,5 @@ apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 - [luci-i18n-amneziawg-ru-0.apk](https://2grey.github.io/awg-openwrt/25.12.5/realtek/rtl838x/luci-i18n-amneziawg-ru-0.apk)
 - [luci-proto-amneziawg-3.0.0-r1.apk](https://2grey.github.io/awg-openwrt/25.12.5/realtek/rtl838x/luci-proto-amneziawg-3.0.0-r1.apk)
 - [luci-proto-amneziawg-3.1.0-r1.apk](https://2grey.github.io/awg-openwrt/25.12.5/realtek/rtl838x/luci-proto-amneziawg-3.1.0-r1.apk)
+- [luci-proto-amneziawg-3.1.1-r1.apk](https://2grey.github.io/awg-openwrt/25.12.5/realtek/rtl838x/luci-proto-amneziawg-3.1.1-r1.apk)
 - [packages.adb](https://2grey.github.io/awg-openwrt/25.12.5/realtek/rtl838x/packages.adb)
