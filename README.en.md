@@ -56,7 +56,9 @@ This repository also publishes a full-featured [OpenWrt package feed](https://2g
    configuration is not removed.
 
 2. Reboot the router to load the new kernel modules.
-3. Hard-refresh LuCI (`Ctrl+F5`) or open it in a private browser window.
+3. Clear the browser cache for LuCI JavaScript: hard-refresh the page
+   (`Ctrl+F5`) or open LuCI in a private browser window. A regular page reload
+   may not be sufficient.
 4. Create a new interface using the `AmneziaWG VPN` protocol.
 
 ### Via the setup script
@@ -74,6 +76,8 @@ sh <(wget -O - https://raw.githubusercontent.com/2Grey/awg-openwrt/refs/heads/ma
 > [!IMPORTANT]
 > On a clean installation, the script can load the kernel module and configure the interface without a reboot.
 > If an older kernel module remains loaded after an upgrade, reboot the router and run the script again.
+> After updating the packages, also clear the browser cache for LuCI JavaScript:
+> hard-refresh the page (`Ctrl+F5`) or open LuCI in a private browser window.
 
 Additional script options:
 
