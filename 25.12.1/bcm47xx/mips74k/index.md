@@ -52,5 +52,6 @@ apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 - [luci-i18n-amneziawg-ru_v25.12.1_mipsel_74kc_bcm47xx_mips74k.apk](https://2grey.github.io/awg-openwrt/25.12.1/bcm47xx/mips74k/luci-i18n-amneziawg-ru_v25.12.1_mipsel_74kc_bcm47xx_mips74k.apk)
 - [luci-proto-amneziawg-3.0.0-r1.apk](https://2grey.github.io/awg-openwrt/25.12.1/bcm47xx/mips74k/luci-proto-amneziawg-3.0.0-r1.apk)
 - [luci-proto-amneziawg-3.1.0-r1.apk](https://2grey.github.io/awg-openwrt/25.12.1/bcm47xx/mips74k/luci-proto-amneziawg-3.1.0-r1.apk)
+- [luci-proto-amneziawg-3.1.1-r1.apk](https://2grey.github.io/awg-openwrt/25.12.1/bcm47xx/mips74k/luci-proto-amneziawg-3.1.1-r1.apk)
 - [luci-proto-amneziawg_v25.12.1_mipsel_74kc_bcm47xx_mips74k.apk](https://2grey.github.io/awg-openwrt/25.12.1/bcm47xx/mips74k/luci-proto-amneziawg_v25.12.1_mipsel_74kc_bcm47xx_mips74k.apk)
 - [packages.adb](https://2grey.github.io/awg-openwrt/25.12.1/bcm47xx/mips74k/packages.adb)
