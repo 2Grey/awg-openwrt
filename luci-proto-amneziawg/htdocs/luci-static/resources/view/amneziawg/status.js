@@ -215,8 +215,8 @@ function renderPeerList(instanceName, peers) {
 			E('span', { 'role': 'columnheader' }, [ _('Traffic') ]),
 			E('span', { 'role': 'columnheader' }, [ _('Latest Handshake') ]),
 			E('span', { 'role': 'columnheader' }, [ _('Actions') ])
-		]),
-		peers.map(function(peer) {
+		])
+	].concat(peers.map(function(peer) {
 			var endpoint = (peer.endpoint && peer.endpoint != '(none)') ? peer.endpoint : _('Not available');
 
 			return E('div', { 'class': 'awg-peer-row', 'role': 'row' }, [
@@ -241,8 +241,8 @@ function renderPeerList(instanceName, peers) {
 					}, [ _('Details') ])
 				])
 			]);
-		})
-	]);
+		}))
+	);
 }
 
 function renderInterface(instanceName, iface) {
