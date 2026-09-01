@@ -147,7 +147,7 @@ jobs:
       - name: Cache OpenWrt Snapshot SDK
         if: steps.existing.outputs.result != 'true'
         id: cache-sdk
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: openwrt-sdk-*/
           key: ${{ runner.os }}-snapshot-sdk-${{ matrix.build_env.revision }}-${{ matrix.build_env.target }}-${{ matrix.build_env.subtarget }}-${{ matrix.build_env.vermagic }}

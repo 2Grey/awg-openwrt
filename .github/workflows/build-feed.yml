@@ -368,7 +368,7 @@ jobs:
 
       - name: Cache OpenWrt IPK index tools
         id: cache-sdk
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: openwrt-sdk-*/
           key: ${{ runner.os }}-openwrt-${{ inputs.version }}-x86-64-ipk-index-tools
