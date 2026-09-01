@@ -1,4 +1,5 @@
-name: Create Release on Tag
+name: Build OpenWrt Packages
+run-name: "Build packages for OpenWrt ${{ inputs.version || inputs.tag_name || github.ref_name }}"
 
 on:
   push:
