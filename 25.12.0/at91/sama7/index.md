@@ -52,5 +52,6 @@ apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 - [luci-i18n-amneziawg-ru_v25.12.0_arm_cortex-a7_vfpv4_at91_sama7.apk](https://2grey.github.io/awg-openwrt/25.12.0/at91/sama7/luci-i18n-amneziawg-ru_v25.12.0_arm_cortex-a7_vfpv4_at91_sama7.apk)
 - [luci-proto-amneziawg-3.0.0-r1.apk](https://2grey.github.io/awg-openwrt/25.12.0/at91/sama7/luci-proto-amneziawg-3.0.0-r1.apk)
 - [luci-proto-amneziawg-3.1.0-r1.apk](https://2grey.github.io/awg-openwrt/25.12.0/at91/sama7/luci-proto-amneziawg-3.1.0-r1.apk)
+- [luci-proto-amneziawg-3.1.1-r1.apk](https://2grey.github.io/awg-openwrt/25.12.0/at91/sama7/luci-proto-amneziawg-3.1.1-r1.apk)
 - [luci-proto-amneziawg_v25.12.0_arm_cortex-a7_vfpv4_at91_sama7.apk](https://2grey.github.io/awg-openwrt/25.12.0/at91/sama7/luci-proto-amneziawg_v25.12.0_arm_cortex-a7_vfpv4_at91_sama7.apk)
 - [packages.adb](https://2grey.github.io/awg-openwrt/25.12.0/at91/sama7/packages.adb)
