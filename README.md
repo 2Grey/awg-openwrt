@@ -9,6 +9,8 @@
 ![OpenWrt 24](https://img.shields.io/badge/OpenWrt-24.10.4_~_24.10.8-blue)
 ![OpenWrt 25](https://img.shields.io/badge/OpenWrt-25.12.0_~_25.12.5-teal)
 
+[![AmneziaWG OpenWrt Feed](https://img.shields.io/badge/AmneziaWG-OpenWrt_Feed-yellow?style=for-the-badge&logo=openwrt)](https://2grey.github.io/awg-openwrt)
+
 ## Поддержка AWG 3.1
 
 В ветке `master` содержится согласованный набор компонентов AWG 3.1:

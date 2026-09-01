@@ -45,21 +45,21 @@ jobs:
       - name: Get OpenWRT version from inputs or tag
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "VERSION=${{ inputs.version }}" >> $GITHUB_ENV
+            echo "VERSION=${{ inputs.version }}" >> "$GITHUB_ENV"
 
             if [ -n "${{ inputs.targets }}" ]; then
-              echo "TARGETS=${{ inputs.targets }}" >> $GITHUB_ENV
+              echo "TARGETS=${{ inputs.targets }}" >> "$GITHUB_ENV"
             fi
 
             if [ -n "${{ inputs.subtargets }}" ]; then
-              echo "SUBTARGETS=${{ inputs.subtargets }}" >> $GITHUB_ENV
+              echo "SUBTARGETS=${{ inputs.subtargets }}" >> "$GITHUB_ENV"
             fi
 
           elif [ "${{ github.event_name }}" = "workflow_call" ]; then
-            echo "VERSION=${{ inputs.tag_name }}" >> $GITHUB_ENV
+            echo "VERSION=${{ inputs.tag_name }}" >> "$GITHUB_ENV"
 
           else
-            echo "VERSION=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_ENV
+            echo "VERSION=${GITHUB_REF/refs\/tags\/v/}" >> "$GITHUB_ENV"
           fi
 
       - name: Install dependencies
@@ -153,10 +153,12 @@ jobs:
           cp -r "$WORKSPACE_DIR/luci-proto-amneziawg" package/
           
           # Configure packages to build
-          echo "CONFIG_PACKAGE_kmod-amneziawg=m" > .config
-          echo "CONFIG_PACKAGE_amneziawg-tools=y" >> .config
-          echo "CONFIG_PACKAGE_luci-proto-amneziawg=y" >> .config
-          echo "CONFIG_PACKAGE_luci-i18n-amneziawg-ru=y" >> .config
+          {
+            echo "CONFIG_PACKAGE_kmod-amneziawg=m"
+            echo "CONFIG_PACKAGE_amneziawg-tools=y"
+            echo "CONFIG_PACKAGE_luci-proto-amneziawg=y"
+            echo "CONFIG_PACKAGE_luci-i18n-amneziawg-ru=y"
+          } > .config
           
           make defconfig
 
@@ -168,13 +170,9 @@ jobs:
 
           echo "Building AmneziaWG packages..."
 
-          # Build all packages in one dependency graph so shared prerequisites
-          # are scheduled once and can run in parallel.
-          make -j4 \
-            package/kmod-amneziawg/compile \
-            package/amneziawg-tools/compile \
-            package/luci-proto-amneziawg/compile \
-            V=s
+          # Building the LuCI package pulls in amneziawg-tools and
+          # kmod-amneziawg through their declared dependency chain.
+          make -j4 package/luci-proto-amneziawg/compile V=s
           
           echo "Build completed. Checking for built packages..."
           find bin/ -name "*.?pk" | grep -E "(amneziawg|luci-proto-amneziawg|luci-i18n-amneziawg)" | head -10
@@ -197,7 +195,7 @@ jobs:
           ls -la awgrelease/
 
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
           files: awgrelease/*.?pk
           tag_name: v${{ matrix.build_env.tag }}
