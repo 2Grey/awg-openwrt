@@ -328,9 +328,18 @@ jobs:
             grep -q "luci-i18n-amneziawg-ru" "$adb_dump"
             python3 "$GITHUB_WORKSPACE/.github/scripts/canonicalize-apk-filenames.py" \
               "$feed_dir/index.json" "$feed_dir"
-            ! grep -q "busybox" "$adb_dump"
-            ! grep -q "\blibc\b" "$adb_dump"
-            ! grep -q "\bubus\b" "$adb_dump"
+            if grep -q "busybox" "$adb_dump"; then
+              echo "Unexpected busybox package in APK feed" >&2
+              exit 1
+            fi
+            if grep -q "\blibc\b" "$adb_dump"; then
+              echo "Unexpected libc package in APK feed" >&2
+              exit 1
+            fi
+            if grep -q "\bubus\b" "$adb_dump"; then
+              echo "Unexpected ubus package in APK feed" >&2
+              exit 1
+            fi
           done < <(find "$GITHUB_WORKSPACE/feed-publish" -mindepth 3 -maxdepth 3 -type d -print0)
           test "$feed_count" -gt 0
 
@@ -481,9 +490,18 @@ jobs:
             grep -q '^Package: kmod-amneziawg$' "$feed_dir/Packages"
             grep -q '^Package: luci-proto-amneziawg$' "$feed_dir/Packages"
             grep -q '^Package: luci-i18n-amneziawg-ru$' "$feed_dir/Packages"
-            ! grep -q '^Package: busybox$' "$feed_dir/Packages"
-            ! grep -q '^Package: libc$' "$feed_dir/Packages"
-            ! grep -q '^Package: ubus$' "$feed_dir/Packages"
+            if grep -q '^Package: busybox$' "$feed_dir/Packages"; then
+              echo "Unexpected busybox package in IPK feed" >&2
+              exit 1
+            fi
+            if grep -q '^Package: libc$' "$feed_dir/Packages"; then
+              echo "Unexpected libc package in IPK feed" >&2
+              exit 1
+            fi
+            if grep -q '^Package: ubus$' "$feed_dir/Packages"; then
+              echo "Unexpected ubus package in IPK feed" >&2
+              exit 1
+            fi
           done < <(find "$GITHUB_WORKSPACE/feed-publish" -mindepth 3 -maxdepth 3 -type d -print0)
           test "$feed_count" -gt 0
 
