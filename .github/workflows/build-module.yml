@@ -167,20 +167,13 @@ jobs:
 
           echo "Building AmneziaWG packages..."
 
-          # Build kmod-amneziawg (kernel module)
-          echo "Building kmod-amneziawg..."
-          make package/kmod-amneziawg/{download,prepare} V=s
-          make -j4 package/kmod-amneziawg/compile V=s
-
-          # Build luci-proto-amneziawg (web interface)
-          echo "Building luci-proto-amneziawg..."
-          make package/luci-proto-amneziawg/{download,prepare} V=s
-          make -j4 package/luci-proto-amneziawg/compile V=s
-
-          # Build amneziawg-tools (userspace tools)
-          echo "Building amneziawg-tools..."
-          make package/amneziawg-tools/{download,prepare} V=s
-          make -j4 package/amneziawg-tools/compile V=s
+          # Build all packages in one dependency graph so shared prerequisites
+          # are scheduled once and can run in parallel.
+          make -j4 \
+            package/kmod-amneziawg/compile \
+            package/amneziawg-tools/compile \
+            package/luci-proto-amneziawg/compile \
+            V=s
           
           echo "Build completed. Checking for built packages..."
           find bin/ -name "*.?pk" | grep -E "(amneziawg|luci-proto-amneziawg|luci-i18n-amneziawg)" | head -10
