@@ -169,13 +169,9 @@ jobs:
 
           echo "Building AmneziaWG packages..."
 
-          # Build all packages in one dependency graph so shared prerequisites
-          # are scheduled once and can run in parallel.
-          make -j4 \
-            package/kmod-amneziawg/compile \
-            package/amneziawg-tools/compile \
-            package/luci-proto-amneziawg/compile \
-            V=s
+          # Building the LuCI package pulls in amneziawg-tools and
+          # kmod-amneziawg through their declared dependency chain.
+          make -j4 package/luci-proto-amneziawg/compile V=s
           
           echo "Build completed. Checking for built packages..."
           find bin/ -name "*.?pk" | grep -E "(amneziawg|luci-proto-amneziawg|luci-i18n-amneziawg)" | head -10
