@@ -1,0 +1,8 @@
+{
+  "version": "24.10.3",
+  "target": "d1",
+  "subtarget": "generic",
+  "pkgarch": "riscv64_riscv64",
+  "format": "ipk",
+  "feed": "awg"
+}

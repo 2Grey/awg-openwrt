@@ -1,0 +1,8 @@
+{
+  "version": "24.10.3",
+  "target": "ipq806x",
+  "subtarget": "generic",
+  "pkgarch": "arm_cortex-a15_neon-vfpv4",
+  "format": "ipk",
+  "feed": "awg"
+}

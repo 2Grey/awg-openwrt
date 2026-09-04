@@ -11,6 +11,7 @@ This GitHub Pages site publishes signed AmneziaWG package feeds for OpenWrt 24.1
 
 ## Available OpenWrt versions
 
+- [24.10.3](https://2grey.github.io/awg-openwrt/24.10.3/)
 - [24.10.4](https://2grey.github.io/awg-openwrt/24.10.4/)
 - [24.10.5](https://2grey.github.io/awg-openwrt/24.10.5/)
 - [24.10.6](https://2grey.github.io/awg-openwrt/24.10.6/)

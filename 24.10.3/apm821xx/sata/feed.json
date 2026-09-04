@@ -1,0 +1,8 @@
+{
+  "version": "24.10.3",
+  "target": "apm821xx",
+  "subtarget": "sata",
+  "pkgarch": "powerpc_464fp",
+  "format": "ipk",
+  "feed": "awg"
+}
