@@ -1,0 +1,8 @@
+{
+  "version": "24.10.2",
+  "target": "lantiq",
+  "subtarget": "ase",
+  "pkgarch": "mips_mips32",
+  "format": "ipk",
+  "feed": "awg"
+}

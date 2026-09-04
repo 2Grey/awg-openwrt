@@ -1,0 +1,8 @@
+{
+  "version": "24.10.2",
+  "target": "layerscape",
+  "subtarget": "armv8_64b",
+  "pkgarch": "aarch64_generic",
+  "format": "ipk",
+  "feed": "awg"
+}
