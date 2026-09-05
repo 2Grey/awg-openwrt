@@ -34,20 +34,20 @@ Section: luci
 Architecture: all
 Installed-Size: 20480
 Filename: luci-i18n-amneziawg-ru_v24.10.6_aarch64_cortex-a72_mvebu_cortexa72.ipk
-Size: 4248
-SHA256sum: 0796a7abbaef1950516e7bf53496e30a64af7f3f86bb5def181a28e667e6e0ff
+Size: 5557
+SHA256sum: 39732d4505a9a8360ac80da411e6b58bfae0337c5f1bfcc4da0ece85429e3a5b
 Description:  Translation for luci-proto-amneziawg - Русский (Russian)
 
 Package: luci-proto-amneziawg
-Version: 3.1.0-r1
+Version: 3.1.1-r1
 Depends: libc, amneziawg-tools, ucode, luci-lib-uqr, resolveip
 License: Apache-2.0
 Section: luci
 URL: https://github.com/openwrt/luci
 Architecture: all
-Installed-Size: 102400
+Installed-Size: 122880
 Filename: luci-proto-amneziawg_v24.10.6_aarch64_cortex-a72_mvebu_cortexa72.ipk
-Size: 29848
-SHA256sum: eb8544c6dabdee229b4f73b966579ed1007c8d311f808c28c4a33a9cab79daa8
+Size: 34337
+SHA256sum: 0999b659aad478213f9630a0935ef834f86e84d7d99a43d417067f5eb6d3e374
 Description:  Provides support and Web UI for AmneziaWG VPN
 
