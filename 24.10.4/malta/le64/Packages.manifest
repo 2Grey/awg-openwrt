@@ -45,12 +45,12 @@ SourceDateEpoch: 1760891865
 Architecture: all
 Installed-Size: 20480
 Filename: luci-i18n-amneziawg-ru_v24.10.4_mips64el_mips64r2_malta_le64.ipk
-Size: 4244
-SHA256sum: 1e446f09fb2e973d327fb452deafe30922df39ec0c6d09d533edc2b97503cbef
+Size: 5552
+SHA256sum: 42f6adc73edd6633a3d6f73e928f1eccb8c2a8723210ddff5d9901094be1cc7a
 Description:  Translation for luci-proto-amneziawg - Русский (Russian)
 
 Package: luci-proto-amneziawg
-Version: 3.1.0-r1
+Version: 3.1.1-r1
 Depends: libc, amneziawg-tools, ucode, luci-lib-uqr, resolveip
 Source: feeds/base/luci-proto-amneziawg
 SourceName: luci-proto-amneziawg
@@ -60,9 +60,9 @@ SourceDateEpoch: 1760891865
 URL: https://github.com/openwrt/luci
 Maintainer: OpenWrt LuCI community
 Architecture: all
-Installed-Size: 102400
+Installed-Size: 122880
 Filename: luci-proto-amneziawg_v24.10.4_mips64el_mips64r2_malta_le64.ipk
-Size: 29846
-SHA256sum: afbb5a56769d8524af5cf64817ca6a13aef8509b90ea95de056e6e36ed49ec96
+Size: 34323
+SHA256sum: 1512c6b42561fa653300457c0aec84ef26b8c5dd1be0ed5786c0cac48bfad378
 Description:  Provides support and Web UI for AmneziaWG VPN
 
