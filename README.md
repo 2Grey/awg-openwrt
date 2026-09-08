@@ -6,7 +6,7 @@
 ![AmneziaWG3.0](https://img.shields.io/badge/AmneziaWG-3.0-orange)
 ![AmneziaWG3.1](https://img.shields.io/badge/AmneziaWG-3.1-red)
 
-![OpenWrt 24](https://img.shields.io/badge/OpenWrt-24.10.4_~_24.10.8-blue)
+![OpenWrt 24](https://img.shields.io/badge/OpenWrt-24.10.0_~_24.10.8-blue)
 ![OpenWrt 25](https://img.shields.io/badge/OpenWrt-25.12.0_~_25.12.5-teal)
 
 [![AmneziaWG OpenWrt Feed](https://img.shields.io/badge/AmneziaWG-OpenWrt_Feed-yellow?style=for-the-badge&logo=openwrt)](https://2grey.github.io/awg-openwrt)
@@ -15,7 +15,7 @@
 
 В ветке `master` содержится согласованный набор компонентов AWG 3.1:
 
-- `kmod-amneziawg` — `v3.1.20260828`;
+- `kmod-amneziawg` — `v3.1.20260906`;
 - `amneziawg-tools` — `v3.1.20260812`;
 - `luci-proto-amneziawg` — `v3.1.1` — веб-интерфейс, а также импорт и экспорт конфигураций AWG 3.1.
 
@@ -147,6 +147,10 @@ sh <(wget -O - https://raw.githubusercontent.com/2Grey/awg-openwrt/refs/heads/ma
 9. [24.10.6](https://github.com/2Grey/awg-openwrt/releases/tag/v24.10.6) – AWG-3.1
 10. [24.10.5](https://github.com/2Grey/awg-openwrt/releases/tag/v24.10.5) – AWG-3.1
 11. [24.10.4](https://github.com/2Grey/awg-openwrt/releases/tag/v24.10.4) – AWG-3.1
+12. [24.10.3](https://github.com/2Grey/awg-openwrt/releases/tag/v24.10.3) – AWG-3.1
+13. [24.10.2](https://github.com/2Grey/awg-openwrt/releases/tag/v24.10.2) – AWG-3.1
+14. [24.10.1](https://github.com/2Grey/awg-openwrt/releases/tag/v24.10.1) – AWG-3.1
+15. [24.10.0](https://github.com/2Grey/awg-openwrt/releases/tag/v24.10.0) – AWG-3.1
 
 ## Сборка пакетов
 
