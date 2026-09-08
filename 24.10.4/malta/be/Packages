@@ -4,11 +4,11 @@ Depends: libc, ip, ip, kmod-amneziawg
 License: GPL-2.0
 Section: net
 URL: https://amnezia.org/
-Architecture: mips_24kc
-Installed-Size: 92160
+Architecture: mips64_mips64r2
+Installed-Size: 153600
 Filename: amneziawg-tools_v24.10.4_mips_24kc_malta_be.ipk
-Size: 33960
-SHA256sum: 1b9424585c64f841c9b6fde153e822b5522170245e56e00516c12a686010f700
+Size: 35005
+SHA256sum: 1ed1209e9339a195351e739ebdc00615a406edf031b9e033132b704c1735df58
 Description:  Amnezia VPN — simple and free app to run a self-hosted VPN with
  high privacy requirements.
  
@@ -16,14 +16,14 @@ Description:  Amnezia VPN — simple and free app to run a self-hosted VPN with
  `awg`, a netifd protocol helper, and a re-resolve watchdog script.
 
 Package: kmod-amneziawg
-Version: 6.6.110.3.1.20260828-r1
-Depends: kernel (=6.6.110~4880f58f355f8d52fbb2985e0e649b73-r1), kmod-udptunnel4, kmod-udptunnel6, kmod-crypto-lib-chacha20poly1305, kmod-crypto-lib-curve25519
+Version: 6.6.110.3.1.20260906-r1
+Depends: kernel (=6.6.110~19e37a7b9ed32aa9d2dc112cd63c3463-r1), kmod-udptunnel4, kmod-udptunnel6, kmod-crypto-lib-chacha20poly1305, kmod-crypto-lib-curve25519
 Section: kernel
-Architecture: mips_24kc
-Installed-Size: 102400
+Architecture: mips64_mips64r2
+Installed-Size: 174080
 Filename: kmod-amneziawg_v24.10.4_mips_24kc_malta_be.ipk
-Size: 46799
-SHA256sum: 95b34f17386f1214a9649aa0f9c1109491cab8cdcaf87f5ba8b87ee9573c50f4
+Size: 53893
+SHA256sum: 64cd23ccbbe9e0382f80ae6fafdd6e7a046852dabd912ee0da8d5eaa00d56ccd
 Description:  AmneziaWG VPN Kernel Module
 
 Package: luci-i18n-amneziawg-ru
