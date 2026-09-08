@@ -16,14 +16,14 @@ Description:  Amnezia VPN — simple and free app to run a self-hosted VPN with
  `awg`, a netifd protocol helper, and a re-resolve watchdog script.
 
 Package: kmod-amneziawg
-Version: 6.6.127.3.1.20260828-r1
+Version: 6.6.127.3.1.20260906-r1
 Depends: kernel (=6.6.127~130d6f17d1ed8dc338c12dbc3ea28823-r1), kmod-udptunnel4, kmod-udptunnel6, kmod-crypto-lib-chacha20poly1305, kmod-crypto-lib-curve25519
 Section: kernel
 Architecture: arm_cortex-a7_neon-vfpv4
 Installed-Size: 102400
 Filename: kmod-amneziawg_v24.10.6_arm_cortex-a7_neon-vfpv4_layerscape_armv7.ipk
-Size: 43793
-SHA256sum: c3f21ea5b28f1e162dc1ce01832a851333ff6796b6e4e07b7246c480c5ace859
+Size: 43843
+SHA256sum: 3efaf099a0dce64342699e7b43f44263d149615d6b19258c927be206baf7c5ef
 Description:  AmneziaWG VPN Kernel Module
 
 Package: luci-i18n-amneziawg-ru
