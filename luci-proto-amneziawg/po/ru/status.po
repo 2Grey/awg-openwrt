@@ -77,6 +77,9 @@ msgstr "Скопировано"
 msgid "Unable to copy the value."
 msgstr "Не удалось скопировать значение."
 
+msgid "No peers reported"
+msgstr "Интерфейс не сообщает об узлах"
+
 msgid "Configured peers will appear here when the interface reports them."
 msgstr "Настроенные узлы появятся здесь, когда интерфейс сообщит о них."
 
@@ -98,14 +101,20 @@ msgstr "Подробнее"
 msgid "Interface is running"
 msgstr "Интерфейс запущен"
 
+msgid "Interface is not running"
+msgstr "Интерфейс не запущен"
+
+msgid "Start the interface to see runtime peer information."
+msgstr "Запустите интерфейс, чтобы увидеть рабочее состояние узлов."
+
 msgid "Interface details"
 msgstr "Сведения об интерфейсе"
 
 msgid "Peers"
 msgstr "Узлы"
 
-msgid "Handshake and traffic information reported by running AmneziaWG interfaces."
-msgstr "Рукопожатия и трафик, о которых сообщают запущенные интерфейсы AmneziaWG."
+msgid "Configuration and runtime information for AmneziaWG interfaces."
+msgstr "Настройки и рабочее состояние интерфейсов AmneziaWG."
 
 msgid "%d interface(s)"
 msgstr "Интерфейсов: %d"

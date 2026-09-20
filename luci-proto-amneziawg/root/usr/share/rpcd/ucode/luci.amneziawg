@@ -65,25 +65,41 @@ const methods = {
 
 			const uci = cursor();
 			const wg_dump = popen("awg show all dump 2>/dev/null");
+			uci.load("network");
+
+			uci.foreach("network", "interface", (s) => {
+				if (s.proto == "amneziawg") {
+					data[s[".name"]] = {
+						name: s[".name"],
+						running: false,
+						public_key: "",
+						listen_port: s.listen_port ?? "",
+						fwmark: s.fwmark ?? "off",
+						random_trailers: s.awg_random_trailers ?? "off",
+						disable_cookies: s.awg_disable_cookies ?? "off",
+						peers: []
+					};
+				}
+			});
 
 			if (wg_dump) {
-				uci.load("network");
-
 				for (let line = wg_dump.read('line'); length(line); line = wg_dump.read('line')) {
 					const record = split(rtrim(line, '\n'), '\t');
 
 					if (last_device != record[0]) {
 						last_device = record[0];
 						const has_awg31_fields = length(record) >= 30;
-						data[last_device] = {
-							name: last_device,
-							public_key: record[2],
-							listen_port: record[3],
-							fwmark: record[length(record) - 1],
-							random_trailers: has_awg31_fields ? record[27] : 'off',
-							disable_cookies: has_awg31_fields ? record[28] : 'off',
-							peers: []
-						};
+
+						if (!data[last_device])
+							data[last_device] = { name: last_device, peers: [] };
+
+						data[last_device].running = true;
+						data[last_device].public_key = record[2];
+						data[last_device].listen_port = record[3];
+						data[last_device].fwmark = record[length(record) - 1];
+						data[last_device].random_trailers = has_awg31_fields ? record[27] : 'off';
+						data[last_device].disable_cookies = has_awg31_fields ? record[28] : 'off';
+						data[last_device].peers = [];
 
 						if (!length(record[2]) || record[2] == '(none)')
 							qr_pubkey[last_device] = '';

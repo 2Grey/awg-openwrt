@@ -102,6 +102,10 @@
 	color: var(--awg-gray);
 }
 
+.awg-status-down {
+	color: var(--awg-gray);
+}
+
 .awg-interface-summary {
 	display: grid;
 	grid-template-columns: repeat(4, minmax(7rem, 1fr)) minmax(13rem, 1.5fr);

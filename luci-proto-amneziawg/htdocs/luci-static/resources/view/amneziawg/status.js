@@ -196,10 +196,16 @@ function renderHandshake(peer) {
 	]);
 }
 
-function renderPeerList(instanceName, peers) {
+function renderPeerList(instanceName, peers, running) {
+	if (!running)
+		return E('div', { 'class': 'awg-empty awg-empty-compact' }, [
+			E('strong', [ _('Interface is not running') ]),
+			E('span', [ _('Start the interface to see runtime peer information.') ])
+		]);
+
 	if (!peers.length)
 		return E('div', { 'class': 'awg-empty awg-empty-compact' }, [
-			E('strong', [ _('No peers connected') ]),
+			E('strong', [ _('No peers reported') ]),
 			E('span', [ _('Configured peers will appear here when the interface reports them.') ])
 		]);
 
@@ -248,7 +254,8 @@ function renderPeerList(instanceName, peers) {
 function renderInterface(instanceName, iface) {
 	var peers = Array.isArray(iface.peers) ? iface.peers : [],
 	    received = 0,
-	    transmitted = 0;
+	    transmitted = 0,
+	    running = iface.running === true;
 
 	peers.forEach(function(peer) {
 		received += +peer.transfer_rx || 0;
@@ -261,9 +268,11 @@ function renderInterface(instanceName, iface) {
 				E('img', { 'src': L.resource('icons', 'amneziawg.svg'), 'alt': '' }),
 				E('div', [
 					E('h3', [ instanceName ]),
-					E('span', { 'class': 'awg-status-pill awg-status-recent' }, [
+					E('span', {
+						'class': 'awg-status-pill ' + (running ? 'awg-status-recent' : 'awg-status-down')
+					}, [
 						E('span', { 'class': 'awg-status-dot', 'aria-hidden': 'true' }),
-						_('Interface is running')
+						running ? _('Interface is running') : _('Interface is not running')
 					])
 				])
 			]),
@@ -275,16 +284,16 @@ function renderInterface(instanceName, iface) {
 		]),
 		E('div', { 'class': 'awg-interface-summary' }, [
 			E('div', [ E('span', [ _('Listen Port') ]), E('strong', [ String(iface.listen_port || '—') ]) ]),
-			E('div', [ E('span', [ _('Peers') ]), E('strong', [ String(peers.length) ]) ]),
-			E('div', [ E('span', [ _('Received Data') ]), E('strong', [ formatBytes(received) ]) ]),
-			E('div', [ E('span', [ _('Transmitted Data') ]), E('strong', [ formatBytes(transmitted) ]) ]),
+			E('div', [ E('span', [ _('Peers') ]), E('strong', [ running ? String(peers.length) : '—' ]) ]),
+			E('div', [ E('span', [ _('Received Data') ]), E('strong', [ running ? formatBytes(received) : '—' ]) ]),
+			E('div', [ E('span', [ _('Transmitted Data') ]), E('strong', [ running ? formatBytes(transmitted) : '—' ]) ]),
 			E('div', { 'class': 'awg-summary-key' }, [
 				E('span', [ _('Public Key') ]),
-				E('strong', { 'title': iface.public_key || '' }, [ shortenKey(iface.public_key) ]),
+				E('strong', { 'title': iface.public_key || '' }, [ shortenKey(iface.public_key) || '—' ]),
 				copyButton(iface.public_key, _('Copy'))
 			])
 		]),
-		renderPeerList(instanceName, peers)
+		renderPeerList(instanceName, peers, running)
 	]);
 }
 
@@ -295,7 +304,7 @@ return view.extend({
 			E('div', { 'class': 'awg-page-heading' }, [
 				E('div', [
 					E('h2', [ _('AmneziaWG Status') ]),
-					E('p', [ _('Handshake and traffic information reported by running AmneziaWG interfaces.') ])
+					E('p', [ _('Configuration and runtime information for AmneziaWG interfaces.') ])
 				]),
 				E('span', { 'class': 'awg-interface-count' }, [ _('%d interface(s)').format(names.length) ])
 			])
