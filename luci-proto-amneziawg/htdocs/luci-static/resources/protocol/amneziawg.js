@@ -80,6 +80,46 @@ function validateUint32Range(section_id, value) {
 	return validateUnsignedIntegerRange(section_id, value, 4294967295);
 }
 
+function parseUnsignedIntegerRange(value) {
+	var match = String(value == null ? '' : value).match(/^(\d+)(?:-(\d+))?$/);
+
+	if (!match)
+		return null;
+
+	return {
+		lower: Number(match[1]),
+		upper: Number(match[2] || match[1])
+	};
+}
+
+function rangesOverlap(first, second) {
+	return first.lower <= second.upper && second.lower <= first.upper;
+}
+
+function usesStandardHeaderValues(config) {
+	var defaults = [ 1, 2, 3, 4 ];
+
+	for (var i = 0; i < defaults.length; i++) {
+		var value = config['interface_h' + (i + 1)],
+		    range = parseUnsignedIntegerRange(value == null || value === '' ? String(defaults[i]) : value);
+
+		if (!range || range.lower != defaults[i] || range.upper != defaults[i])
+			return false;
+	}
+
+	return true;
+}
+
+function validateUint16(section_id, value) {
+	if (value == null || value.length == 0)
+		return true;
+
+	if (!value.match(/^\d+$/) || !Number.isSafeInteger(Number(value)) || Number(value) > 65535)
+		return _('Expected an integer between 0 and 65535');
+
+	return true;
+}
+
 function validateAwgBoolean(section_id, value) {
 	if (value == null || value.length == 0)
 		return true;
@@ -267,6 +307,66 @@ return network.registerProtocol('amneziawg', {
 		var o, ss, ss2;
 		ensureStylesheet();
 
+		function formOrConfigValue(section_id, option, defaultValue) {
+			var value = s.formvalue(section_id, option);
+
+			if (value == null)
+				value = uci.get('network', section_id, option);
+
+			return (value == null || value === '') ? defaultValue : String(value);
+		}
+
+		function validateJunkSize(option) {
+			return function(section_id, value) {
+				var result = validateUint16(section_id, value);
+
+				if (result !== true)
+					return result;
+
+				var jmin = option == 'awg_jmin' ? value : formOrConfigValue(section_id, 'awg_jmin', ''),
+				    jmax = option == 'awg_jmax' ? value : formOrConfigValue(section_id, 'awg_jmax', '');
+
+				if (jmin !== '' && jmax !== '' && Number(jmin) > Number(jmax))
+					return _('Jmin must not be greater than Jmax');
+
+				return true;
+			};
+		}
+
+		function validateHeaderRange(option) {
+			var defaults = {
+				awg_h1: '1',
+				awg_h2: '2',
+				awg_h3: '3',
+				awg_h4: '4'
+			};
+
+			return function(section_id, value) {
+				var result = validateUint32Range(section_id, value),
+				    currentRange,
+				    options = Object.keys(defaults);
+
+				if (result !== true)
+					return result;
+
+				currentRange = parseUnsignedIntegerRange(value || defaults[option]);
+
+				for (var i = 0; i < options.length; i++) {
+					var other = options[i];
+
+					if (other == option)
+						continue;
+
+					var otherValue = formOrConfigValue(section_id, other, defaults[other]);
+					if (validateUint32Range(section_id, otherValue) === true &&
+					    rangesOverlap(currentRange, parseUnsignedIntegerRange(otherValue)))
+						return _('%s and %s ranges must not overlap').format(option.substring(4).toUpperCase(), other.substring(4).toUpperCase());
+				}
+
+				return true;
+			};
+		}
+
 		// -- general ---------------------------------------------------------------------
 
 		o = s.taboption('general', form.Value, 'private_key', _('Private Key'), _('Required. Base64-encoded private key for this interface.'));
@@ -343,15 +443,15 @@ return network.registerProtocol('amneziawg', {
         o.placeholder = '0';
         o.optional = true;
 
-        o = s.taboption('amneziawg', form.Value, 'awg_jmin', _('Jmin'), _('Junk packet minimum size.'));
-        o.datatype = 'uinteger';
-        o.placeholder = '0';
-        o.optional = true;
+		o = s.taboption('amneziawg', form.Value, 'awg_jmin', _('Jmin'), _('Junk packet minimum size.'));
+		o.validate = validateJunkSize('awg_jmin');
+		o.placeholder = '0';
+		o.optional = true;
 
-        o = s.taboption('amneziawg', form.Value, 'awg_jmax', _('Jmax'), _('Junk packet maximum size.'));
-        o.datatype = 'uinteger';
-        o.placeholder = '0';
-        o.optional = true;
+		o = s.taboption('amneziawg', form.Value, 'awg_jmax', _('Jmax'), _('Junk packet maximum size.'));
+		o.validate = validateJunkSize('awg_jmax');
+		o.placeholder = '0';
+		o.optional = true;
 
 		addSettingGroup(s, 'amneziawg', '_awg_group_padding', _('Packet padding'),
 			_('Junk header sizes for handshake, cookie reply and transport packets.'));
@@ -379,23 +479,23 @@ return network.registerProtocol('amneziawg', {
 		addSettingGroup(s, 'amneziawg', '_awg_group_headers', _('Packet type headers'),
 			_('Packet type values must match the configuration on the remote peer.'));
 
-        o = s.taboption('amneziawg', form.Value, 'awg_h1', _('H1'), _('Handshake initiation packet type header.'));
-		o.validate = validateUint32Range;
+		o = s.taboption('amneziawg', form.Value, 'awg_h1', _('H1'), _('Handshake initiation packet type header.'));
+		o.validate = validateHeaderRange('awg_h1');
         o.placeholder = '1';
         o.optional = true;
 
-        o = s.taboption('amneziawg', form.Value, 'awg_h2', _('H2'), _('Handshake response packet type header.'));
-		o.validate = validateUint32Range;
+		o = s.taboption('amneziawg', form.Value, 'awg_h2', _('H2'), _('Handshake response packet type header.'));
+		o.validate = validateHeaderRange('awg_h2');
         o.placeholder = '2';
         o.optional = true;
 
-        o = s.taboption('amneziawg', form.Value, 'awg_h3', _('H3'), _('Handshake cookie packet type header.'));
-		o.validate = validateUint32Range;
+		o = s.taboption('amneziawg', form.Value, 'awg_h3', _('H3'), _('Handshake cookie packet type header.'));
+		o.validate = validateHeaderRange('awg_h3');
         o.placeholder = '3';
         o.optional = true;
 
-        o = s.taboption('amneziawg', form.Value, 'awg_h4', _('H4'), _('Transport packet type header.'));
-		o.validate = validateUint32Range;
+		o = s.taboption('amneziawg', form.Value, 'awg_h4', _('H4'), _('Transport packet type header.'));
+		o.validate = validateHeaderRange('awg_h4');
 		o.placeholder = '4';
         o.optional = true;
 
@@ -423,7 +523,7 @@ return network.registerProtocol('amneziawg', {
         o.optional = true;
 
 		addSettingGroup(s, 'amneziawg', '_awg_group_protection', _('Header protection'),
-			_('AWG 3.x header protection settings. The key and S1-S4 values must match on both sides.'));
+			_('AWG 3.x header protection settings. The key and S1-S4 values must match on both sides. When header protection is enabled, the standard H1-H4 values 1, 2, 3 and 4 are recommended.'));
 
 		o = s.taboption('amneziawg', form.Value, 'awg_header_protection_key', _('Header Protection Key'), _('AWG 3.x. Base64 key used to protect packet headers. The same key is required on both sides; S1-S4 must each be at least 12.'));
 		o.password = true;
@@ -616,11 +716,35 @@ return network.registerProtocol('amneziawg', {
 						return _('Header protection requires S1, S2, S3 and S4 to be at least 12');
 			}
 
+			var junkSizeSettings = [ 'interface_jmin', 'interface_jmax' ];
+			for (var i = 0; i < junkSizeSettings.length; i++)
+				if (config[junkSizeSettings[i]] != null &&
+				    validateUint16(null, config[junkSizeSettings[i]]) !== true)
+					return _('Jmin and Jmax settings must be integers between 0 and 65535');
+
+			if (config.interface_jmin != null && config.interface_jmax != null &&
+			    Number(config.interface_jmin) > Number(config.interface_jmax))
+				return _('Jmin must not be greater than Jmax');
+
 			var uint32RangeSettings = [ 'interface_h1', 'interface_h2', 'interface_h3', 'interface_h4' ];
 			for (var i = 0; i < uint32RangeSettings.length; i++)
 				if (config[uint32RangeSettings[i]] != null &&
 				    validateUint32Range(null, config[uint32RangeSettings[i]]) !== true)
 					return _('H1-H4 settings must be valid 32-bit numbers or ranges');
+
+			var headerDefaults = [ '1', '2', '3', '4' ];
+			for (var i = 0; i < uint32RangeSettings.length; i++) {
+				var firstValue = config[uint32RangeSettings[i]] || headerDefaults[i],
+				    firstRange = parseUnsignedIntegerRange(firstValue);
+
+				for (var j = i + 1; j < uint32RangeSettings.length; j++) {
+					var secondValue = config[uint32RangeSettings[j]] || headerDefaults[j],
+					    secondRange = parseUnsignedIntegerRange(secondValue);
+
+					if (rangesOverlap(firstRange, secondRange))
+						return _('%s and %s ranges must not overlap').format('H' + (i + 1), 'H' + (j + 1));
+				}
+			}
 
 			var uint16RangeSettings = [
 				'interface_contentpaddingaddition',
@@ -693,6 +817,11 @@ return network.registerProtocol('amneziawg', {
 				error.style.display = 'block';
 				return;
 			}
+
+			if (mode == 'full' && config.interface_headerprotectionkey &&
+			    !usesStandardHeaderValues(config) &&
+			    !confirm(_('HeaderProtectionKey is set while H1-H4 use non-standard values. The standard values 1, 2, 3 and 4 are recommended with header protection. Import anyway?')))
+				return;
 
 			if (mode == 'full') {
 				var prv = s.formvalue(s.section, 'private_key');
