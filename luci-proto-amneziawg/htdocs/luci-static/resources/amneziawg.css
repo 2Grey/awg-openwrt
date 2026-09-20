@@ -10,6 +10,7 @@
 .awg-page-heading,
 .awg-interface-header,
 .awg-interface-title,
+.awg-interface-actions,
 .awg-copy-value,
 .awg-peer-traffic,
 .awg-peer-actions,
@@ -36,6 +37,19 @@
 
 .awg-page-heading p {
 	margin-top: .25rem;
+	color: var(--awg-muted);
+}
+
+.awg-page-meta {
+	display: flex;
+	align-items: flex-end;
+	flex-direction: column;
+	gap: .3rem;
+}
+
+.awg-last-updated {
+	white-space: nowrap;
+	font-size: .82em;
 	color: var(--awg-muted);
 }
 
@@ -72,6 +86,22 @@
 
 .awg-interface-title h3 {
 	margin-bottom: .3rem;
+}
+
+.awg-interface-title h3 a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.awg-interface-title h3 a:hover,
+.awg-interface-title h3 a:focus {
+	text-decoration: underline;
+}
+
+.awg-interface-actions {
+	justify-content: flex-end;
+	flex-wrap: wrap;
+	gap: .5rem;
 }
 
 .awg-status-pill {
@@ -400,6 +430,14 @@
 
 	.awg-interface-count {
 		align-self: flex-start;
+	}
+
+	.awg-page-meta {
+		align-items: flex-start;
+	}
+
+	.awg-interface-actions {
+		justify-content: flex-start;
 	}
 
 	.awg-interface-summary {

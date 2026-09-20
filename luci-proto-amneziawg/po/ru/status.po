@@ -110,6 +110,9 @@ msgstr "Запустите интерфейс, чтобы увидеть раб�
 msgid "Interface details"
 msgstr "Сведения об интерфейсе"
 
+msgid "Edit interface"
+msgstr "Редактировать интерфейс"
+
 msgid "Peers"
 msgstr "Узлы"
 
@@ -118,6 +121,9 @@ msgstr "Настройки и рабочее состояние интерфей
 
 msgid "%d interface(s)"
 msgstr "Интерфейсов: %d"
+
+msgid "Updated: %s"
+msgstr "Обновлено: %s"
 
 msgid "Create an AmneziaWG interface or start an existing one to see its status here."
 msgstr "Создайте интерфейс AmneziaWG или запустите существующий, чтобы увидеть здесь его состояние."

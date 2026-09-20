@@ -255,7 +255,8 @@ function renderInterface(instanceName, iface) {
 	var peers = Array.isArray(iface.peers) ? iface.peers : [],
 	    received = 0,
 	    transmitted = 0,
-	    running = iface.running === true;
+	    running = iface.running === true,
+	    editUrl = L.url('admin/network/network', instanceName);
 
 	peers.forEach(function(peer) {
 		received += +peer.transfer_rx || 0;
@@ -267,7 +268,12 @@ function renderInterface(instanceName, iface) {
 			E('div', { 'class': 'awg-interface-title' }, [
 				E('img', { 'src': L.resource('icons', 'amneziawg.svg'), 'alt': '' }),
 				E('div', [
-					E('h3', [ instanceName ]),
+					E('h3', [
+						E('a', {
+							'href': editUrl,
+							'title': _('Edit interface') + ': ' + instanceName
+						}, [ instanceName ])
+					]),
 					E('span', {
 						'class': 'awg-status-pill ' + (running ? 'awg-status-recent' : 'awg-status-down')
 					}, [
@@ -276,11 +282,17 @@ function renderInterface(instanceName, iface) {
 					])
 				])
 			]),
-			E('button', {
-				'class': 'btn cbi-button',
-				'type': 'button',
-				'click': function() { handleInterfaceDetails(iface); }
-			}, [ _('Interface details') ])
+			E('div', { 'class': 'awg-interface-actions' }, [
+				E('a', {
+					'class': 'btn cbi-button',
+					'href': editUrl
+				}, [ _('Edit interface') ]),
+				E('button', {
+					'class': 'btn cbi-button',
+					'type': 'button',
+					'click': function() { handleInterfaceDetails(iface); }
+				}, [ _('Interface details') ])
+			])
 		]),
 		E('div', { 'class': 'awg-interface-summary' }, [
 			E('div', [ E('span', [ _('Listen Port') ]), E('strong', [ String(iface.listen_port || '—') ]) ]),
@@ -300,13 +312,20 @@ function renderInterface(instanceName, iface) {
 return view.extend({
 	renderIfaces: function(ifaces) {
 		var names = Object.keys(ifaces || {}),
+		    updatedAt = new Date(),
 		    content = [
 			E('div', { 'class': 'awg-page-heading' }, [
 				E('div', [
 					E('h2', [ _('AmneziaWG Status') ]),
 					E('p', [ _('Configuration and runtime information for AmneziaWG interfaces.') ])
 				]),
-				E('span', { 'class': 'awg-interface-count' }, [ _('%d interface(s)').format(names.length) ])
+				E('div', { 'class': 'awg-page-meta' }, [
+					E('span', { 'class': 'awg-interface-count' }, [ _('%d interface(s)').format(names.length) ]),
+					E('span', {
+						'class': 'awg-last-updated',
+						'title': updatedAt.toLocaleString()
+					}, [ _('Updated: %s').format(updatedAt.toLocaleTimeString()) ])
+				])
 			])
 		];
 
