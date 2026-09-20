@@ -125,6 +125,21 @@ msgstr "Интерфейсов: %d"
 msgid "Updated: %s"
 msgstr "Обновлено: %s"
 
+msgid "Diagnostics"
+msgstr "Диагностика"
+
+msgid "AmneziaWG Diagnostics"
+msgstr "Диагностика AmneziaWG"
+
+msgid "The report excludes private keys, public keys and peer endpoints."
+msgstr "Отчёт не содержит закрытые и публичные ключи, а также адреса удалённых узлов."
+
+msgid "Copy report"
+msgstr "Копировать отчёт"
+
+msgid "Unable to load diagnostics."
+msgstr "Не удалось загрузить диагностические данные."
+
 msgid "Create an AmneziaWG interface or start an existing one to see its status here."
 msgstr "Создайте интерфейс AmneziaWG или запустите существующий, чтобы увидеть здесь его состояние."
 

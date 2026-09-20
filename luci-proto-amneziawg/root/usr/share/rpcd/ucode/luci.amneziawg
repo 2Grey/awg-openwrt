@@ -15,6 +15,15 @@ function command(cmd) {
 	return trim(popen(cmd)?.read?.('all'));
 }
 
+function packageVersion(name) {
+	const apk_version = command(`apk info ${shellquote(name)} 2>/dev/null | sed -n 's/^${name}-\\(.*\\) description:$/\\1/p' | head -n 1`);
+
+	if (length(apk_version))
+		return apk_version;
+
+	return command(`opkg status ${shellquote(name)} 2>/dev/null | awk '/^Status: / { installed = ($0 ~ / installed$/) } /^Version: / { version = substr($0, 10) } END { if (installed && version != "") print version }'`);
+}
+
 function checkPeerHost(configHost, configPort, wgHost) {
 	const ips = popen(`resolveip ${shellquote(configHost)} 2>/dev/null`);
 	const hostIp = replace(wgHost, /\[|\]/g, "");
@@ -54,6 +63,25 @@ const methods = {
 			const pub = command(`echo ${shellquote(priv)} | awg pubkey 2>/dev/null`);
 
 			return { keys: { priv, pub } };
+		}
+	},
+
+	getDiagnostics: {
+		call: function() {
+			return {
+				openwrt: command("ubus -S call system board 2>/dev/null | jsonfilter -e '@.release.description' 2>/dev/null"),
+				model: command("ubus -S call system board 2>/dev/null | jsonfilter -e '@.model' 2>/dev/null"),
+				target: command("ubus -S call system board 2>/dev/null | jsonfilter -e '@.release.target' 2>/dev/null"),
+				kernel: command('uname -r 2>/dev/null'),
+				module_loaded: command("test -d /sys/module/amneziawg && echo yes || echo no"),
+				module_version: command("cat /sys/module/amneziawg/version 2>/dev/null || dmesg 2>/dev/null | sed -n 's/.*amneziawg: AmneziaWG \\([^[:space:]]*\\) loaded\\..*/\\1/p' | tail -n 1"),
+				awg_version: command('awg --version 2>/dev/null'),
+				packages: {
+					kmod: packageVersion('kmod-amneziawg'),
+					tools: packageVersion('amneziawg-tools'),
+					luci: packageVersion('luci-proto-amneziawg')
+				}
+			};
 		}
 	},
 

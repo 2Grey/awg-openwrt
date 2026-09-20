@@ -47,6 +47,14 @@
 	gap: .3rem;
 }
 
+.awg-page-meta-actions {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	gap: .5rem;
+}
+
 .awg-last-updated {
 	white-space: nowrap;
 	font-size: .82em;
@@ -303,6 +311,25 @@
 	margin: .4rem 0;
 }
 
+.awg-diagnostics-report {
+	box-sizing: border-box;
+	width: 100%;
+	max-height: 60vh;
+	padding: 1rem;
+	overflow: auto;
+	white-space: pre-wrap;
+	word-break: break-word;
+	background: var(--awg-surface);
+	border: 1px solid var(--awg-border);
+	border-radius: .4rem;
+}
+
+.awg-diagnostics-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: .5rem;
+}
+
 .awg-setting-group {
 	margin: 1rem 0 .25rem;
 	padding: .75rem 1rem;
@@ -434,6 +461,10 @@
 
 	.awg-page-meta {
 		align-items: flex-start;
+	}
+
+	.awg-page-meta-actions {
+		justify-content: flex-start;
 	}
 
 	.awg-interface-actions {

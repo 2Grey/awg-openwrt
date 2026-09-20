@@ -11,6 +11,11 @@ var callGetAwgInstances = rpc.declare({
 	method: 'getAwgInstances'
 });
 
+var callGetDiagnostics = rpc.declare({
+	object: 'luci.amneziawg',
+	method: 'getDiagnostics'
+});
+
 function ensureStylesheet() {
 	if (document.querySelector('link[data-amneziawg-styles]'))
 		return;
@@ -126,6 +131,92 @@ function copyButton(value, label) {
 			});
 		}
 	}, [ label || _('Copy') ]);
+}
+
+function diagnosticValue(value, fallback) {
+	value = String(value || '').trim();
+	return value || fallback;
+}
+
+function packageVersion(name, value) {
+	value = diagnosticValue(value, 'not installed');
+
+	return value.indexOf(name + '-') == 0 ? value.substring(name.length + 1) : value;
+}
+
+function buildDiagnosticReport(info, ifaces) {
+	info = info || {};
+	ifaces = ifaces || {};
+
+	var packages = info.packages || {},
+	    names = Object.keys(ifaces),
+	    lines = [
+		'AmneziaWG diagnostics',
+		'Generated: ' + new Date().toISOString(),
+		'',
+		'System:',
+		'  OpenWrt: ' + diagnosticValue(info.openwrt, 'unknown'),
+		'  Model: ' + diagnosticValue(info.model, 'unknown'),
+		'  Target: ' + diagnosticValue(info.target, 'unknown'),
+		'  Kernel: ' + diagnosticValue(info.kernel, 'unknown'),
+		'',
+		'Components:',
+		'  kmod-amneziawg: ' + packageVersion('kmod-amneziawg', packages.kmod),
+		'  amneziawg-tools: ' + packageVersion('amneziawg-tools', packages.tools),
+		'  luci-proto-amneziawg: ' + packageVersion('luci-proto-amneziawg', packages.luci),
+		'  Loaded module: ' + (info.module_loaded == 'yes' ? diagnosticValue(info.module_version, 'unknown') : 'not loaded'),
+		'  awg: ' + diagnosticValue(info.awg_version, 'unavailable'),
+		'',
+		'Interfaces: ' + names.length
+	];
+
+	if (!names.length)
+		lines.push('  none');
+
+	names.forEach(function(name) {
+		var iface = ifaces[name] || {},
+		    peers = Array.isArray(iface.peers) ? iface.peers : [];
+
+		lines.push('  ' + name + ': ' + (iface.running === true ? 'running' : 'not running'));
+		lines.push('    Runtime peers: ' + (iface.running === true ? peers.length : 'unavailable'));
+
+		if (iface.running === true) {
+			lines.push('    RandomTrailers: ' + diagnosticValue(iface.random_trailers, 'off'));
+			lines.push('    DisableCookies: ' + diagnosticValue(iface.disable_cookies, 'off'));
+
+			peers.forEach(function(peer, index) {
+				var handshake = +peer.latest_handshake;
+
+				lines.push('    Peer ' + (index + 1) + ': handshake=' +
+					(handshake > 0 ? new Date(handshake * 1000).toISOString() : 'never') +
+					', rx=' + (+peer.transfer_rx || 0) +
+					', tx=' + (+peer.transfer_tx || 0));
+			});
+		}
+	});
+
+	return lines.join('\n');
+}
+
+function handleDiagnostics(ifaces) {
+	return callGetDiagnostics().then(function(info) {
+		var report = buildDiagnosticReport(info, ifaces);
+
+		ui.showModal(_('AmneziaWG Diagnostics'), [
+			E('p', [ _('The report excludes private keys, public keys and peer endpoints.') ]),
+			E('pre', { 'class': 'awg-diagnostics-report' }, [ report ]),
+			E('div', { 'class': 'right awg-diagnostics-actions' }, [
+				copyButton(report, _('Copy report')),
+				E('button', {
+					'class': 'btn cbi-button',
+					'type': 'button',
+					'click': ui.hideModal
+				}, [ _('Dismiss') ])
+			])
+		]);
+	}, function() {
+		ui.addNotification(null, E('p', [ _('Unable to load diagnostics.') ]), 'error');
+	});
 }
 
 function handleInterfaceDetails(iface) {
@@ -320,7 +411,14 @@ return view.extend({
 					E('p', [ _('Configuration and runtime information for AmneziaWG interfaces.') ])
 				]),
 				E('div', { 'class': 'awg-page-meta' }, [
-					E('span', { 'class': 'awg-interface-count' }, [ _('%d interface(s)').format(names.length) ]),
+					E('div', { 'class': 'awg-page-meta-actions' }, [
+						E('span', { 'class': 'awg-interface-count' }, [ _('%d interface(s)').format(names.length) ]),
+						E('button', {
+							'class': 'btn cbi-button',
+							'type': 'button',
+							'click': function() { return handleDiagnostics(ifaces); }
+						}, [ _('Diagnostics') ])
+					]),
 					E('span', {
 						'class': 'awg-last-updated',
 						'title': updatedAt.toLocaleString()
