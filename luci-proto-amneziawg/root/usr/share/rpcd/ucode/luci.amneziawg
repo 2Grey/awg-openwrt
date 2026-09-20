@@ -130,7 +130,7 @@ const methods = {
 							persistent_keepalive: record[8]
 						};
 
-						if (record[3] != '(none)' && length(record[4]))
+						if (length(record[4]) && record[4] != '(none)')
 							push(peer.allowed_ips, ...split(record[4], ','));
 
 						push(data[last_device].peers, peer);
