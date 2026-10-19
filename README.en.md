@@ -7,7 +7,7 @@ English | [Russian](README.md)
 ![AmneziaWG3.1](https://img.shields.io/badge/AmneziaWG-3.1-red)
 
 ![OpenWrt 24](https://img.shields.io/badge/OpenWrt-24.10.0_~_24.10.8-blue)
-![OpenWrt 25](https://img.shields.io/badge/OpenWrt-25.12.0_~_25.12.5-teal)
+![OpenWrt 25](https://img.shields.io/badge/OpenWrt-25.12.0_~_25.12.6-teal)
 
 [![AmneziaWG OpenWrt Feed](https://img.shields.io/badge/AmneziaWG-OpenWrt_Feed-yellow?style=for-the-badge&logo=openwrt)](https://2grey.github.io/awg-openwrt)
 
@@ -132,6 +132,7 @@ Open the release page for your OpenWrt version and use your browser's page searc
 
 #### Supported OpenWrt versions
 
+1. [25.12.6](https://github.com/2Grey/awg-openwrt/releases/tag/v25.12.6) – AWG-3.1
 1. [25.12.5](https://github.com/2Grey/awg-openwrt/releases/tag/v25.12.5) – AWG-3.1
 2. [25.12.4](https://github.com/2Grey/awg-openwrt/releases/tag/v25.12.4) – AWG-3.1
 3. [25.12.3](https://github.com/2Grey/awg-openwrt/releases/tag/v25.12.3) – AWG-3.1
