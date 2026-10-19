@@ -1,0 +1,8 @@
+{
+  "version": "25.12.6",
+  "target": "ixp4xx",
+  "subtarget": "generic",
+  "pkgarch": "armeb_xscale",
+  "format": "apk",
+  "feed": "awg"
+}

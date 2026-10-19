@@ -1,0 +1,8 @@
+{
+  "version": "25.12.6",
+  "target": "lantiq",
+  "subtarget": "xrx200_legacy",
+  "pkgarch": "mips_24kc",
+  "format": "apk",
+  "feed": "awg"
+}
