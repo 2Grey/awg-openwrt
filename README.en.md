@@ -65,7 +65,13 @@ This repository also publishes a full-featured [OpenWrt package feed](https://2g
 
 If you only need to install the packages, use the `amneziawg-install` script. It automatically downloads the packages for your device from this repository and also offers to configure an interface using the AmneziaWG protocol.
 
-If you accept, enter the configuration parameters requested by the script. The script creates the interface, configures its firewall rules, and enables routing for the addresses in `AllowedIPs`. By default, this routes all IPv4 and IPv6 traffic through the tunnel by enabling **Route Allowed IPs** in the peer settings.
+If another `awg-openwrt` feed is configured (including one for an older OpenWrt
+version), the script shows its URL and offers to abort installation, overwrite
+the feed with the current 2Grey URL and install its signing key, or continue
+without changes. Installation is aborted by default. If you continue, all
+configured feeds undergo the usual availability check.
+
+If you agree to configure an interface, enter the configuration parameters requested by the script. The script creates the interface, configures its firewall rules, and enables routing for the addresses in `AllowedIPs`. By default, this routes all IPv4 and IPv6 traffic through the tunnel by enabling **Route Allowed IPs** in the peer settings.
 
 To run the script, connect to the router via SSH, enter the following command, and follow the on-screen instructions:
 

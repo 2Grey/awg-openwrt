@@ -10,11 +10,11 @@ AWG_VERSION="1.0"
 AWG_PROFILE="auto"
 CONFIG_FILE=""
 INTERFACE_NAME="awg1"
-LEGACY_FEED_PATTERN="slava-shchipunov.github.io/awg-openwrt"
-LEGACY_FEED_SED_PATTERN="slava-shchipunov\.github\.io/awg-openwrt"
+AWG_FEED_ROOT="https://2grey.github.io/awg-openwrt"
 
 APK_REPOSITORIES_FILE=${APK_REPOSITORIES_FILE:-/etc/apk/repositories}
 APK_REPOSITORIES_DIR=${APK_REPOSITORIES_DIR:-/etc/apk/repositories.d}
+APK_KEY_DIR=${APK_KEY_DIR:-/etc/apk/keys}
 OPKG_FEED_CONFIG=${OPKG_FEED_CONFIG:-/etc/opkg/customfeeds.conf}
 LUCI_PROTOCOL_FILE=${LUCI_PROTOCOL_FILE:-/www/luci-static/resources/protocol/amneziawg.js}
 
@@ -145,33 +145,130 @@ remove_pkg() {
     esac
 }
 
-remove_legacy_feed_from_file() {
-    LEGACY_CONFIG_FILE=$1
-    [ -f "$LEGACY_CONFIG_FILE" ] || return 0
-    grep -F -q "$LEGACY_FEED_PATTERN" "$LEGACY_CONFIG_FILE" 2>/dev/null || return 0
-
-    if [ "${LEGACY_FEED_NOTICE_SHOWN:-0}" -eq 0 ]; then
-        print_info "Legacy awg-openwrt feed detected. It will be removed to avoid package and signing-key conflicts:"
-        LEGACY_FEED_NOTICE_SHOWN=1
-    fi
-    printf '  %s\n' "$LEGACY_CONFIG_FILE"
-    LEGACY_TEMP_FILE="${LEGACY_CONFIG_FILE}.awg-migrate.$$"
-    if ! sed "\\|$LEGACY_FEED_SED_PATTERN|d" "$LEGACY_CONFIG_FILE" > "$LEGACY_TEMP_FILE" ||
-        ! cat "$LEGACY_TEMP_FILE" > "$LEGACY_CONFIG_FILE"; then
-        rm -f "$LEGACY_TEMP_FILE"
-        die "Unable to remove the legacy feed from $LEGACY_CONFIG_FILE."
-    fi
-    rm -f "$LEGACY_TEMP_FILE"
+# Report or replace active awg-openwrt URLs, preserving unrelated entries.
+process_awg_feed_file() {
+    awk -v mode="$1" -v manager="$PKG_MANAGER" -v wanted="$AWG_FEED_URL" '
+        {
+            url = ""
+            if ($0 !~ /^[[:space:]]*#/) {
+                if (manager == "opkg" && $1 ~ /^src(\/gz)?$/) {
+                    url = $3
+                } else if (manager == "apk") {
+                    for (i = 1; i <= NF; i++) {
+                        if ($i ~ /^#/) break
+                        if ($i ~ /^https?:\/\//) { url = $i; break }
+                    }
+                }
+            }
+            normalized = url
+            sub(/\/+$/, "", normalized)
+            if (url ~ /^https?:\/\// && url ~ /\/awg-openwrt([\/?#]|$)/ && normalized != wanted) {
+                if (mode == "report") {
+                    printf "В системе найден другой feed %s (%s:%d).\n", url, FILENAME, FNR
+                } else {
+                    start = index($0, url)
+                    $0 = substr($0, 1, start - 1) wanted substr($0, start + length(url))
+                    if (manager == "opkg") sub(/^[[:space:]]*src[[:space:]]+/, "src/gz ")
+                }
+            }
+            if (mode == "rewrite") print
+        }
+    ' "$2"
 }
 
-remove_legacy_feeds() {
-    LEGACY_FEED_NOTICE_SHOWN=0
-
-    remove_legacy_feed_from_file "$OPKG_FEED_CONFIG"
-    remove_legacy_feed_from_file "$APK_REPOSITORIES_FILE"
-    for LEGACY_CONFIG_FILE in "$APK_REPOSITORIES_DIR"/*.list; do
-        remove_legacy_feed_from_file "$LEGACY_CONFIG_FILE"
+report_conflicting_awg_feeds() {
+    for AWG_FEED_CONFIG_FILE in "$@"; do
+        [ -f "$AWG_FEED_CONFIG_FILE" ] || continue
+        process_awg_feed_file report "$AWG_FEED_CONFIG_FILE" || return 1
     done
+    return 0
+}
+
+detect_current_awg_feed() {
+    AWG_FEED_BOARD=$(ubus call system board) || die "Unable to detect the OpenWrt release."
+    AWG_FEED_VERSION=$(printf '%s\n' "$AWG_FEED_BOARD" | jsonfilter -e '@.release.version')
+    AWG_FEED_TARGET=$(printf '%s\n' "$AWG_FEED_BOARD" | jsonfilter -e '@.release.target')
+    case "$AWG_FEED_VERSION" in
+        '' | *[!0-9A-Za-z._-]*) die "Invalid OpenWrt version: $AWG_FEED_VERSION" ;;
+    esac
+    case "$AWG_FEED_TARGET" in
+        '' | /* | */ | */*/* | *[!0-9A-Za-z_/-]*) die "Invalid OpenWrt target: $AWG_FEED_TARGET" ;;
+        */*) ;;
+        *) die "Invalid OpenWrt target: $AWG_FEED_TARGET" ;;
+    esac
+    AWG_FEED_URL="$AWG_FEED_ROOT/$AWG_FEED_VERSION/$AWG_FEED_TARGET"
+    [ "$PKG_MANAGER" != "apk" ] || AWG_FEED_URL="$AWG_FEED_URL/packages.adb"
+}
+
+install_awg_feed_key() {
+    AWG_DIR=$(mktemp -d /tmp/amneziawg.XXXXXX) || die "Unable to create a temporary key directory."
+    case "$PKG_MANAGER" in
+        apk)
+            wget -O "$AWG_DIR/feed.pem" "$AWG_FEED_ROOT/keys/awg-openwrt-feed.pem" &&
+                [ -s "$AWG_DIR/feed.pem" ] &&
+                mkdir -p "$APK_KEY_DIR" &&
+                cp "$AWG_DIR/feed.pem" "$APK_KEY_DIR/awg-openwrt-feed.pem" ||
+                die "Unable to install the feed signing key; feed URLs were not changed."
+            ;;
+        opkg)
+            command -v opkg-key >/dev/null 2>&1 || die "opkg-key is required to replace the feed."
+            wget -O "$AWG_DIR/feed.pub" "$AWG_FEED_ROOT/keys/awg-openwrt-feed.pub" &&
+                [ -s "$AWG_DIR/feed.pub" ] &&
+                opkg-key add "$AWG_DIR/feed.pub" ||
+                die "Unable to install the feed signing key; feed URLs were not changed."
+            ;;
+    esac
+    cleanup_downloads
+}
+
+check_existing_awg_feeds() {
+    case "$PKG_MANAGER" in
+        apk) set -- "$APK_REPOSITORIES_FILE" "$APK_REPOSITORIES_DIR"/*.list ;;
+        opkg)
+            # Include the override even when its filename does not end in .conf.
+            set -- /etc/opkg.conf "$OPKG_FEED_CONFIG"
+            for AWG_FEED_CONFIG_FILE in "${OPKG_FEED_CONFIG%/*}"/*.conf; do
+                [ "$AWG_FEED_CONFIG_FILE" = "$OPKG_FEED_CONFIG" ] || set -- "$@" "$AWG_FEED_CONFIG_FILE"
+            done
+            ;;
+        *) die "Unsupported package manager: $PKG_MANAGER" ;;
+    esac
+
+    AWG_FEED_URL=""
+    AWG_FEED_CONFLICTS=$(report_conflicting_awg_feeds "$@") || die "Unable to read configured feeds."
+    [ -n "$AWG_FEED_CONFLICTS" ] || return 0
+    detect_current_awg_feed
+    AWG_FEED_CONFLICTS=$(report_conflicting_awg_feeds "$@") || die "Unable to read configured feeds."
+    [ -n "$AWG_FEED_CONFLICTS" ] || return 0
+
+    print_info "$AWG_FEED_CONFLICTS"
+    printf 'Актуальный feed: %s\n' "$AWG_FEED_URL"
+    while :; do
+        printf '1) Прервать установку\n2) Перезаписать feed\n3) Продолжить установку\nВыберите действие [1]: '
+        IFS= read -r AWG_FEED_CHOICE || die "Установка прервана: не выбран способ обработки feed."
+        case "$AWG_FEED_CHOICE" in
+            '' | 1) die "Установка прервана." ;;
+            2) break ;;
+            3) return 0 ;;
+            *) printf 'Выберите 1, 2 или 3.\n' ;;
+        esac
+    done
+
+    install_awg_feed_key
+    for AWG_FEED_CONFIG_FILE in "$@"; do
+        [ -f "$AWG_FEED_CONFIG_FILE" ] || continue
+        AWG_FEED_CONFLICTS=$(process_awg_feed_file report "$AWG_FEED_CONFIG_FILE") || die "Unable to read $AWG_FEED_CONFIG_FILE."
+        [ -n "$AWG_FEED_CONFLICTS" ] || continue
+        AWG_FEED_TEMP=$(mktemp "${AWG_FEED_CONFIG_FILE}.awg.XXXXXX") || die "Unable to prepare $AWG_FEED_CONFIG_FILE."
+        if ! cp -p "$AWG_FEED_CONFIG_FILE" "$AWG_FEED_TEMP" ||
+            ! process_awg_feed_file rewrite "$AWG_FEED_CONFIG_FILE" > "$AWG_FEED_TEMP" ||
+            ! cat "$AWG_FEED_TEMP" > "$AWG_FEED_CONFIG_FILE"; then
+            rm -f "$AWG_FEED_TEMP"
+            die "Unable to replace feed in $AWG_FEED_CONFIG_FILE."
+        fi
+        rm -f "$AWG_FEED_TEMP"
+    done
+    print_info "Feed перезаписан: $AWG_FEED_URL"
 }
 
 remove_conflicting_luci_package() {
@@ -259,17 +356,44 @@ download_package() {
     return 1
 }
 
-# The OpenWrt repository must be available for kmod-amneziawg dependencies.
+# Refresh configured feeds before installing kmod-amneziawg dependencies.
 check_repo() {
-    print_info "Checking OpenWrt repo availability..."
+    print_info "Checking configured package feeds..."
 
-    if ! REPO_UPDATE_OUTPUT=$(pkg_update 2>&1); then
-        die "${PKG_MANAGER} failed. Check internet or date. Command for force ntp sync: ntpd -p ptbtime1.ptb.de"
+    # Capture the command status before printing or inspecting its output.
+    REPO_UPDATE_STATUS=0
+    REPO_UPDATE_OUTPUT=$(pkg_update 2>&1) || REPO_UPDATE_STATUS=$?
+    if [ -n "$REPO_UPDATE_OUTPUT" ]; then
+        printf '%s\n' "$REPO_UPDATE_OUTPUT"
+    fi
+    printf '%s update exit code: %s\n' "$PKG_MANAGER" "$REPO_UPDATE_STATUS"
+
+    # Some opkg failures (notably signature checks) can return success.
+    if [ "$REPO_UPDATE_STATUS" -eq 0 ] &&
+        ! printf '%s\n' "$REPO_UPDATE_OUTPUT" | grep -Eiq \
+            'Failed to download|Signature (check|file download) failed|^[[:space:]]*ERROR:|^[[:space:]]*WARNING: (updating|opening|fetching) |(^|[[:space:],;])[1-9][0-9]* (unavailable|stale)([[:space:],;]|$)'; then
+        return 0
     fi
 
-    if printf '%s\n' "$REPO_UPDATE_OUTPUT" | grep -q 'Failed to download'; then
-        die "${PKG_MANAGER} failed. Check internet or date. Command for force ntp sync: ntpd -p ptbtime1.ptb.de"
-    fi
+    print_error "Unable to refresh all configured feeds. Review the URLs and errors above; a custom feed may fail while the OpenWrt feeds remain reachable."
+    print_error "Configured feeds (file:line: entry):"
+    case "$PKG_MANAGER" in
+        apk)
+            set -- "$APK_REPOSITORIES_FILE" "$APK_REPOSITORIES_DIR"/*.list
+            ;;
+        opkg)
+            set -- /etc/opkg.conf "${OPKG_FEED_CONFIG%/*}"/*.conf
+            ;;
+    esac
+    for REPO_CONFIG_FILE in "$@"; do
+        [ -r "$REPO_CONFIG_FILE" ] || continue
+        awk -v manager="$PKG_MANAGER" '
+            /^[[:space:]]*($|#)/ { next }
+            manager == "opkg" && $1 !~ /^src(\/gz)?$/ { next }
+            { printf "%s:%d: %s\n", FILENAME, FNR, $0 }
+        ' "$REPO_CONFIG_FILE" >&2
+    done
+    die "Feed configuration was not changed by this check. After an OpenWrt upgrade, check feed URLs for the current release and architecture. For other errors, check DNS/network access, TLS/system date, signing keys, and free space as indicated above."
 }
 
 detect_base_awg_version() {
@@ -610,7 +734,7 @@ prepare_awg_packages() {
         return
     fi
 
-    remove_legacy_feeds
+    check_existing_awg_feeds
     check_repo
     install_awg_packages
 }
