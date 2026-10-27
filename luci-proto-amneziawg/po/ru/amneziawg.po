@@ -111,6 +111,15 @@ msgstr "Ожидается число или возрастающий диапа
 msgid "Range values must be between 0 and %d"
 msgstr "Значения диапазона должны находиться между 0 и %d"
 
+msgid "Expected an integer between 0 and 65535"
+msgstr "Ожидается целое число от 0 до 65535"
+
+msgid "Jmin must not be greater than Jmax"
+msgstr "Jmin не должен быть больше Jmax"
+
+msgid "%s and %s ranges must not overlap"
+msgstr "Диапазоны %s и %s не должны пересекаться"
+
 msgid "Header Protection Key"
 msgstr "Ключ защиты заголовка"
 
@@ -167,6 +176,12 @@ msgstr "Параметр HeaderProtectionKey недействителен"
 
 msgid "H1-H4 settings must be valid 32-bit numbers or ranges"
 msgstr "Параметры H1-H4 должны быть допустимыми 32-битными числами или диапазонами"
+
+msgid "Jmin and Jmax settings must be integers between 0 and 65535"
+msgstr "Параметры Jmin и Jmax должны быть целыми числами от 0 до 65535"
+
+msgid "HeaderProtectionKey is set while H1-H4 use non-standard values. The standard values 1, 2, 3 and 4 are recommended with header protection. Import anyway?"
+msgstr "Параметр HeaderProtectionKey задан, но H1-H4 используют нестандартные значения. Для защиты заголовков рекомендуются стандартные значения 1, 2, 3 и 4. Всё равно импортировать?"
 
 msgid "AWG 3.x timing and padding settings must be valid 16-bit numbers or ranges"
 msgstr "Параметры таймеров и заполнения AWG 3.x должны быть допустимыми 16-битными числами или диапазонами"
@@ -271,8 +286,8 @@ msgstr "Необязательные сигнатуры специальных �
 msgid "Header protection"
 msgstr "Защита заголовков"
 
-msgid "AWG 3.x header protection settings. The key and S1-S4 values must match on both sides."
-msgstr "Настройки защиты заголовков AWG 3.x. Ключ и значения S1-S4 должны совпадать на обеих сторонах."
+msgid "AWG 3.x header protection settings. The key and S1-S4 values must match on both sides. When header protection is enabled, the standard H1-H4 values 1, 2, 3 and 4 are recommended."
+msgstr "Настройки защиты заголовков AWG 3.x. Ключ и значения S1-S4 должны совпадать на обеих сторонах. При включённой защите заголовков рекомендуются стандартные значения H1-H4: 1, 2, 3 и 4."
 
 msgid "Handshake timing"
 msgstr "Таймеры рукопожатия"

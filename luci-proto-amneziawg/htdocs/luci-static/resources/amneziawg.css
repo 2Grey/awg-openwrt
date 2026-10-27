@@ -10,6 +10,7 @@
 .awg-page-heading,
 .awg-interface-header,
 .awg-interface-title,
+.awg-interface-actions,
 .awg-copy-value,
 .awg-peer-traffic,
 .awg-peer-actions,
@@ -36,6 +37,27 @@
 
 .awg-page-heading p {
 	margin-top: .25rem;
+	color: var(--awg-muted);
+}
+
+.awg-page-meta {
+	display: flex;
+	align-items: flex-end;
+	flex-direction: column;
+	gap: .3rem;
+}
+
+.awg-page-meta-actions {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+	gap: .5rem;
+}
+
+.awg-last-updated {
+	white-space: nowrap;
+	font-size: .82em;
 	color: var(--awg-muted);
 }
 
@@ -74,6 +96,22 @@
 	margin-bottom: .3rem;
 }
 
+.awg-interface-title h3 a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.awg-interface-title h3 a:hover,
+.awg-interface-title h3 a:focus {
+	text-decoration: underline;
+}
+
+.awg-interface-actions {
+	justify-content: flex-end;
+	flex-wrap: wrap;
+	gap: .5rem;
+}
+
 .awg-status-pill {
 	display: inline-flex;
 	align-items: center;
@@ -99,6 +137,10 @@
 }
 
 .awg-status-never {
+	color: var(--awg-gray);
+}
+
+.awg-status-down {
 	color: var(--awg-gray);
 }
 
@@ -269,6 +311,25 @@
 	margin: .4rem 0;
 }
 
+.awg-diagnostics-report {
+	box-sizing: border-box;
+	width: 100%;
+	max-height: 60vh;
+	padding: 1rem;
+	overflow: auto;
+	white-space: pre-wrap;
+	word-break: break-word;
+	background: var(--awg-surface);
+	border: 1px solid var(--awg-border);
+	border-radius: .4rem;
+}
+
+.awg-diagnostics-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: .5rem;
+}
+
 .awg-setting-group {
 	margin: 1rem 0 .25rem;
 	padding: .75rem 1rem;
@@ -396,6 +457,18 @@
 
 	.awg-interface-count {
 		align-self: flex-start;
+	}
+
+	.awg-page-meta {
+		align-items: flex-start;
+	}
+
+	.awg-page-meta-actions {
+		justify-content: flex-start;
+	}
+
+	.awg-interface-actions {
+		justify-content: flex-start;
 	}
 
 	.awg-interface-summary {

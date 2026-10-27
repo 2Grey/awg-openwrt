@@ -11,6 +11,11 @@ var callGetAwgInstances = rpc.declare({
 	method: 'getAwgInstances'
 });
 
+var callGetDiagnostics = rpc.declare({
+	object: 'luci.amneziawg',
+	method: 'getDiagnostics'
+});
+
 function ensureStylesheet() {
 	if (document.querySelector('link[data-amneziawg-styles]'))
 		return;
@@ -128,6 +133,92 @@ function copyButton(value, label) {
 	}, [ label || _('Copy') ]);
 }
 
+function diagnosticValue(value, fallback) {
+	value = String(value || '').trim();
+	return value || fallback;
+}
+
+function packageVersion(name, value) {
+	value = diagnosticValue(value, 'not installed');
+
+	return value.indexOf(name + '-') == 0 ? value.substring(name.length + 1) : value;
+}
+
+function buildDiagnosticReport(info, ifaces) {
+	info = info || {};
+	ifaces = ifaces || {};
+
+	var packages = info.packages || {},
+	    names = Object.keys(ifaces),
+	    lines = [
+		'AmneziaWG diagnostics',
+		'Generated: ' + new Date().toISOString(),
+		'',
+		'System:',
+		'  OpenWrt: ' + diagnosticValue(info.openwrt, 'unknown'),
+		'  Model: ' + diagnosticValue(info.model, 'unknown'),
+		'  Target: ' + diagnosticValue(info.target, 'unknown'),
+		'  Kernel: ' + diagnosticValue(info.kernel, 'unknown'),
+		'',
+		'Components:',
+		'  kmod-amneziawg: ' + packageVersion('kmod-amneziawg', packages.kmod),
+		'  amneziawg-tools: ' + packageVersion('amneziawg-tools', packages.tools),
+		'  luci-proto-amneziawg: ' + packageVersion('luci-proto-amneziawg', packages.luci),
+		'  Loaded module: ' + (info.module_loaded == 'yes' ? diagnosticValue(info.module_version, 'unknown') : 'not loaded'),
+		'  awg: ' + diagnosticValue(info.awg_version, 'unavailable'),
+		'',
+		'Interfaces: ' + names.length
+	];
+
+	if (!names.length)
+		lines.push('  none');
+
+	names.forEach(function(name) {
+		var iface = ifaces[name] || {},
+		    peers = Array.isArray(iface.peers) ? iface.peers : [];
+
+		lines.push('  ' + name + ': ' + (iface.running === true ? 'running' : 'not running'));
+		lines.push('    Runtime peers: ' + (iface.running === true ? peers.length : 'unavailable'));
+
+		if (iface.running === true) {
+			lines.push('    RandomTrailers: ' + diagnosticValue(iface.random_trailers, 'off'));
+			lines.push('    DisableCookies: ' + diagnosticValue(iface.disable_cookies, 'off'));
+
+			peers.forEach(function(peer, index) {
+				var handshake = +peer.latest_handshake;
+
+				lines.push('    Peer ' + (index + 1) + ': handshake=' +
+					(handshake > 0 ? new Date(handshake * 1000).toISOString() : 'never') +
+					', rx=' + (+peer.transfer_rx || 0) +
+					', tx=' + (+peer.transfer_tx || 0));
+			});
+		}
+	});
+
+	return lines.join('\n');
+}
+
+function handleDiagnostics(ifaces) {
+	return callGetDiagnostics().then(function(info) {
+		var report = buildDiagnosticReport(info, ifaces);
+
+		ui.showModal(_('AmneziaWG Diagnostics'), [
+			E('p', [ _('The report excludes private keys, public keys and peer endpoints.') ]),
+			E('pre', { 'class': 'awg-diagnostics-report' }, [ report ]),
+			E('div', { 'class': 'right awg-diagnostics-actions' }, [
+				copyButton(report, _('Copy report')),
+				E('button', {
+					'class': 'btn cbi-button',
+					'type': 'button',
+					'click': ui.hideModal
+				}, [ _('Dismiss') ])
+			])
+		]);
+	}, function() {
+		ui.addNotification(null, E('p', [ _('Unable to load diagnostics.') ]), 'error');
+	});
+}
+
 function handleInterfaceDetails(iface) {
 	ui.showModal(_('Instance Details'), [
 		ui.itemlist(E([]), [
@@ -196,10 +287,16 @@ function renderHandshake(peer) {
 	]);
 }
 
-function renderPeerList(instanceName, peers) {
+function renderPeerList(instanceName, peers, running) {
+	if (!running)
+		return E('div', { 'class': 'awg-empty awg-empty-compact' }, [
+			E('strong', [ _('Interface is not running') ]),
+			E('span', [ _('Start the interface to see runtime peer information.') ])
+		]);
+
 	if (!peers.length)
 		return E('div', { 'class': 'awg-empty awg-empty-compact' }, [
-			E('strong', [ _('No peers connected') ]),
+			E('strong', [ _('No peers reported') ]),
 			E('span', [ _('Configured peers will appear here when the interface reports them.') ])
 		]);
 
@@ -248,7 +345,9 @@ function renderPeerList(instanceName, peers) {
 function renderInterface(instanceName, iface) {
 	var peers = Array.isArray(iface.peers) ? iface.peers : [],
 	    received = 0,
-	    transmitted = 0;
+	    transmitted = 0,
+	    running = iface.running === true,
+	    editUrl = L.url('admin/network/network', instanceName);
 
 	peers.forEach(function(peer) {
 		received += +peer.transfer_rx || 0;
@@ -260,44 +359,71 @@ function renderInterface(instanceName, iface) {
 			E('div', { 'class': 'awg-interface-title' }, [
 				E('img', { 'src': L.resource('icons', 'amneziawg.svg'), 'alt': '' }),
 				E('div', [
-					E('h3', [ instanceName ]),
-					E('span', { 'class': 'awg-status-pill awg-status-recent' }, [
+					E('h3', [
+						E('a', {
+							'href': editUrl,
+							'title': _('Edit interface') + ': ' + instanceName
+						}, [ instanceName ])
+					]),
+					E('span', {
+						'class': 'awg-status-pill ' + (running ? 'awg-status-recent' : 'awg-status-down')
+					}, [
 						E('span', { 'class': 'awg-status-dot', 'aria-hidden': 'true' }),
-						_('Interface is running')
+						running ? _('Interface is running') : _('Interface is not running')
 					])
 				])
 			]),
-			E('button', {
-				'class': 'btn cbi-button',
-				'type': 'button',
-				'click': function() { handleInterfaceDetails(iface); }
-			}, [ _('Interface details') ])
+			E('div', { 'class': 'awg-interface-actions' }, [
+				E('a', {
+					'class': 'btn cbi-button',
+					'href': editUrl
+				}, [ _('Edit interface') ]),
+				E('button', {
+					'class': 'btn cbi-button',
+					'type': 'button',
+					'click': function() { handleInterfaceDetails(iface); }
+				}, [ _('Interface details') ])
+			])
 		]),
 		E('div', { 'class': 'awg-interface-summary' }, [
 			E('div', [ E('span', [ _('Listen Port') ]), E('strong', [ String(iface.listen_port || '—') ]) ]),
-			E('div', [ E('span', [ _('Peers') ]), E('strong', [ String(peers.length) ]) ]),
-			E('div', [ E('span', [ _('Received Data') ]), E('strong', [ formatBytes(received) ]) ]),
-			E('div', [ E('span', [ _('Transmitted Data') ]), E('strong', [ formatBytes(transmitted) ]) ]),
+			E('div', [ E('span', [ _('Peers') ]), E('strong', [ running ? String(peers.length) : '—' ]) ]),
+			E('div', [ E('span', [ _('Received Data') ]), E('strong', [ running ? formatBytes(received) : '—' ]) ]),
+			E('div', [ E('span', [ _('Transmitted Data') ]), E('strong', [ running ? formatBytes(transmitted) : '—' ]) ]),
 			E('div', { 'class': 'awg-summary-key' }, [
 				E('span', [ _('Public Key') ]),
-				E('strong', { 'title': iface.public_key || '' }, [ shortenKey(iface.public_key) ]),
+				E('strong', { 'title': iface.public_key || '' }, [ shortenKey(iface.public_key) || '—' ]),
 				copyButton(iface.public_key, _('Copy'))
 			])
 		]),
-		renderPeerList(instanceName, peers)
+		renderPeerList(instanceName, peers, running)
 	]);
 }
 
 return view.extend({
 	renderIfaces: function(ifaces) {
 		var names = Object.keys(ifaces || {}),
+		    updatedAt = new Date(),
 		    content = [
 			E('div', { 'class': 'awg-page-heading' }, [
 				E('div', [
 					E('h2', [ _('AmneziaWG Status') ]),
-					E('p', [ _('Handshake and traffic information reported by running AmneziaWG interfaces.') ])
+					E('p', [ _('Configuration and runtime information for AmneziaWG interfaces.') ])
 				]),
-				E('span', { 'class': 'awg-interface-count' }, [ _('%d interface(s)').format(names.length) ])
+				E('div', { 'class': 'awg-page-meta' }, [
+					E('div', { 'class': 'awg-page-meta-actions' }, [
+						E('span', { 'class': 'awg-interface-count' }, [ _('%d interface(s)').format(names.length) ]),
+						E('button', {
+							'class': 'btn cbi-button',
+							'type': 'button',
+							'click': function() { return handleDiagnostics(ifaces); }
+						}, [ _('Diagnostics') ])
+					]),
+					E('span', {
+						'class': 'awg-last-updated',
+						'title': updatedAt.toLocaleString()
+					}, [ _('Updated: %s').format(updatedAt.toLocaleTimeString()) ])
+				])
 			])
 		];
 

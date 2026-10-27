@@ -15,6 +15,15 @@ function command(cmd) {
 	return trim(popen(cmd)?.read?.('all'));
 }
 
+function packageVersion(name) {
+	const apk_version = command(`apk info ${shellquote(name)} 2>/dev/null | sed -n 's/^${name}-\\(.*\\) description:$/\\1/p' | head -n 1`);
+
+	if (length(apk_version))
+		return apk_version;
+
+	return command(`opkg status ${shellquote(name)} 2>/dev/null | awk '/^Status: / { installed = ($0 ~ / installed$/) } /^Version: / { version = substr($0, 10) } END { if (installed && version != "") print version }'`);
+}
+
 function checkPeerHost(configHost, configPort, wgHost) {
 	const ips = popen(`resolveip ${shellquote(configHost)} 2>/dev/null`);
 	const hostIp = replace(wgHost, /\[|\]/g, "");
@@ -57,6 +66,25 @@ const methods = {
 		}
 	},
 
+	getDiagnostics: {
+		call: function() {
+			return {
+				openwrt: command("ubus -S call system board 2>/dev/null | jsonfilter -e '@.release.description' 2>/dev/null"),
+				model: command("ubus -S call system board 2>/dev/null | jsonfilter -e '@.model' 2>/dev/null"),
+				target: command("ubus -S call system board 2>/dev/null | jsonfilter -e '@.release.target' 2>/dev/null"),
+				kernel: command('uname -r 2>/dev/null'),
+				module_loaded: command("test -d /sys/module/amneziawg && echo yes || echo no"),
+				module_version: command("cat /sys/module/amneziawg/version 2>/dev/null || dmesg 2>/dev/null | sed -n 's/.*amneziawg: AmneziaWG \\([^[:space:]]*\\) loaded\\..*/\\1/p' | tail -n 1"),
+				awg_version: command('awg --version 2>/dev/null'),
+				packages: {
+					kmod: packageVersion('kmod-amneziawg'),
+					tools: packageVersion('amneziawg-tools'),
+					luci: packageVersion('luci-proto-amneziawg')
+				}
+			};
+		}
+	},
+
 	getAwgInstances: {
 		call: function() {
 			const data = {};
@@ -65,25 +93,41 @@ const methods = {
 
 			const uci = cursor();
 			const wg_dump = popen("awg show all dump 2>/dev/null");
+			uci.load("network");
+
+			uci.foreach("network", "interface", (s) => {
+				if (s.proto == "amneziawg") {
+					data[s[".name"]] = {
+						name: s[".name"],
+						running: false,
+						public_key: "",
+						listen_port: s.listen_port ?? "",
+						fwmark: s.fwmark ?? "off",
+						random_trailers: s.awg_random_trailers ?? "off",
+						disable_cookies: s.awg_disable_cookies ?? "off",
+						peers: []
+					};
+				}
+			});
 
 			if (wg_dump) {
-				uci.load("network");
-
 				for (let line = wg_dump.read('line'); length(line); line = wg_dump.read('line')) {
 					const record = split(rtrim(line, '\n'), '\t');
 
 					if (last_device != record[0]) {
 						last_device = record[0];
 						const has_awg31_fields = length(record) >= 30;
-						data[last_device] = {
-							name: last_device,
-							public_key: record[2],
-							listen_port: record[3],
-							fwmark: record[length(record) - 1],
-							random_trailers: has_awg31_fields ? record[27] : 'off',
-							disable_cookies: has_awg31_fields ? record[28] : 'off',
-							peers: []
-						};
+
+						if (!data[last_device])
+							data[last_device] = { name: last_device, peers: [] };
+
+						data[last_device].running = true;
+						data[last_device].public_key = record[2];
+						data[last_device].listen_port = record[3];
+						data[last_device].fwmark = record[length(record) - 1];
+						data[last_device].random_trailers = has_awg31_fields ? record[27] : 'off';
+						data[last_device].disable_cookies = has_awg31_fields ? record[28] : 'off';
+						data[last_device].peers = [];
 
 						if (!length(record[2]) || record[2] == '(none)')
 							qr_pubkey[last_device] = '';
@@ -114,7 +158,7 @@ const methods = {
 							persistent_keepalive: record[8]
 						};
 
-						if (record[3] != '(none)' && length(record[4]))
+						if (length(record[4]) && record[4] != '(none)')
 							push(peer.allowed_ips, ...split(record[4], ','));
 
 						push(data[last_device].peers, peer);
