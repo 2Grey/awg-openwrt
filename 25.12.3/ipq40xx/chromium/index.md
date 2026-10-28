@@ -54,5 +54,6 @@ apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 - [luci-proto-amneziawg-3.0.0-r1.apk](https://2grey.github.io/awg-openwrt/25.12.3/ipq40xx/chromium/luci-proto-amneziawg-3.0.0-r1.apk)
 - [luci-proto-amneziawg-3.1.0-r1.apk](https://2grey.github.io/awg-openwrt/25.12.3/ipq40xx/chromium/luci-proto-amneziawg-3.1.0-r1.apk)
 - [luci-proto-amneziawg-3.1.1-r1.apk](https://2grey.github.io/awg-openwrt/25.12.3/ipq40xx/chromium/luci-proto-amneziawg-3.1.1-r1.apk)
+- [luci-proto-amneziawg-3.1.1-r2.apk](https://2grey.github.io/awg-openwrt/25.12.3/ipq40xx/chromium/luci-proto-amneziawg-3.1.1-r2.apk)
 - [luci-proto-amneziawg_v25.12.3_arm_cortex-a7_neon-vfpv4_ipq40xx_chromium.apk](https://2grey.github.io/awg-openwrt/25.12.3/ipq40xx/chromium/luci-proto-amneziawg_v25.12.3_arm_cortex-a7_neon-vfpv4_ipq40xx_chromium.apk)
 - [packages.adb](https://2grey.github.io/awg-openwrt/25.12.3/ipq40xx/chromium/packages.adb)
