@@ -54,5 +54,6 @@ apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 - [luci-proto-amneziawg-3.0.0-r1.apk](https://2grey.github.io/awg-openwrt/25.12.2/malta/be64/luci-proto-amneziawg-3.0.0-r1.apk)
 - [luci-proto-amneziawg-3.1.0-r1.apk](https://2grey.github.io/awg-openwrt/25.12.2/malta/be64/luci-proto-amneziawg-3.1.0-r1.apk)
 - [luci-proto-amneziawg-3.1.1-r1.apk](https://2grey.github.io/awg-openwrt/25.12.2/malta/be64/luci-proto-amneziawg-3.1.1-r1.apk)
+- [luci-proto-amneziawg-3.1.1-r2.apk](https://2grey.github.io/awg-openwrt/25.12.2/malta/be64/luci-proto-amneziawg-3.1.1-r2.apk)
 - [luci-proto-amneziawg_v25.12.2_mips64_mips64r2_malta_be64.apk](https://2grey.github.io/awg-openwrt/25.12.2/malta/be64/luci-proto-amneziawg_v25.12.2_mips64_mips64r2_malta_be64.apk)
 - [packages.adb](https://2grey.github.io/awg-openwrt/25.12.2/malta/be64/packages.adb)
