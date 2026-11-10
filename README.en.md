@@ -35,6 +35,8 @@ When using `HeaderProtectionKey`, the `S1-S4` parameters must be at least 12.
 
 This repository also publishes a full-featured [OpenWrt package feed](https://2grey.github.io/awg-openwrt/) with signed IPK repositories for OpenWrt 24.x and signed APK repositories for OpenWrt 25.x and later.
 
+[How to upgrade OpenWrt 24.10 or 25.12 using our ASU server](docs/attended-sysupgrade.en.md)
+
 ## Installation
 
 ### Via the custom package feed
