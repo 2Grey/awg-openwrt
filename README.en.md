@@ -81,6 +81,38 @@ To run the script, connect to the router via SSH, enter the following command, a
 sh <(wget -O - https://raw.githubusercontent.com/2Grey/awg-openwrt/refs/heads/master/amneziawg-install.sh)
 ```
 
+If a GitHub Releases package download fails, the installer automatically tries
+`ghproxy.net`, `ghfast.top`, `gh-proxy.com`, and `gh-proxy.org`, in that order.
+For each package, all sources are tried with the current package manager's
+extension (`.apk` or `.ipk`) before trying the alternate extension.
+Each attempt has a 20-second response timeout.
+
+Set the optional `AWG_GITHUB_PROXY` environment variable to an HTTP(S) URL prefix
+to try your own mirror **before direct GitHub downloads**. If it fails, the
+installer continues through the other sources. The full GitHub URL is appended
+to the prefix, for example
+`https://ghfast.top/https://github.com/2Grey/awg-openwrt/releases/download/...`.
+This is a GitHub mirror service URL, rather than an HTTP CONNECT/SOCKS proxy.
+
+For an already downloaded script:
+
+```sh
+AWG_GITHUB_PROXY='https://ghfast.top/' sh amneziawg-install.sh
+```
+
+If the script itself cannot be downloaded directly, fetch it through a mirror
+and then run it with the variable:
+
+```sh
+wget -O /tmp/amneziawg-install.sh \
+  'https://ghfast.top/https://raw.githubusercontent.com/2Grey/awg-openwrt/refs/heads/master/amneziawg-install.sh' &&
+AWG_GITHUB_PROXY='https://ghfast.top/' sh /tmp/amneziawg-install.sh
+```
+
+The variable only affects this installer's GitHub Releases package downloads.
+Feed checks by `apk`/`opkg` use their configured URLs. Public mirrors are operated
+by third parties; availability depends on your network.
+
 > [!IMPORTANT]
 > On a clean installation, the script can load the kernel module and configure the interface without a reboot.
 > If an older kernel module remains loaded after an upgrade, reboot the router and run the script again.

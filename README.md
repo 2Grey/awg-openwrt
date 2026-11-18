@@ -83,6 +83,38 @@ AWG 3.0, если оба новых параметра отсутствуют и
 sh <(wget -O - https://raw.githubusercontent.com/2Grey/awg-openwrt/refs/heads/master/amneziawg-install.sh)
 ```
 
+При ошибке скачивания пакета из GitHub Releases установщик автоматически пробует
+`ghproxy.net`, `ghfast.top`, `gh-proxy.com` и `gh-proxy.org` в указанном порядке.
+Для каждого пакета сначала проверяются все источники с расширением текущего
+менеджера пакетов (`.apk` или `.ipk`), затем — с альтернативным расширением.
+Для каждой попытки задан таймаут ожидания ответа 20 секунд.
+
+Через ENV-переменную `AWG_GITHUB_PROXY` можно указать свой HTTP(S) URL-префикс.
+Он будет проверяться **перед прямым скачиванием с GitHub**; если загрузка не
+удастся, установщик продолжит перебор источников. Полная ссылка GitHub
+добавляется после префикса, например
+`https://ghfast.top/https://github.com/2Grey/awg-openwrt/releases/download/...`.
+Это адрес сервиса зеркалирования GitHub, а не HTTP CONNECT/SOCKS-прокси.
+
+Для уже скачанного скрипта:
+
+```sh
+AWG_GITHUB_PROXY='https://ghfast.top/' sh amneziawg-install.sh
+```
+
+Если сам скрипт тоже не скачивается напрямую, загрузите его через зеркало,
+затем запустите с переменной:
+
+```sh
+wget -O /tmp/amneziawg-install.sh \
+  'https://ghfast.top/https://raw.githubusercontent.com/2Grey/awg-openwrt/refs/heads/master/amneziawg-install.sh' &&
+AWG_GITHUB_PROXY='https://ghfast.top/' sh /tmp/amneziawg-install.sh
+```
+
+Переменная влияет только на загрузку пакетов из GitHub Releases этим
+установщиком. Проверка feeds через `apk`/`opkg` использует их настроенные адреса.
+Публичные зеркала управляются третьими лицами; их доступность зависит от сети.
+
 > [!IMPORTANT]
 > При чистой установке скрипт может загрузить модуль ядра и настроить интерфейс без перезагрузки.
 > Если после обновления в памяти остался старый модуль ядра, перезагрузите роутер и повторно запустите скрипт.

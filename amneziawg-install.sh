@@ -11,6 +11,8 @@ AWG_PROFILE="auto"
 CONFIG_FILE=""
 INTERFACE_NAME="awg1"
 AWG_FEED_ROOT="https://2grey.github.io/awg-openwrt"
+# URL prefix for GitHub release downloads, e.g. https://ghfast.top/.
+AWG_GITHUB_PROXY=${AWG_GITHUB_PROXY:-}
 
 APK_REPOSITORIES_FILE=${APK_REPOSITORIES_FILE:-/etc/apk/repositories}
 APK_REPOSITORIES_DIR=${APK_REPOSITORIES_DIR:-/etc/apk/repositories.d}
@@ -45,6 +47,10 @@ Usage: ${0##*/} [-h] [-e] [-n] [-s] [-a 2.0|3.0|3.1|auto] [-c FILE] [-i NAME]
     -a    connection profile: 2.0, 3.0, 3.1, or auto (default: auto)
     -c    import connection settings from an AmneziaWG .conf file
     -i    OpenWrt interface name (default: awg1)
+
+Environment:
+    AWG_GITHUB_PROXY    optional HTTP(S) GitHub download URL prefix; tried first
+                       before direct GitHub and built-in public mirrors
 
 An installed AWG 3.1 stack is backwards-compatible with 2.0 and 3.0
 connection profiles. In auto mode, FILE is inspected for version-specific
@@ -325,6 +331,44 @@ get_pkgarch() {
     uname -m
 }
 
+download_github_file() (
+    GITHUB_DOWNLOAD_URL=$1
+    GITHUB_DOWNLOAD_PATH=$2
+
+    case "$AWG_GITHUB_PROXY" in
+        '') ;;
+        http://?* | https://?*) ;;
+        *)
+            print_error "AWG_GITHUB_PROXY must be an HTTP(S) URL prefix (for example https://ghfast.top/)."
+            return 1
+            ;;
+    esac
+
+    # Keep each prefix quoted: a custom URL may contain shell metacharacters.
+    # An empty prefix means a direct request to GitHub.
+    for GITHUB_PROXY_PREFIX in "$AWG_GITHUB_PROXY" '' \
+        'https://ghproxy.net/' 'https://ghfast.top/' \
+        'https://gh-proxy.com/' 'https://gh-proxy.org/'; do
+        # With no custom proxy the first empty entry duplicates direct GitHub.
+        if [ -z "$GITHUB_PROXY_PREFIX" ]; then
+            [ "${GITHUB_DIRECT_TRIED:-0}" -eq 0 ] || continue
+            GITHUB_DIRECT_TRIED=1
+            printf 'Downloading from GitHub directly...\n' >&2
+            GITHUB_REQUEST_URL=$GITHUB_DOWNLOAD_URL
+        else
+            printf 'Downloading through a GitHub proxy...\n' >&2
+            GITHUB_REQUEST_URL="${GITHUB_PROXY_PREFIX%/}/$GITHUB_DOWNLOAD_URL"
+        fi
+
+        if wget -T 20 -t 1 -O "$GITHUB_DOWNLOAD_PATH" "$GITHUB_REQUEST_URL" >&2 &&
+            [ -s "$GITHUB_DOWNLOAD_PATH" ]; then
+            return 0
+        fi
+        rm -f "$GITHUB_DOWNLOAD_PATH"
+    done
+    return 1
+)
+
 download_package() {
     DOWNLOAD_PACKAGE_NAME=$1
     DOWNLOAD_POSTFIX=$2
@@ -332,8 +376,7 @@ download_package() {
     DOWNLOAD_BASE_URL=$4
 
     DOWNLOAD_FILE="${DOWNLOAD_PACKAGE_NAME}${DOWNLOAD_POSTFIX}.${PKG_EXT}"
-    if wget -O "$DOWNLOAD_DIR/$DOWNLOAD_FILE" "${DOWNLOAD_BASE_URL}${DOWNLOAD_FILE}" &&
-        [ -s "$DOWNLOAD_DIR/$DOWNLOAD_FILE" ]; then
+    if download_github_file "${DOWNLOAD_BASE_URL}${DOWNLOAD_FILE}" "$DOWNLOAD_DIR/$DOWNLOAD_FILE"; then
         printf '%s\n' "$DOWNLOAD_FILE"
         return 0
     fi
@@ -346,8 +389,7 @@ download_package() {
     esac
 
     DOWNLOAD_FILE="${DOWNLOAD_PACKAGE_NAME}${DOWNLOAD_POSTFIX}.${DOWNLOAD_FALLBACK_EXT}"
-    if wget -O "$DOWNLOAD_DIR/$DOWNLOAD_FILE" "${DOWNLOAD_BASE_URL}${DOWNLOAD_FILE}" &&
-        [ -s "$DOWNLOAD_DIR/$DOWNLOAD_FILE" ]; then
+    if download_github_file "${DOWNLOAD_BASE_URL}${DOWNLOAD_FILE}" "$DOWNLOAD_DIR/$DOWNLOAD_FILE"; then
         printf '%s\n' "$DOWNLOAD_FILE"
         return 0
     fi
