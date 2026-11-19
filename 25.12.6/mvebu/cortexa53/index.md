@@ -42,6 +42,7 @@ apk add amneziawg-tools kmod-amneziawg luci-proto-amneziawg
 - [feed.json](https://2grey.github.io/awg-openwrt/25.12.6/mvebu/cortexa53/feed.json)
 - [index.json](https://2grey.github.io/awg-openwrt/25.12.6/mvebu/cortexa53/index.json)
 - [kmod-amneziawg-6.12.112.3.1.20260906-r1.apk](https://2grey.github.io/awg-openwrt/25.12.6/mvebu/cortexa53/kmod-amneziawg-6.12.112.3.1.20260906-r1.apk)
+- [kmod-amneziawg-6.12.112.3.1.20261113.02-r1.apk](https://2grey.github.io/awg-openwrt/25.12.6/mvebu/cortexa53/kmod-amneziawg-6.12.112.3.1.20261113.02-r1.apk)
 - [luci-i18n-amneziawg-ru-0.apk](https://2grey.github.io/awg-openwrt/25.12.6/mvebu/cortexa53/luci-i18n-amneziawg-ru-0.apk)
 - [luci-proto-amneziawg-3.1.1-r1.apk](https://2grey.github.io/awg-openwrt/25.12.6/mvebu/cortexa53/luci-proto-amneziawg-3.1.1-r1.apk)
 - [luci-proto-amneziawg-3.1.1-r2.apk](https://2grey.github.io/awg-openwrt/25.12.6/mvebu/cortexa53/luci-proto-amneziawg-3.1.1-r2.apk)
