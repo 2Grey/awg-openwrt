@@ -15,7 +15,7 @@ English | [Russian](README.md)
 
 The `master` branch contains an aligned set of AWG 3.1 components:
 
-- `kmod-amneziawg` — `v3.1.20260906`;
+- `kmod-amneziawg` — `v3.1.20261113-02`;
 - `amneziawg-tools` — `v3.1.20260812`;
 - `luci-proto-amneziawg` — `v3.1.1` — Web interface and import/export of AWG 3.1 configurations.
 
