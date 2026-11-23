@@ -14,6 +14,11 @@ on:
         description: "Snapshot subtargets, comma-separated; empty means all"
         required: false
         type: string
+      force_rebuild:
+        description: "Rebuild and replace packages even if this Snapshot ABI is already published"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -96,10 +101,16 @@ jobs:
         env:
           RELEASE_TAG: ${{ matrix.build_env.releaseTag }}
           ARTIFACT_POSTFIX: ${{ matrix.build_env.artifactPostfix }}
+          FORCE_REBUILD: ${{ github.event_name == 'workflow_dispatch' && inputs.force_rebuild }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           result-encoding: string
           script: |
+            if (process.env.FORCE_REBUILD === 'true') {
+              core.info('Forced rebuild requested; existing Snapshot packages will be replaced.');
+              return false;
+            }
+
             const requiredPackages = [
               'amneziawg-tools',
               'kmod-amneziawg',
