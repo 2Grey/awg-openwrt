@@ -198,8 +198,89 @@ jobs:
           echo "Built packages:"
           ls -la awgrelease/
 
+      - name: Generate release checksums and kernel metadata
+        env:
+          BUILD_CONFIG: ${{ toJson(matrix.build_env) }}
+          ARTIFACT_POSTFIX: v${{ matrix.build_env.tag }}_${{ matrix.build_env.pkgarch }}_${{ matrix.build_env.target }}_${{ matrix.build_env.subtarget }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import email.parser
+          import hashlib
+          import json
+          import os
+          import re
+          import subprocess
+          import tarfile
+          from pathlib import Path
+
+          config = json.loads(os.environ["BUILD_CONFIG"])
+          postfix = os.environ["ARTIFACT_POSTFIX"]
+          sdk = next(Path(".").glob("openwrt-sdk-*/"))
+          directory = Path("awgrelease")
+          names = ["amneziawg-tools", "kmod-amneziawg",
+                   "luci-proto-amneziawg", "luci-i18n-amneziawg-ru"]
+          packages = sorted(directory.glob("*.?pk"))
+          formats = {path.suffix[1:] for path in packages}
+          if len(packages) != 4 or len(formats) != 1:
+              raise SystemExit("Expected exactly four packages in one format")
+          package_format = formats.pop()
+          if package_format not in {"ipk", "apk"}:
+              raise SystemExit("Unsupported package format")
+          if {path.name for path in packages} != {
+              f"{name}_{postfix}.{package_format}" for name in names
+          }:
+              raise SystemExit("Unexpected release package set")
+          kmod = directory / f"kmod-amneziawg_{postfix}.{package_format}"
+          if package_format == "ipk":
+              with tarfile.open(kmod, "r:gz") as archive:
+                  member = next(m for m in archive.getmembers()
+                                if m.name.removeprefix("./") == "control.tar.gz")
+                  with tarfile.open(fileobj=archive.extractfile(member), mode="r:gz") as control:
+                      member = next(m for m in control.getmembers()
+                                    if m.name.removeprefix("./") == "control")
+                      info = email.parser.Parser().parsestr(control.extractfile(member).read().decode())
+              if info["Package"] != "kmod-amneziawg":
+                  raise SystemExit("Unexpected kernel module package")
+              versions = re.findall(r"(?:^|,)\s*kernel\s*\(=\s*([^\s)]+)\s*\)", info.get("Depends", ""))
+          else:
+              output = subprocess.check_output([
+                  str(sdk.resolve() / "staging_dir/host/bin/apk"),
+                  "adbdump", "--format", "json", str(kmod),
+              ], text=True)
+              info = json.loads(output)["info"]
+              if info["name"] != "kmod-amneziawg":
+                  raise SystemExit("Unexpected kernel module package")
+              versions = [dep[len("kernel="):] for dep in info.get("depends", [])
+                          if dep.startswith("kernel=")]
+          if len(versions) != 1 or not versions[0] or any(c.isspace() for c in versions[0]):
+              raise SystemExit("Expected one exact kernel dependency in kmod-amneziawg")
+          kernel_version = re.match(r"\d+\.\d+(?:\.\d+)?(?:[-_]rc\d+)?", versions[0])
+          if not kernel_version:
+              raise SystemExit("Invalid kernel version")
+          metadata = {
+              "schema_version": 1,
+              "version": config.get("tag", "SNAPSHOT"),
+              "target": config["target"], "subtarget": config["subtarget"],
+              "pkgarch": config["pkgarch"], "format": package_format,
+              "kernel": {"version": kernel_version.group(), "package_version": versions[0]},
+          }
+          if "revision" in config:
+              metadata["revision"] = config["revision"]
+          metadata_path = directory / f"metadata_{postfix}.json"
+          metadata_path.write_text(json.dumps(metadata, indent=2) + "\n")
+          with (directory / f"sha256sums_{postfix}.txt").open("w") as sums:
+              for path in sorted([*packages, metadata_path]):
+                  sums.write(f"{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.name}\n")
+          PY
+          (cd awgrelease && sha256sum -c "sha256sums_${ARTIFACT_POSTFIX}.txt")
+
       - name: Release
         uses: softprops/action-gh-release@v3
         with:
-          files: awgrelease/*.?pk
+          files: |
+            awgrelease/*.?pk
+            awgrelease/metadata_*.json
+            awgrelease/sha256sums_*.txt
+          fail_on_unmatched_files: true
           tag_name: v${{ matrix.build_env.tag }}

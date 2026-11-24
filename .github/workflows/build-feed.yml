@@ -329,6 +329,63 @@ jobs:
           done < <(find "$GITHUB_WORKSPACE/feed-publish" -mindepth 3 -maxdepth 3 -type d -print0)
           test "$feed_count" -gt 0
 
+      - name: Generate feed checksums and kernel metadata
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import email.parser
+          import hashlib
+          import json
+          import os
+          import re
+          import subprocess
+          from pathlib import Path
+
+          root = Path(os.environ["GITHUB_WORKSPACE"]) / "feed-publish"
+          for metadata_path in sorted(root.glob("*/*/*/feed.json")):
+              directory = metadata_path.parent
+              metadata = json.loads(metadata_path.read_text())
+              package_format = metadata["format"]
+              if package_format == "apk":
+                  sdk = Path(os.environ.get("OPENWRT_SDK_DIR", "/builder"))
+                  output = subprocess.check_output([
+                      str(sdk / "staging_dir/host/bin/apk"),
+                      "adbdump", "--format", "json", str(directory / "packages.adb"),
+                  ], text=True)
+                  kmods = [info for info in json.loads(output)["packages"]
+                           if info["name"] == "kmod-amneziawg"]
+                  dependencies = kmods[0].get("depends", []) if len(kmods) == 1 else []
+                  versions = [dep[len("kernel="):] for dep in dependencies if dep.startswith("kernel=")]
+              elif package_format == "ipk":
+                  parser = email.parser.Parser()
+                  entries = [parser.parsestr(chunk) for chunk in
+                             (directory / "Packages").read_text().strip().split("\n\n")]
+                  kmods = [info for info in entries if info["Package"] == "kmod-amneziawg"]
+                  dependencies = kmods[0].get("Depends", "") if len(kmods) == 1 else ""
+                  versions = re.findall(r"(?:^|,)\s*kernel\s*\(=\s*([^\s)]+)\s*\)", dependencies)
+              else:
+                  raise SystemExit(f"Unsupported package format in {metadata_path}")
+              if len(versions) != 1 or not versions[0] or any(c.isspace() for c in versions[0]):
+                  raise SystemExit(f"Expected one exact kernel dependency in {directory}")
+              kernel_version = re.match(r"\d+\.\d+(?:\.\d+)?(?:[-_]rc\d+)?", versions[0])
+              if not kernel_version:
+                  raise SystemExit(f"Invalid kernel version in {directory}")
+              metadata.update({
+                  "schema_version": 1,
+                  "kernel": {"version": kernel_version.group(), "package_version": versions[0]},
+              })
+              metadata_path.write_text(json.dumps(metadata, indent=2) + "\n")
+              # Hash the final filenames and bytes, including metadata and signed indexes.
+              files = sorted(path for path in directory.iterdir()
+                             if path.is_file() and path.name != "sha256sums.txt")
+              with (directory / "sha256sums.txt").open("w") as sums:
+                  for path in files:
+                      sums.write(f"{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.name}\n")
+          PY
+          while IFS= read -r -d '' sums; do
+            (cd "$(dirname "$sums")" && sha256sum -c sha256sums.txt)
+          done < <(find "$GITHUB_WORKSPACE/feed-publish" -mindepth 4 -maxdepth 4 -name sha256sums.txt -type f -print0)
+
       - name: Upload APK feed artifact
         uses: actions/upload-artifact@v4
         with:
@@ -490,6 +547,63 @@ jobs:
             fi
           done < <(find "$GITHUB_WORKSPACE/feed-publish" -mindepth 3 -maxdepth 3 -type d -print0)
           test "$feed_count" -gt 0
+
+      - name: Generate feed checksums and kernel metadata
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import email.parser
+          import hashlib
+          import json
+          import os
+          import re
+          import subprocess
+          from pathlib import Path
+
+          root = Path(os.environ["GITHUB_WORKSPACE"]) / "feed-publish"
+          for metadata_path in sorted(root.glob("*/*/*/feed.json")):
+              directory = metadata_path.parent
+              metadata = json.loads(metadata_path.read_text())
+              package_format = metadata["format"]
+              if package_format == "apk":
+                  sdk = Path(os.environ.get("OPENWRT_SDK_DIR", "/builder"))
+                  output = subprocess.check_output([
+                      str(sdk / "staging_dir/host/bin/apk"),
+                      "adbdump", "--format", "json", str(directory / "packages.adb"),
+                  ], text=True)
+                  kmods = [info for info in json.loads(output)["packages"]
+                           if info["name"] == "kmod-amneziawg"]
+                  dependencies = kmods[0].get("depends", []) if len(kmods) == 1 else []
+                  versions = [dep[len("kernel="):] for dep in dependencies if dep.startswith("kernel=")]
+              elif package_format == "ipk":
+                  parser = email.parser.Parser()
+                  entries = [parser.parsestr(chunk) for chunk in
+                             (directory / "Packages").read_text().strip().split("\n\n")]
+                  kmods = [info for info in entries if info["Package"] == "kmod-amneziawg"]
+                  dependencies = kmods[0].get("Depends", "") if len(kmods) == 1 else ""
+                  versions = re.findall(r"(?:^|,)\s*kernel\s*\(=\s*([^\s)]+)\s*\)", dependencies)
+              else:
+                  raise SystemExit(f"Unsupported package format in {metadata_path}")
+              if len(versions) != 1 or not versions[0] or any(c.isspace() for c in versions[0]):
+                  raise SystemExit(f"Expected one exact kernel dependency in {directory}")
+              kernel_version = re.match(r"\d+\.\d+(?:\.\d+)?(?:[-_]rc\d+)?", versions[0])
+              if not kernel_version:
+                  raise SystemExit(f"Invalid kernel version in {directory}")
+              metadata.update({
+                  "schema_version": 1,
+                  "kernel": {"version": kernel_version.group(), "package_version": versions[0]},
+              })
+              metadata_path.write_text(json.dumps(metadata, indent=2) + "\n")
+              # Hash the final filenames and bytes, including metadata and signed indexes.
+              files = sorted(path for path in directory.iterdir()
+                             if path.is_file() and path.name != "sha256sums.txt")
+              with (directory / "sha256sums.txt").open("w") as sums:
+                  for path in files:
+                      sums.write(f"{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.name}\n")
+          PY
+          while IFS= read -r -d '' sums; do
+            (cd "$(dirname "$sums")" && sha256sum -c sha256sums.txt)
+          done < <(find "$GITHUB_WORKSPACE/feed-publish" -mindepth 4 -maxdepth 4 -name sha256sums.txt -type f -print0)
 
       - name: Upload IPK feed artifact
         uses: actions/upload-artifact@v4
